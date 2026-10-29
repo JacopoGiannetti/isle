@@ -40,6 +40,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     private var cravingRing: SKShapeNode?
 
     private var tileNodes: [TileKey: SKSpriteNode] = [:]
+    private let sway = Sway()
     private var elementNodes: [String: ElementNode] = [:]
     private var animalNodes: [String: AnimalNode] = [:]
     /// Lucciole di sola atmosfera: ci sono ogni notte, anche su un'isola giovane,
@@ -290,7 +291,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
                 n.refresh()
                 continue
             }
-            let n = ElementNode(el)
+            let n = ElementNode(el, sway: sway)
             castChanged = true
             addChild(n)
             if let l = n.light { addChild(l) }
@@ -377,7 +378,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         let s = Textures.sprite(key, make)
         s.position = Iso.point(Double(k.x), Double(k.y))
         s.zPosition = 10 + Iso.depth(Double(k.x), Double(k.y)) * 0.02
-        Textures.applySway(s, amp: 0, phase: 0, base: 0)
+        Textures.applySway(s, sway, amp: 0, phase: 0, base: 0)
         addChild(s)
         tileNodes[k] = s
         return s
@@ -555,8 +556,8 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         let stormChanged = s != storm
         storm = s
         wither = w
-        Textures.wither.floatValue = Float(w)
-        Textures.wind.floatValue = Float([1, 1.1, 1.3, 1.7, 2.1, 2.4][s])
+        sway.wither.floatValue = Float(w)
+        sway.wind.floatValue = Float([1, 1.1, 1.3, 1.7, 2.1, 2.4][s])
         applyFog()
         // Con la nebbia e la pioggia, gli animali si nascondono.
         let hideShare = max(w * 0.75, s >= 2 ? 0.6 : 0)

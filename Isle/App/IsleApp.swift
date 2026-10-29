@@ -189,6 +189,15 @@ struct RootView: View {
         .onAppear {
             if Launch.open == "world", let h = store.habits.first { openWorld = h.id }
             if Launch.open == "new" { creating = true }
+            #if DEBUG
+            // Apre e richiude l'isola dalla Home, per provare il ritorno alla miniatura.
+            if let n = Launch.once("cycleWorld").flatMap(Int.init), let h = store.habits.first {
+                for i in 0..<n {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3 + Double(i) * 7) { openWorld = h.id }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 7 + Double(i) * 7) { openWorld = nil }
+                }
+            }
+            #endif
         }
     }
 }

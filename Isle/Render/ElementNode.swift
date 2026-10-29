@@ -37,18 +37,18 @@ final class ElementNode: SKNode {
         return sprite.size.height * 0.62 * growth
     }
 
-    init(_ el: Element) {
+    init(_ el: Element, sway: Sway) {
         self.el = el
         super.init()
         let p = Iso.point(el.x, el.y)
         position = p
         zPosition = isFlat ? 200 + Iso.depth(el.x, el.y) * 0.1 : 300 + Iso.depth(el.x, el.y) * 2
-        build()
+        build(sway)
     }
 
     required init?(coder: NSCoder) { fatalError() }
 
-    private func build() {
+    private func build(_ sway: Sway) {
         var r = RNG(el.id)
         if !isFlat, el.big {
             let sh = SKSpriteNode(texture: Textures.shadow.texture, size: Textures.shadow.size)
@@ -71,10 +71,10 @@ final class ElementNode: SKNode {
                 amp = kind == .tree ? 0.012 : (kind == .flower ? 0.03 : 0)
             case .crater: amp = 0
             }
-            Textures.applySway(sprite, amp: amp, speed: Float(r.range(1.1, 1.7)), phase: Float(r.range(0, 6.28)),
+            Textures.applySway(sprite, sway, amp: amp, speed: Float(r.range(1.1, 1.7)), phase: Float(r.range(0, 6.28)),
                                base: Float(sprite.anchorPoint.y))
         } else {
-            Textures.applySway(sprite, amp: 0, phase: 0, base: 0)
+            Textures.applySway(sprite, sway, amp: 0, phase: 0, base: 0)
         }
         // Piccola variazione: nessun albero è identico all'altro.
         if case .flora = el.kind { sprite.xScale = r.chance(0.5) ? -1 : 1 }

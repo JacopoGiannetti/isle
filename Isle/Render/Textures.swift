@@ -134,13 +134,7 @@ enum Textures {
     static var glow: Tex { tex("glow") { Art.glow() } }
     static var sparkle: Tex { tex("sparkle") { Art.sparkle() } }
 
-    /// Oscillazione al vento, appassimento e alone rosso, tutto in un unico shader.
-    static let wither = SKUniform(name: "u_wither", float: 0)
-    /// Forza del vento: 1 è la brezza normale, con la tempesta tutto si piega.
-    static let wind = SKUniform(name: "u_wind", float: 1)
-
-    static let sway: SKShader = {
-        let src = """
+    fileprivate static let swaySource = """
         void main() {
             vec2 uv = (v_tex_coord - a_rect.xy) / a_rect.zw;
             float h = clamp((uv.y - a_base) / max(0.001, 1.0 - a_base), 0.0, 1.0);
@@ -157,8 +151,32 @@ enum Textures {
             gl_FragColor = c * v_color_mix.a;
         }
         """
-        let sh = SKShader(source: src, uniforms: [wither, wind])
-        sh.attributes = [
+
+    static func applySway(_ s: SKSpriteNode, _ sway: Sway, amp: Float, speed: Float = 1.4, phase: Float, base: Float) {
+        s.shader = sway.shader
+        s.setValue(SKAttributeValue(float: base), forAttribute: "a_base")
+        s.setValue(SKAttributeValue(float: amp), forAttribute: "a_amp")
+        s.setValue(SKAttributeValue(float: speed), forAttribute: "a_speed")
+        s.setValue(SKAttributeValue(float: phase), forAttribute: "a_phase")
+        s.setValue(SKAttributeValue(float: 0), forAttribute: "a_hl")
+        s.setValue(SKAttributeValue(float: 0), forAttribute: "a_dry")
+        setRect(s)
+    }
+}
+
+/// Oscillazione al vento, appassimento e alone rosso, tutto in un unico shader.
+/// Ogni scena ha il suo: quando la Home e l'isola si disegnano insieme, nel mezzo secondo
+/// in cui l'isola si apre o si chiude, uno shader condiviso scambiava gli attributi degli sprite.
+@MainActor
+final class Sway {
+    let shader: SKShader
+    let wither = SKUniform(name: "u_wither", float: 0)
+    /// Forza del vento: 1 è la brezza normale, con la tempesta tutto si piega.
+    let wind = SKUniform(name: "u_wind", float: 1)
+
+    init() {
+        shader = SKShader(source: Textures.swaySource, uniforms: [wither, wind])
+        shader.attributes = [
             SKAttribute(name: "a_base", type: .float),
             SKAttribute(name: "a_amp", type: .float),
             SKAttribute(name: "a_speed", type: .float),
@@ -167,17 +185,5 @@ enum Textures {
             SKAttribute(name: "a_dry", type: .float),
             SKAttribute(name: "a_rect", type: .vectorFloat4),
         ]
-        return sh
-    }()
-
-    static func applySway(_ s: SKSpriteNode, amp: Float, speed: Float = 1.4, phase: Float, base: Float) {
-        s.shader = sway
-        s.setValue(SKAttributeValue(float: base), forAttribute: "a_base")
-        s.setValue(SKAttributeValue(float: amp), forAttribute: "a_amp")
-        s.setValue(SKAttributeValue(float: speed), forAttribute: "a_speed")
-        s.setValue(SKAttributeValue(float: phase), forAttribute: "a_phase")
-        s.setValue(SKAttributeValue(float: 0), forAttribute: "a_hl")
-        s.setValue(SKAttributeValue(float: 0), forAttribute: "a_dry")
-        setRect(s)
     }
 }
