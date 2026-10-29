@@ -1,0 +1,57 @@
+name: Isle
+options:
+  bundleIdPrefix: com.jacopogiannetti
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: it
+  knownRegions: [it, en, es, fr, de]
+  createIntermediateGroups: true
+  xcodeVersion: "26.6"
+
+schemes:
+  Isle:
+    build:
+      targets:
+        Isle: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    MARKETING_VERSION: 0.1
+    CURRENT_PROJECT_VERSION: 1
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: 7ZST47J92X
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+    STRING_CATALOG_GENERATE_SYMBOLS: NO
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+
+targets:
+  Isle:
+    type: application
+    platform: iOS
+    sources:
+      - path: Isle
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacopogiannetti.isle
+        INFOPLIST_KEY_UIUserInterfaceStyle: Light
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    info:
+      path: Isle/Supporting/Info.plist
+      properties:
+        CFBundleDisplayName: Isle
+        CFBundleLocalizations: [it, en, es, fr, de]
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UIUserInterfaceStyle: Light
+        ITSAppUsesNonExemptEncryption: false
