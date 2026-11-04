@@ -24,11 +24,18 @@ final class Premium: SuperwallDelegate {
         if newValue.isActive { Task { await Analytics.reportPurchases() } }
     }
 
-    /// Attributi per le audience della dashboard: niente testi dell'utente, solo numeri.
+    /// Attributi per le audience e i testi del paywall: niente testi dell'utente, solo numeri
+    /// e le scelte fisse delle domande di benvenuto. Il nome resta sull'iPhone.
     static func describe(_ store: Store) {
         let habits = store.habits
         let first = habits.map(\.created).min()
+        let profile = Profile.saved
         Superwall.shared.setUserAttributes([
+            "source": profile.source ?? "",
+            "goals": profile.goals.joined(separator: ","),
+            "goal": profile.goals.first ?? "",
+            "tried": profile.tried ?? "",
+            "obstacles": profile.obstacles.joined(separator: ","),
             "islands": habits.count,
             "quit_islands": habits.filter { $0.kind == .quit }.count,
             "build_islands": habits.filter { $0.kind == .build }.count,

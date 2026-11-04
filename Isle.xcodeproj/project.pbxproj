@@ -25,6 +25,7 @@
 		7C1A0D5E2B9F4E61A3C8D211 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D212 /* Analytics.swift */; };
 		7C1A0D5E2B9F4E61A3C8D213 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D214 /* Secrets.swift */; };
 		7C1A0D5E2B9F4E61A3C8D215 /* TrustView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D216 /* TrustView.swift */; };
+		7C1A0D5E2B9F4E61A3C8D21C /* WelcomeQuiz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D21D /* WelcomeQuiz.swift */; };
 		7C1A0D5E2B9F4E61A3C8D217 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D218 /* InfoPlist.xcstrings */; };
 		7C1A0D5E2B9F4E61A3C8D219 /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 7C1A0D5E2B9F4E61A3C8D21A /* AppsFlyerLib */; };
 		7C1A0D5E2B9F4E61A3C8D201 /* Cloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D202 /* Cloud.swift */; };
@@ -124,6 +125,7 @@
 		7C1A0D5E2B9F4E61A3C8D212 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		7C1A0D5E2B9F4E61A3C8D214 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		7C1A0D5E2B9F4E61A3C8D216 /* TrustView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrustView.swift; sourceTree = "<group>"; };
+		7C1A0D5E2B9F4E61A3C8D21D /* WelcomeQuiz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeQuiz.swift; sourceTree = "<group>"; };
 		7C1A0D5E2B9F4E61A3C8D218 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		7C1A0D5E2B9F4E61A3C8D202 /* Cloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cloud.swift; sourceTree = "<group>"; };
 		7C1A0D5E2B9F4E61A3C8D203 /* Isle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Isle.entitlements; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 				F608C46F75DBC8D6B0DAA053 /* Theme.swift */,
 				F52769D2981D4EDB33D36D20 /* Tutorial.swift */,
 				7C1A0D5E2B9F4E61A3C8D216 /* TrustView.swift */,
+				7C1A0D5E2B9F4E61A3C8D21D /* WelcomeQuiz.swift */,
 				FC692A2C3631E00F84E1DDC8 /* WorldController.swift */,
 				A13E66A3DFC91F3CF3006280 /* WorldPicker.swift */,
 				0F83D35536D198B3F9839EB3 /* WorldView.swift */,
@@ -428,6 +431,7 @@
 				7C1A0D5E2B9F4E61A3C8D211 /* Analytics.swift in Sources */,
 				7C1A0D5E2B9F4E61A3C8D213 /* Secrets.swift in Sources */,
 				7C1A0D5E2B9F4E61A3C8D215 /* TrustView.swift in Sources */,
+				7C1A0D5E2B9F4E61A3C8D21C /* WelcomeQuiz.swift in Sources */,
 				ACD8BCE18DCC1DD7B7F635DA /* Savanna.swift in Sources */,
 				E604CC4C25B3C14ED1ADD3FF /* SeedPicker.swift in Sources */,
 				24ABB84CB006E024AB61957F /* SettingsView.swift in Sources */,

@@ -236,14 +236,19 @@ struct RootView: View {
     /// L'introduzione è partita senza isole: se finisce con delle isole, sono arrivate da iCloud.
     /// Rivista dalle Impostazioni, invece, le isole c'erano già e non apre il paywall.
     @State private var introFromScratch = false
+    /// Le domande di benvenuto, solo per chi comincia da zero.
+    @State private var quizzing = false
 
     var body: some View {
         ZStack {
             if store.restoring {
                 Color("LaunchBackground").ignoresSafeArea()
             } else if !store.seenIntro {
-                if trusting {
-                    TrustView(onDone: finishIntro)
+                if quizzing {
+                    WelcomeQuiz(onDone: finishIntro)
+                        .transition(.opacity)
+                } else if trusting {
+                    TrustView(onDone: afterTrust)
                         .transition(.opacity)
                 } else {
                     IntroView(onStart: leaveIntro)
@@ -279,6 +284,9 @@ struct RootView: View {
             }
             #if DEBUG
             if Launch.open == "art" { PaywallArt().zIndex(2) }
+            // `-open quiz` mostra le domande di benvenuto sopra tutto, senza toccare le isole
+            // (con `-quizStep pact` da una pagina precisa).
+            if Launch.open == "quiz" { WelcomeQuiz(onDone: {}).zIndex(2) }
             #endif
         }
         .fullScreenCover(item: Binding(get: { openWorld.map(IDBox.init) }, set: { openWorld = $0?.id })) { box in
@@ -327,14 +335,24 @@ struct RootView: View {
         #if DEBUG
         if UserDefaults.standard.integer(forKey: "trust") > 0 { showTrust = true }
         #endif
-        guard showTrust else { return finishIntro() }
+        guard showTrust else { return afterTrust() }
         withAnimation(.easeInOut(duration: 0.6)) { trusting = true }
+    }
+
+    /// Chi ha ritrovato le isole su iCloud, o rivede l'introduzione, salta le domande.
+    private func afterTrust() {
+        guard introFromScratch && store.habits.isEmpty else { return finishIntro() }
+        withAnimation(.easeInOut(duration: 0.6)) {
+            trusting = false
+            quizzing = true
+        }
     }
 
     /// Chi ha ritrovato le sue isole su iCloud le apre già oltre il primo animale: lì vale il paywall.
     private func finishIntro() {
         withAnimation(.easeInOut(duration: 0.6)) {
             trusting = false
+            quizzing = false
             store.seenIntro = true
             creating = store.habits.isEmpty
         }

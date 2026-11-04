@@ -125,6 +125,7 @@ final class Store {
         Clock.offset = 0
         Clock.hourOverride = nil
         seenIntro = false
+        Profile.reset()
         Notifier.reschedule(self)
         Superwall.shared.reset()
     }

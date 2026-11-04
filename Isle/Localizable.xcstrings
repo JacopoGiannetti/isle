@@ -1437,6 +1437,41 @@
         }
       }
     },
+    "2 semi in regalo per cominciare" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 geschenkte Samen für den Anfang"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 free seeds to get started"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 semillas de regalo para empezar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 graines offertes pour commencer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 semi in regalo per cominciare"
+          }
+        }
+      }
+    },
     "?" : {
 
     },
@@ -3890,6 +3925,41 @@
         }
       }
     },
+    "Altro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonstiges"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altro"
+          }
+        }
+      }
+    },
     "Alza il collo fuori dalla palude per guardarsi intorno. Poi sparisce senza un'onda." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4621,6 +4691,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Animali"
+          }
+        }
+      }
+    },
+    "Animali e mondi da scoprire" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiere und Welten zum Entdecken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animals and worlds to discover"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animales y mundos por descubrir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des animaux et des mondes à découvrir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animali e mondi da scoprire"
           }
         }
       }
@@ -6231,6 +6336,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Attiva"
+          }
+        }
+      }
+    },
+    "Attiva i promemoria" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on reminders"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar recordatorios"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer les rappels"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attiva i promemoria"
           }
         }
       }
@@ -10015,6 +10155,41 @@
         }
       }
     },
+    "Cambi l'ora o la spegni quando vuoi." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändere die Uhrzeit oder schalte sie ab, wann du willst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the time or turn it off whenever you like."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia la hora o desactívala cuando quieras."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change l'heure ou désactive-la quand tu veux."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambi l'ora o la spegni quando vuoi."
+          }
+        }
+      }
+    },
     "Cambia colore quando cambia umore." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11625,6 +11800,41 @@
         }
       }
     },
+    "Cercando sull'App Store" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über die App-Store-Suche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searching the App Store"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando en la App Store"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En cherchant sur l'App Store"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cercando sull'App Store"
+          }
+        }
+      }
+    },
     "Cerchio delle fate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12391,6 +12601,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chiudi isola"
+          }
+        }
+      }
+    },
+    "Ci aiuta a capire dove raccontarla." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So wissen wir, wo wir davon erzählen sollen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It helps us know where to tell people about it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nos ayuda a saber dónde darla a conocer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ça nous aide à savoir où en parler."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ci aiuta a capire dove raccontarla."
+          }
+        }
+      }
+    },
+    "Ci hai già provato?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hast du es schon mal versucht?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Have you tried before?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ya lo has intentado?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu as déjà essayé ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ci hai già provato?"
           }
         }
       }
@@ -13655,6 +13935,41 @@
         }
       }
     },
+    "Com'è andata oggi?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie war dein Tag?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How did today go?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué tal ha ido hoy?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment ça s'est passé aujourd'hui ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com'è andata oggi?"
+          }
+        }
+      }
+    },
     "Come funzionerà per te" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13686,6 +14001,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Come funzionerà per te"
+          }
+        }
+      }
+    },
+    "Come hai conosciuto Isle?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie hast du von Isle erfahren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How did you hear about Isle?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo conociste Isle?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment as-tu connu Isle ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Come hai conosciuto Isle?"
+          }
+        }
+      }
+    },
+    "Come ti chiami?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie heißt du?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's your name?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo te llamas?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment tu t'appelles ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Come ti chiami?"
           }
         }
       }
@@ -14001,6 +14386,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Con %@"
+          }
+        }
+      }
+    },
+    "Con 2 timbri regalati" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit 2 geschenkten Stempeln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With 2 free stamps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con 2 sellos regalados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec 2 tampons offerts"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con 2 timbri regalati"
           }
         }
       }
@@ -15055,6 +15475,41 @@
         }
       }
     },
+    "Cosa ti ha fatto mollare?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was hat dich aufgeben lassen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What made you give up?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué te hizo abandonar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qu'est-ce qui t'a fait lâcher ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa ti ha fatto mollare?"
+          }
+        }
+      }
+    },
     "Cosa vuoi cambiare?" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15121,6 +15576,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cosa vuoi iniziare a fare?"
+          }
+        }
+      }
+    },
+    "Cosa vuoi ottenere, %@?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du erreichen, %@?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do you want to gain, %@?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres conseguir, %@?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qu'est-ce que tu veux y gagner, %@ ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi ottenere, %@?"
+          }
+        }
+      }
+    },
+    "Cosa vuoi ottenere?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du erreichen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do you want to gain?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres conseguir?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qu'est-ce que tu veux y gagner ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi ottenere?"
           }
         }
       }
@@ -15296,6 +15821,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Così alta che solo le giraffe arrivano alle foglie."
+          }
+        }
+      }
+    },
+    "Così la tua isola saprà di chi è." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit deine Insel weiß, wem sie gehört."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So your island knows who it belongs to."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Así tu isla sabrá de quién es."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme ça, ton île saura à qui elle appartient."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Così la tua isola saprà di chi è."
           }
         }
       }
@@ -16490,6 +17050,41 @@
         }
       }
     },
+    "Decidere quando ti aiuta a farlo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Festzulegen wann, hilft dir dabei"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deciding when helps you do it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decidir cuándo te ayuda a hacerlo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décider quand t'aide à le faire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decidere quando ti aiuta a farlo"
+          }
+        }
+      }
+    },
     "Decorazioni" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17610,6 +18205,41 @@
         }
       }
     },
+    "Dopo qualche giorno la motivazione spariva" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach ein paar Tagen war die Motivation weg"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After a few days, my motivation faded"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A los pocos días la motivación desaparecía"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au bout de quelques jours, la motivation disparaissait"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dopo qualche giorno la motivazione spariva"
+          }
+        }
+      }
+    },
     "Dopo un giorno senza risposta arriva la tempesta: nuvole, pioggia, poi vento. Col vento alcuni animali se ne vanno e il Sentiero si ferma." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -18131,6 +18761,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dorme sulla rupe quasi tutto il giorno. Al tramonto ruggisce, e lo si sente da tutta l'isola."
+          }
+        }
+      }
+    },
+    "Dormire meglio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Besser schlafen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep better"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dormir mejor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mieux dormir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dormire meglio"
           }
         }
       }
@@ -19881,6 +20546,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Espira"
+          }
+        }
+      }
+    },
+    "Essere fiero di me" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stolz auf mich sein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Be proud of myself"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estar orgulloso de mí"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Être fier de moi"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essere fiero di me"
           }
         }
       }
@@ -29230,6 +29930,41 @@
         }
       }
     },
+    "I giorni di fila ripartono, ma l'isola e i suoi animali restano lì." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Serie beginnt neu, aber die Insel und ihre Tiere bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your streak starts over, but the island and its animals stay."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La racha vuelve a empezar, pero la isla y sus animales se quedan."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La série repart de zéro, mais l'île et ses animaux restent là."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I giorni di fila ripartono, ma l'isola e i suoi animali restano lì."
+          }
+        }
+      }
+    },
     "I pesci saltano fuori a salutare." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -29331,6 +30066,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I rami si piegano sotto le ghiande."
+          }
+        }
+      }
+    },
+    "I tuoi primi 2 semi sono un regalo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine ersten 2 Samen sind ein Geschenk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your first 2 seeds are a gift"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus 2 primeras semillas son un regalo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tes 2 premières graines sont un cadeau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi primi 2 semi sono un regalo"
           }
         }
       }
@@ -30455,6 +31225,41 @@
         }
       }
     },
+    "Il gioco tiene vivo l'impegno" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spielen hält dich dran"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play keeps commitment alive"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El juego mantiene vivo el compromiso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le jeu entretient l'engagement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il gioco tiene vivo l'impegno"
+          }
+        }
+      }
+    },
     "Il lunedì l'isola è nuvolosa e ti diciamo com'è andata. Torna il sole appena lo rifai. Nessun danno." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -31260,6 +32065,76 @@
         }
       }
     },
+    "Il tuo nome" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton prénom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo nome"
+          }
+        }
+      }
+    },
+    "Il tuo patto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Versprechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your pact"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu pacto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton pacte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo patto"
+          }
+        }
+      }
+    },
     "Il vapore sale e disegna nuvole." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -31536,6 +32411,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "In tutto"
+          }
+        }
+      }
+    },
+    "In uno studio su 602 adulti, chi aveva punti e livelli ha camminato fino a 920 passi al giorno in più di chi non li aveva, per sei mesi." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In einer Studie mit 602 Erwachsenen gingen Menschen mit Punkten und Levels bis zu 920 Schritte pro Tag mehr als die ohne, sechs Monate lang."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In a study of 602 adults, those with points and levels walked up to 920 more steps a day than those without, for six months."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En un estudio con 602 adultos, quienes tenían puntos y niveles caminaron hasta 920 pasos más al día que quienes no los tenían, durante seis meses."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans une étude sur 602 adultes, ceux qui avaient des points et des niveaux ont marché jusqu'à 920 pas de plus par jour que les autres, pendant six mois."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In uno studio su 602 adulti, chi aveva punti e livelli ha camminato fino a 920 passi al giorno in più di chi non li aveva, per sei mesi."
+          }
+        }
+      }
+    },
+    "In uno studio, chi riceveva una tessera fedeltà con 2 timbri già regalati arrivava in fondo quasi il doppio delle volte." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In einer Studie füllten Menschen, deren Treuekarte schon 2 geschenkte Stempel hatte, sie fast doppelt so oft voll."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In one study, people given a loyalty card with 2 free stamps already on it finished it almost twice as often."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En un estudio, quienes recibían una tarjeta de fidelidad con 2 sellos ya regalados la completaban casi el doble de veces."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans une étude, les personnes qui recevaient une carte de fidélité avec 2 tampons déjà offerts allaient au bout presque deux fois plus souvent."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In uno studio, chi riceveva una tessera fedeltà con 2 timbri già regalati arrivava in fondo quasi il doppio delle volte."
           }
         }
       }
@@ -31925,6 +32870,41 @@
         }
       }
     },
+    "Io, %@, mi impegno a far crescere la mia isola, un giorno alla volta. Anche nei giorni difficili." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich, %@, verspreche, meine Insel wachsen zu lassen, Tag für Tag. Auch an schweren Tagen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I, %@, promise to grow my island, one day at a time. Even on the hard days."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yo, %@, me comprometo a hacer crecer mi isla, un día a la vez. También en los días difíciles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moi, %@, je m'engage à faire grandir mon île, un jour à la fois. Même les jours difficiles."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Io, %@, mi impegno a far crescere la mia isola, un giorno alla volta. Anche nei giorni difficili."
+          }
+        }
+      }
+    },
     "Ippopotami" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32309,6 +33289,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Isle vive degli abbonamenti, non dei tuoi dati. Non li vendiamo a nessuno."
+          }
+        }
+      }
+    },
+    "Isle è fatta apposta per quello che ti ha fermato." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle ist genau für das gemacht, was dich gebremst hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle is built for exactly what stopped you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle está hecha justo para lo que te frenó."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle est pensée exactement pour ce qui t'a arrêté."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle è fatta apposta per quello che ti ha fermato."
+          }
+        }
+      }
+    },
+    "Isle è fatta per le cose che di solito fanno mollare." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle ist für genau das gemacht, woran man sonst scheitert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle is built for the things that usually make people give up."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle está hecha para lo que suele hacer abandonar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle est pensée pour ce qui fait d'habitude lâcher."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle è fatta per le cose che di solito fanno mollare."
           }
         }
       }
@@ -32764,6 +33814,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "L'ho fatto un'altra volta"
+          }
+        }
+      }
+    },
+    "L'isola cresce e arriva sempre qualcuno di nuovo: domani c'è di nuovo qualcosa da vedere." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Insel wächst und immer kommt jemand Neues: Morgen gibt es wieder etwas zu sehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your island grows and someone new keeps arriving: tomorrow there's always something to see."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La isla crece y siempre llega alguien nuevo: mañana habrá otra vez algo que ver."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'île grandit et quelqu'un de nouveau arrive toujours : demain, il y aura encore quelque chose à voir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'isola cresce e arriva sempre qualcuno di nuovo: domani c'è di nuovo qualcosa da vedere."
           }
         }
       }
@@ -34483,6 +35568,41 @@
         }
       }
     },
+    "Le app che ho provato erano noiose" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Apps, die ich probiert habe, waren langweilig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The apps I tried were boring"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las apps que probé eran aburridas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les apps que j'ai essayées étaient ennuyeuses"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le app che ho provato erano noiose"
+          }
+        }
+      }
+    },
     "Le corna le ricrescono ogni anno, più grandi." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -35809,6 +36929,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lepri lunari"
+          }
+        }
+      }
+    },
+    "Li pianti subito. Col secondo arriva il primo animale." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du pflanzt sie sofort. Mit dem zweiten kommt das erste Tier."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You plant them right away. With the second one, your first animal arrives."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las plantas enseguida. Con la segunda llega el primer animal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu les plantes tout de suite. Avec la deuxième arrive le premier animal."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Li pianti subito. Col secondo arriva il primo animale."
           }
         }
       }
@@ -38228,6 +39383,41 @@
         }
       }
     },
+    "Me ne dimenticavo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich habe es vergessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I kept forgetting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me olvidaba"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J'oubliais"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me ne dimenticavo"
+          }
+        }
+      }
+    },
     "Meditare" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -38399,6 +39589,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Megattere"
+          }
+        }
+      }
+    },
+    "Mente più lucida" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klarerer Kopf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A clearer mind"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mente más clara"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un esprit plus clair"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mente più lucida"
           }
         }
       }
@@ -38609,6 +39834,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mezzo uccello e mezzo dinosauro, con i denti."
+          }
+        }
+      }
+    },
+    "Mi impegno a far crescere la mia isola, un giorno alla volta. Anche nei giorni difficili." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich verspreche, meine Insel wachsen zu lassen, Tag für Tag. Auch an schweren Tagen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I promise to grow my island, one day at a time. Even on the hard days."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me comprometo a hacer crecer mi isla, un día a la vez. También en los días difíciles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je m'engage à faire grandir mon île, un jour à la fois. Même les jours difficiles."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi impegno a far crescere la mia isola, un giorno alla volta. Anche nei giorni difficili."
           }
         }
       }
@@ -39488,6 +40748,41 @@
         }
       }
     },
+    "Nessun giudizio: quasi tutti ci provano più di una volta prima di farcela." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Urteil: Fast alle versuchen es mehr als einmal, bevor es klappt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No judgment: almost everyone tries more than once before it sticks."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin juicios: casi todos lo intentan más de una vez antes de lograrlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun jugement : presque tout le monde essaie plusieurs fois avant d'y arriver."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun giudizio: quasi tutti ci provano più di una volta prima di farcela."
+          }
+        }
+      }
+    },
     "Nessuno l'ha costruito. Una mattina era lì." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -40118,6 +41413,41 @@
         }
       }
     },
+    "Niente più dimenticanze" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie mehr vergessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No more forgetting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se acabaron los olvidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fini les oublis"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niente più dimenticanze"
+          }
+        }
+      }
+    },
     "Niente pubblicità" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -40184,6 +41514,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Niente seme quel giorno, e si riparte. Nessun danno."
+          }
+        }
+      }
+    },
+    "Niente spam: solo la domanda e le novità della tua isola." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Spam: nur die Frage und Neues von deiner Insel."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No spam: just the question and news from your island."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada de spam: solo la pregunta y las novedades de tu isla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de spam : juste la question et les nouvelles de ton île."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niente spam: solo la domanda e le novità della tua isola."
           }
         }
       }
@@ -40958,6 +42323,41 @@
         }
       }
     },
+    "Non vedevo i progressi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich habe keine Fortschritte gesehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn't see my progress"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No veía el progreso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je ne voyais pas mes progrès"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non vedevo i progressi"
+          }
+        }
+      }
+    },
     "Non vola, ma corre più veloce di un'auto." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -41024,6 +42424,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non è ancora arrivato"
+          }
+        }
+      }
+    },
+    "Non è solo un gioco" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht nur ein Spiel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's not just a game"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No es solo un juego"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n'est pas qu'un jeu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è solo un gioco"
+          }
+        }
+      }
+    },
+    "Non è un numero in una lista: è un mondo che si allarga, giorno dopo giorno." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Zahl in einer Liste, sondern eine Welt, die Tag für Tag wächst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's not a number in a list: it's a world that grows, day after day."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No es un número en una lista: es un mundo que crece, día tras día."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n'est pas un chiffre dans une liste : c'est un monde qui s'agrandit, jour après jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è un numero in una lista: è un mondo che si allarga, giorno dopo giorno."
           }
         }
       }
@@ -44913,6 +46383,41 @@
         }
       }
     },
+    "Parti col piede giusto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte mit dem richtigen Fuß"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start on the right foot"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empieza con buen pie"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pars du bon pied"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parti col piede giusto"
+          }
+        }
+      }
+    },
     "Partiti per un po'" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -45473,6 +46978,41 @@
         }
       }
     },
+    "Pensata per: %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemacht für: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Made for: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensada para: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensée pour : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensata per: %@"
+          }
+        }
+      }
+    },
     "Pepe" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -45504,6 +47044,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pepe"
+          }
+        }
+      }
+    },
+    "Per chi amo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für die, die ich liebe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For the people I love"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por quienes quiero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour ceux que j'aime"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per chi amo"
           }
         }
       }
@@ -45609,6 +47184,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Per ora è tutto"
+          }
+        }
+      }
+    },
+    "Per: %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per: %@"
           }
         }
       }
@@ -47993,6 +49603,41 @@
         }
       }
     },
+    "Più energia" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr Energie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More energy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más energía"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus d'énergie"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più energia"
+          }
+        }
+      }
+    },
     "Più profondo, più morbido, più felice." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -48024,6 +49669,111 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Più profondo, più morbido, più felice."
+          }
+        }
+      }
+    },
+    "Più salute" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr Gesundheit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Better health"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más salud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus de santé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più salute"
+          }
+        }
+      }
+    },
+    "Più tardi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Später"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más tarde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più tardi"
+          }
+        }
+      }
+    },
+    "Più tempo per me" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr Zeit für mich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More time for me"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más tiempo para mí"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus de temps pour moi"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più tempo per me"
           }
         }
       }
@@ -49148,6 +50898,41 @@
         }
       }
     },
+    "Preferisco non dirlo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieber nicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'd rather not say"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prefiero no decirlo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je préfère ne pas le dire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferisco non dirlo"
+          }
+        }
+      }
+    },
     "Prende a testate i tronchi per salutare. Non si fa mai male." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -49253,6 +51038,76 @@
         }
       }
     },
+    "Prepariamo l'isola di %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir bereiten %@s Insel vor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting %@'s island ready"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparamos la isla de %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On prépare l'île de %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepariamo l'isola di %@"
+          }
+        }
+      }
+    },
+    "Prepariamo la tua isola" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir bereiten deine Insel vor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting your island ready"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparamos tu isla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On prépare ton île"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepariamo la tua isola"
+          }
+        }
+      }
+    },
     "Presto" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -49319,6 +51174,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prima di cominciare"
+          }
+        }
+      }
+    },
+    "Progressi che si vedono" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortschritt, den man sieht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress you can see"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progreso que se ve"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des progrès qui se voient"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progressi che si vedono"
+          }
+        }
+      }
+    },
+    "Promemoria attivi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen aktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders on"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recordatorios activados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappels activés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Promemoria attivi"
           }
         }
       }
@@ -50653,6 +52578,41 @@
         }
       }
     },
+    "Quattro mondi, decine di animali e varianti rare da scoprire." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vier Welten, Dutzende Tiere und seltene Varianten zum Entdecken."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Four worlds, dozens of animals and rare variants to discover."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuatro mundos, decenas de animales y variantes raras por descubrir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quatre mondes, des dizaines d'animaux et des variantes rares à découvrir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quattro mondi, decine di animali e varianti rare da scoprire."
+          }
+        }
+      }
+    },
     "Quel giorno niente seme e i giorni di fila ripartono da zero. L'isola resta com'è." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -50719,6 +52679,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quel giorno niente seme e i giorni puliti ripartono da zero. L'isola resta com'è."
+          }
+        }
+      }
+    },
+    "Quello che fa Isle si basa su studi seri." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was Isle macht, beruht auf ernsthafter Forschung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What Isle does is based on serious research."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que hace Isle se basa en estudios serios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce que fait Isle repose sur des études sérieuses."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quello che fa Isle si basa su studi seri."
           }
         }
       }
@@ -51034,6 +53029,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quercia millenaria d'oro"
+          }
+        }
+      }
+    },
+    "Questa volta è diverso" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diesmal ist es anders"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time is different"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta vez es diferente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette fois, c'est différent"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa volta è diverso"
           }
         }
       }
@@ -52298,6 +54328,41 @@
         }
       }
     },
+    "Resta solo su questo iPhone." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er bleibt nur auf diesem iPhone."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It stays on this iPhone only."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se queda solo en este iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il reste uniquement sur cet iPhone."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resta solo su questo iPhone."
+          }
+        }
+      }
+    },
     "Resta sospesa davanti ai fiori battendo le ali velocissime. Beve il nettare con una proboscide lunga quanto lei." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -53033,6 +55098,41 @@
         }
       }
     },
+    "Risparmiare" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geld sparen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save money"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahorrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Économiser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risparmiare"
+          }
+        }
+      }
+    },
     "Rispondere \"sì\" fa cadere un meteorite. Rispondere \"no\" fa crescere l'isola." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -53064,6 +55164,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rispondere \"sì\" fa cadere un meteorite. Rispondere \"no\" fa crescere l'isola."
+          }
+        }
+      }
+    },
+    "Rispondi direttamente dalla notifica." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworte direkt aus der Mitteilung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer right from the notification."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Responde directamente desde la notificación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponds directement depuis la notification."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rispondi direttamente dalla notifica."
+          }
+        }
+      }
+    },
+    "Rispondi e guarda crescere la tua isola." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworte und sieh deine Insel wachsen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer and watch your island grow."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Responde y mira crecer tu isla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponds et regarde ton île grandir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rispondi e guarda crescere la tua isola."
           }
         }
       }
@@ -55168,6 +57338,76 @@
         }
       }
     },
+    "Scegli tutto quello che ti è successo." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle alles, was dir passiert ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick everything that happened to you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige todo lo que te pasó."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis tout ce qui t'est arrivé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli tutto quello che ti è successo."
+          }
+        }
+      }
+    },
+    "Scegli tutto quello che vale per te." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle alles, was auf dich zutrifft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick everything that's true for you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige todo lo que vaya contigo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis tout ce qui te correspond."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli tutto quello che vale per te."
+          }
+        }
+      }
+    },
     "Sceglie la ciliegia più rossa e la mangia con calma. Fischia piano, quasi sottovoce." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -56183,6 +58423,41 @@
         }
       }
     },
+    "Segnare i progressi aiuta a farcela" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortschritte festhalten hilft ans Ziel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracking progress helps you get there"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrar el progreso ayuda a lograrlo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noter ses progrès aide à y arriver"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnare i progressi aiuta a farcela"
+          }
+        }
+      }
+    },
     "Segue chi lavora la terra, sperando in un vermetto. Canta anche d'inverno, quando gli altri tacciono." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -56949,6 +59224,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Senza risposta"
+          }
+        }
+      }
+    },
+    "Senza timbri regalati" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne geschenkte Stempel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No free stamps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin sellos regalados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans tampons offerts"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senza timbri regalati"
           }
         }
       }
@@ -61048,6 +63358,41 @@
         }
       }
     },
+    "Stabilire in anticipo quando agire aumenta molto le probabilità di raggiungere un obiettivo." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorher festzulegen, wann man handelt, erhöht die Chance deutlich, ein Ziel zu erreichen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deciding in advance when to act greatly increases the chances of reaching a goal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decidir de antemano cuándo actuar aumenta mucho las probabilidades de alcanzar un objetivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décider à l'avance quand agir augmente nettement les chances d'atteindre un objectif."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stabilire in anticipo quando agire aumenta molto le probabilità di raggiungere un obiettivo."
+          }
+        }
+      }
+    },
     "Stagno" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -61779,6 +64124,146 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Studia i graffiti della grotta per ore. Forse si riconosce."
+          }
+        }
+      }
+    },
+    "Su Isle ci sono semi, animali e mondi da scoprire." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei Isle gibt es Samen, Tiere und Welten zu entdecken."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Isle, there are seeds, animals and worlds to discover."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Isle hay semillas, animales y mundos por descubrir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur Isle, il y a des graines, des animaux et des mondes à découvrir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su Isle ci sono semi, animali e mondi da scoprire."
+          }
+        }
+      }
+    },
+    "Su Isle la domanda arriva ogni giorno alla stessa ora." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei Isle kommt die Frage jeden Tag zur selben Zeit."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Isle, the question comes every day at the same time."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Isle, la pregunta llega cada día a la misma hora."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur Isle, la question arrive chaque jour à la même heure."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su Isle la domanda arriva ogni giorno alla stessa ora."
+          }
+        }
+      }
+    },
+    "Su Isle ogni giorno segnato si vede: è un pezzo d'isola in più." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei Isle sieht man jeden markierten Tag: ein Stück Insel mehr."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Isle, every day you mark shows: it's one more piece of island."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Isle, cada día marcado se ve: es un trozo más de isla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur Isle, chaque jour noté se voit : c'est un bout d'île en plus."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su Isle ogni giorno segnato si vede: è un pezzo d'isola in più."
+          }
+        }
+      }
+    },
+    "Su quasi 20.000 persone, chi teneva traccia dei progressi raggiungeva più spesso il suo obiettivo. Ancora di più quando i progressi venivano registrati, non solo ricordati." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei fast 20.000 Menschen erreichten diejenigen, die ihre Fortschritte verfolgten, ihr Ziel häufiger. Noch mehr, wenn die Fortschritte festgehalten und nicht nur gemerkt wurden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Across nearly 20,000 people, those who tracked their progress reached their goals more often. Even more so when progress was recorded, not just remembered."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En casi 20.000 personas, quienes registraban su progreso alcanzaban su objetivo más a menudo. Aún más cuando el progreso se anotaba, no solo se recordaba."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur près de 20 000 personnes, celles qui suivaient leurs progrès atteignaient plus souvent leur objectif. Encore plus quand les progrès étaient notés, pas seulement retenus."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su quasi 20.000 persone, chi teneva traccia dei progressi raggiungeva più spesso il suo obiettivo. Ancora di più quando i progressi venivano registrati, non solo ricordati."
           }
         }
       }
@@ -62724,6 +65209,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "T-Rex gentili"
+          }
+        }
+      }
+    },
+    "Tante volte" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schon oft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Many times"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muchas veces"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plein de fois"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tante volte"
           }
         }
       }
@@ -63708,6 +66228,41 @@
         }
       }
     },
+    "Ti diamo un vantaggio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir geben dir einen Vorsprung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We give you a head start"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te damos ventaja"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On te donne une longueur d'avance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ti diamo un vantaggio"
+          }
+        }
+      }
+    },
     "Ti fissa senza battere ciglio. Per ore." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -63879,6 +66434,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ti mancano %d volte: oggi è l'ultimo giorno della settimana."
+          }
+        }
+      }
+    },
+    "Tieni premuto per impegnarti" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gedrückt halten, um dich zu verpflichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press and hold to commit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsado para comprometerte"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maintiens appuyé pour t'engager"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni premuto per impegnarti"
           }
         }
       }
@@ -65598,6 +68188,41 @@
         }
       }
     },
+    "Tutt'altro che noioso" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles andere als langweilig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anything but boring"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada aburrido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout sauf ennuyeux"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutt'altro che noioso"
+          }
+        }
+      }
+    },
     "Tutte le api del glicine lavorano per lei." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -66084,6 +68709,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un altro giorno pulito. L'isola si allarga."
+          }
+        }
+      }
+    },
+    "Un amico o un parente" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freunde oder Familie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A friend or family member"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un amigo o un familiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un ami ou un proche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un amico o un parente"
           }
         }
       }
@@ -66753,6 +69413,41 @@
         }
       }
     },
+    "Un motivo per tornare ogni giorno" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Grund, jeden Tag zurückzukommen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A reason to come back every day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un motivo para volver cada día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une raison de revenir chaque jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un motivo per tornare ogni giorno"
+          }
+        }
+      }
+    },
     "Un omino di pietre che indica la strada." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -66784,6 +69479,111 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un omino di pietre che indica la strada."
+          }
+        }
+      }
+    },
+    "Un passo falso e lasciavo perdere tutto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Ausrutscher und ich habe alles hingeworfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One slip and I gave up on everything"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un tropiezo y lo dejaba todo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un faux pas et je laissais tout tomber"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un passo falso e lasciavo perdere tutto"
+          }
+        }
+      }
+    },
+    "Un passo falso non cancella niente" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Ausrutscher löscht nichts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A slip doesn't erase anything"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un tropiezo no borra nada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un faux pas n'efface rien"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un passo falso non cancella niente"
+          }
+        }
+      }
+    },
+    "Un piccolo gesto, per cominciare sul serio." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine kleine Geste, um wirklich anzufangen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A small gesture, to start for real."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un pequeño gesto, para empezar en serio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un petit geste, pour commencer pour de vrai."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un piccolo gesto, per cominciare sul serio."
           }
         }
       }
@@ -67138,6 +69938,41 @@
         }
       }
     },
+    "Un'isola che resta, anche dopo un passo falso" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Insel, die bleibt, auch nach einem Ausrutscher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An island that stays, even after a slip"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una isla que se queda, incluso tras un tropiezo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une île qui reste, même après un faux pas"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un'isola che resta, anche dopo un passo falso"
+          }
+        }
+      }
+    },
     "Un'ombra con due occhi d'oro." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -67488,6 +70323,76 @@
         }
       }
     },
+    "Una domanda al giorno" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Frage am Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One question a day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pregunta al día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une question par jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una domanda al giorno"
+          }
+        }
+      }
+    },
+    "Una domanda al giorno, all'ora giusta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Frage am Tag, zur richtigen Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One question a day, at the right time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una pregunta al día, a la hora justa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une question par jour, au bon moment"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una domanda al giorno, all'ora giusta"
+          }
+        }
+      }
+    },
     "Una felce alta come un albero: qui tutto comincia da lei." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -67659,6 +70564,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Una nebbiolina bassa si posa tra gli alberi e sparisce col sole."
+          }
+        }
+      }
+    },
+    "Una o due volte" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein- oder zweimal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once or twice"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una o dos veces"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une ou deux fois"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una o due volte"
           }
         }
       }
@@ -67873,6 +70813,41 @@
         }
       }
     },
+    "Una ricerca sul web" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Websuche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A web search"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una búsqueda en internet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une recherche sur le web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una ricerca sul web"
+          }
+        }
+      }
+    },
     "Una risposta al giorno, all'ora che scegli." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -67939,6 +70914,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Una settimana completa vale 7 semi, come chi lo fa ogni giorno."
+          }
+        }
+      }
+    },
+    "Una sola domanda al giorno, all'ora che scegli tu." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur eine Frage am Tag, zur Uhrzeit deiner Wahl."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Just one question a day, at the time you choose."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una sola pregunta al día, a la hora que elijas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une seule question par jour, à l'heure que tu choisis."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una sola domanda al giorno, all'ora che scegli tu."
           }
         }
       }
@@ -82713,6 +85723,76 @@
         }
       }
     },
+    "ora" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "maintenant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ora"
+          }
+        }
+      }
+    },
+    "passi al giorno" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritte pro Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "steps a day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pasos al día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas par jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "passi al giorno"
+          }
+        }
+      }
+    },
     "pigro" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -83409,6 +86489,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "sta volando"
+          }
+        }
+      }
+    },
+    "studi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Studien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "studies"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "estudios"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "études"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "studi"
           }
         }
       }
@@ -87752,6 +90867,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "È il meteo dell'isola, non dipende da te."
+          }
+        }
+      }
+    },
+    "È il momento che fa crescere la tua isola. Te la ricordiamo noi, all'ora che scegli." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist der Moment, in dem deine Insel wächst. Wir erinnern dich zur Uhrzeit deiner Wahl."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's the moment that grows your island. We'll remind you, at the time you choose."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es el momento que hace crecer tu isla. Te la recordamos nosotros, a la hora que elijas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est le moment qui fait grandir ton île. On te la rappelle, à l'heure que tu choisis."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È il momento che fa crescere la tua isola. Te la ricordiamo noi, all'ora che scegli."
+          }
+        }
+      }
+    },
+    "È la prima volta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das erste Mal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is my first time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es la primera vez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est la première fois"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È la prima volta"
           }
         }
       }
