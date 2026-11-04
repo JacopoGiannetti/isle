@@ -18,25 +18,33 @@ struct HomeView: View {
         var plants = 0
         var animals = 0
         var storm = 0
+        var pathDay = 1
+        var weekMissed: Int?
     }
 
     var body: some View {
         ZStack {
             TimelineView(.everyMinute) { _ in HomeSky() }
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 22) {
+                    HStack(alignment: .bottom) {
                         TimelineView(.everyMinute) { _ in
                             let dark = WorldScene.light(at: Clock.hour()).1 > 0.5
-                            Text(L("Le tue isole"))
-                                .font(.cozy(32, .bold))
-                                .foregroundStyle(dark ? .white : Theme.ink)
-                                .shadow(color: .black.opacity(dark ? 0.25 : 0), radius: 4, y: 1)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(Clock.now.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Lang.shared.locale)).uppercased())
+                                    .font(.cozy(12, .bold))
+                                    .tracking(1.4)
+                                    .foregroundStyle(dark ? .white.opacity(0.7) : Theme.ink.opacity(0.45))
+                                Text(L("Le tue isole"))
+                                    .font(.book(34, .bold))
+                                    .foregroundStyle(dark ? .white : Theme.ink)
+                            }
+                            .shadow(color: .black.opacity(dark ? 0.25 : 0), radius: 4, y: 1)
                         }
                         Spacer()
                         IconButton(icon: "gearshape") { settings = true }
                             .accessibilityLabel(L("Impostazioni"))
-                        IconButton(icon: "plus", accent: true, action: onNew)
+                        IconButton(icon: "plus", ink: true, action: onNew)
                             .accessibilityLabel(L("Nuova isola"))
                     }
                     .padding(.top, 12)
@@ -45,11 +53,15 @@ struct HomeView: View {
                         Button { onOpen(h.id) } label: { card(h) }
                             .buttonStyle(PressStyle())
                             .contextMenu {
+                                if h.kind == .quit {
+                                    Toggle(isOn: Binding(get: { h.isHard }, set: { store.setHard(h.id, $0) })) {
+                                        Label(L("Modalità dura"), systemImage: "flame")
+                                        Text(L("Se ricadi cade un meteorite"))
+                                    }
+                                }
                                 Button(L("Elimina isola"), systemImage: "trash", role: .destructive) { deleting = h.id }
                             }
                     }
-                    Button(action: onNew) { Label(L("Nuova isola"), systemImage: "plus") }
-                        .buttonStyle(DashedButton())
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
@@ -73,6 +85,10 @@ struct HomeView: View {
         }
         .onChange(of: store.habits.map(\.answers.count)) { _, _ in summarize() }
         .task { notificationsOff = await Notifier.denied() }
+        .task {
+            try? await Task.sleep(for: .seconds(2))
+            await WorldPreviews.shared.prepare()
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { notificationsOff = await Notifier.denied() }
             summarize()
@@ -82,17 +98,23 @@ struct HomeView: View {
     /// Le simulazioni girano lontano dal disegno; arrivano solo i risultati del calcolo più recente.
     private func summarize() {
         let habits = store.habits
+        let revision = store.revision
         generation += 1
         let gen = generation
         Task {
             let worlds = await Task.detached(priority: .utility) { habits.map { ($0.id, Sim.run($0)) } }.value
             guard gen == generation else { return }
+            for (id, w) in worlds { WorldController.remember(w, for: id, revision: revision) }
             for (id, w) in worlds {
-                summaries[id] = Summary(plants: w.plantCount, animals: w.animalCount, storm: w.storm)
+                summaries[id] = Summary(plants: w.plantCount, animals: w.animalCount, storm: w.storm, pathDay: w.pathDay, weekMissed: w.weekMissed)
                 if let scene = portals[id] {
                     scene.apply(w, animated: true)
                 } else {
+                    await Textures.packInBackground(WorldScene.wantedTextures(for: w))
+                    await Textures.prerender([WorldScene.undersideArt(for: w)])
+                    guard gen == generation else { return }
                     let scene = WorldScene.makePortal()
+                    scene.framing = Self.framing
                     scene.apply(w, animated: false)
                     portals[id] = scene
                 }
@@ -124,9 +146,15 @@ struct HomeView: View {
         .surface(20)
     }
 
+    /// L'isola sta nella parte bassa della cartolina: in alto il cielo resta libero per il nome.
+    private static let framing = CGRect(x: 0.03, y: -0.1, width: 0.94, height: 0.77)
+
+    /// Ogni isola è una cartolina: la finestra sul mondo vivo è tutta la card,
+    /// il nome sta nel cielo, il giorno è un timbro e lo stato un biglietto appoggiato sotto.
     private func card(_ h: Habit) -> some View {
         let s = summaries[h.id] ?? Summary()
-        return VStack(alignment: .leading, spacing: 12) {
+        let shape = RoundedRectangle(cornerRadius: 30, style: .continuous)
+        return ZStack(alignment: .topLeading) {
             Group {
                 if let scene = portals[h.id] {
                     IslePortal(scene: scene, paused: paused)
@@ -134,43 +162,113 @@ struct HomeView: View {
                     Color(hex: 0x9CD4EC)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 220)
-            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(h.title).font(.cozy(20, .bold)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.8)
-                    HStack(spacing: 12) {
-                        Label("\(h.pathDays)", systemImage: "calendar").labelStyle(Compact())
-                        Label("\(s.plants)", systemImage: "tree.fill").labelStyle(Compact())
-                        Label("\(s.animals)", systemImage: "pawprint.fill").labelStyle(Compact())
+            LinearGradient(stops: [.init(color: .black.opacity(0.2), location: 0), .init(color: .clear, location: 0.34)],
+                           startPoint: .top, endPoint: .bottom)
+                .allowsHitTesting(false)
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(h.title)
+                            .font(.book(27, .semibold))
+                            .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                        HStack(spacing: 12) {
+                            Label("\(s.plants)", systemImage: "tree.fill").labelStyle(Compact())
+                            Label("\(s.animals)", systemImage: "pawprint.fill").labelStyle(Compact())
+                        }
+                        .font(.cozy(13, .semibold))
+                        .foregroundStyle(.white.opacity(0.85))
                     }
-                    .font(.cozy(13, .semibold))
-                    .foregroundStyle(Theme.muted)
-                    TimelineView(.everyMinute) { _ in status(h, s) }
+                    .shadow(color: .black.opacity(0.3), radius: 6, y: 1)
+                    Spacer(minLength: 0)
+                    DayStamp(day: s.pathDay)
                 }
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.right").foregroundStyle(Theme.line)
+                TimelineView(.everyMinute) { _ in status(h, s) }
             }
-            .padding(.horizontal, 6)
-            .padding(.bottom, 4)
+            .padding(18)
         }
-        .padding(12)
-        .surface(28)
+        .frame(maxWidth: .infinity)
+        .frame(height: 340)
+        .clipShape(shape)
+        .overlay(shape.strokeBorder(.white.opacity(0.4), lineWidth: 1))
+        .shadow(color: .black.opacity(0.14), radius: 18, y: 8)
+        .contentShape(shape)
     }
 
     @ViewBuilder private func status(_ h: Habit, _ s: Summary) -> some View {
-        if s.storm >= 2 {
-            Chip(text: s.storm >= 4 ? L("Temporale sull'isola") : L("Piove sull'isola"), color: Theme.muted, dot: true)
+        if s.storm >= 2 && s.weekMissed == nil {
+            Note(text: Lf("Tempesta: %@", StormInfo.name(s.storm, snowy: h.land.snowy)), storm: true)
         } else if h.needsAnswerToday {
-            Chip(text: h.question, color: Theme.peach, dot: true)
+            Note(text: h.question, icon: "questionmark.bubble.fill", tint: Theme.peach, action: true)
         } else if h.seedsPending > 0 {
-            Chip(text: h.seedsPending == 1 ? L("Un seme da piantare") : Lf("%d semi da piantare", h.seedsPending), color: Theme.green, dot: true)
+            Note(text: h.seedsPending == 1 ? L("Un seme da piantare") : Lf("%d semi da piantare", h.seedsPending),
+                 icon: "leaf.fill", tint: Color(hex: 0x9BD67F), action: true)
+        } else if let missed = s.weekMissed {
+            Note(text: Lf("La settimana scorsa: %d di %d.", missed, h.rhythm.target), storm: true)
+        } else if s.storm == 1 {
+            Note(text: Lf("Tempesta: %@", StormInfo.name(s.storm)), storm: true)
+        } else if h.canMark {
+            Note(text: h.progressText, icon: "circle.dotted", tint: Theme.peach, action: true)
+        } else if h.kind == .build && h.rhythm.isWeekly && h.targetReached {
+            Note(text: L("Obiettivo della settimana raggiunto"), icon: "checkmark.seal.fill", tint: Theme.green)
         } else if h.waitingForQuestion {
-            Chip(text: String(format: L("Domanda alle %d:%02d"), h.reminderHour, h.reminderMinute), color: Theme.muted, dot: true)
+            Note(text: String(format: L("Domanda alle %d:%02d"), h.reminderHour, h.reminderMinute), icon: "clock.fill", tint: Theme.muted)
         } else {
-            Chip(text: L("Tutto fatto per oggi"), color: Theme.green, dot: true)
+            Note(text: L("Tutto fatto per oggi"), icon: "checkmark.circle.fill", tint: Theme.green)
         }
+    }
+}
+
+/// Il giorno del sentiero, come il timbro postale su una cartolina.
+private struct DayStamp: View {
+    let day: Int
+
+    var body: some View {
+        VStack(spacing: -2) {
+            Text(L("Giorno").uppercased())
+                .font(.cozy(8.5, .bold))
+                .tracking(1.2)
+                .foregroundStyle(Theme.ink.opacity(0.55))
+            Text("\(day)")
+                .font(.book(24, .bold))
+                .monospacedDigit()
+                .foregroundStyle(Theme.ink)
+                .minimumScaleFactor(0.6)
+        }
+        .frame(width: 60, height: 60)
+        .background(Circle().fill(Theme.paper.opacity(0.94)))
+        .overlay(Circle().inset(by: 4).strokeBorder(Theme.ink.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [2, 2.5])))
+        .rotationEffect(.degrees(-8))
+        .shadow(color: .black.opacity(0.15), radius: 6, y: 3)
+    }
+}
+
+/// Lo stato dell'isola, un biglietto in fondo alla cartolina: scuro quando c'è qualcosa da fare.
+private struct Note: View {
+    let text: String
+    var icon: String?
+    var tint: Color = Theme.green
+    var action = false
+    var storm = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if storm {
+                StormInfo.Badge(size: 17)
+            } else if let icon {
+                Image(systemName: icon).font(.system(size: 14, weight: .semibold)).foregroundStyle(tint)
+            }
+            Text(text).font(.cozy(14, .semibold)).lineLimit(1)
+            if action {
+                Image(systemName: "arrow.right").font(.system(size: 12, weight: .bold)).opacity(0.6)
+            }
+        }
+        .foregroundStyle(action ? .white : Theme.ink)
+        .padding(.leading, 12).padding(.trailing, 14).padding(.vertical, 10)
+        .background(Capsule().fill(action ? Theme.ink.opacity(0.88) : Theme.paper.opacity(0.94)))
+        .shadow(color: .black.opacity(0.16), radius: 8, y: 3)
     }
 }
 
@@ -233,7 +331,7 @@ private struct IslePortal: View {
         // Si ferma solo dopo aver disegnato almeno una volta: una scena mai disegnata è un rettangolo grigio.
         let stop = (paused || !visible) && drawn
         ZStack {
-            SkyView(scene: scene, bodyScale: 0.5)
+            SkyView(scene: scene, bodyScale: 0.5, paused: stop)
             LitScene(scene: scene, paused: stop, fps: 30)
                 .opacity(drawn ? 1 : 0)
         }

@@ -48,7 +48,7 @@ enum Notifier {
 
     static func registerCategories() {
         let quit = UNNotificationCategory(identifier: "quit", actions: [
-            UNNotificationAction(identifier: no, title: L("No, sono pulito"), options: []),
+            UNNotificationAction(identifier: no, title: L("No"), options: []),
             UNNotificationAction(identifier: yes, title: L("Sì"), options: [.destructive, .foreground]),
         ], intentIdentifiers: [])
         let build = UNNotificationCategory(identifier: "build", actions: [
@@ -81,9 +81,14 @@ enum Notifier {
                       fire > realNow else { continue }
                 if d == 0 && !h.unansweredToday { continue }
                 let silent = Clock.day(day) - lastDay
+                var text = body(h, silentDays: silent)
+                if h.rhythm.isWeekly {
+                    guard let behind = weekBehind(h, on: day) else { continue }
+                    if Storm.stage(silentDays: silent, h.rhythm) == 0 { text = behind }
+                }
                 let content = UNMutableNotificationContent()
                 content.title = h.question
-                content.body = body(h, silentDays: silent)
+                content.body = text
                 content.sound = .default
                 content.categoryIdentifier = h.kind == .quit ? "quit" : "build"
                 content.userInfo = ["habit": h.id]
@@ -192,6 +197,28 @@ enum Notifier {
                                         trigger: UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)))
             n += 1
         }
+    }
+
+    /// Settimanali: si avvisa solo quando i giorni rimasti cominciano a stringere,
+    /// mai dopo aver raggiunto l'obiettivo. Nil se quel giorno non serve.
+    private static func weekBehind(_ h: Habit, on day: Date) -> String? {
+        let cal = Clock.calendar
+        let shown = day.addingTimeInterval(Clock.offset)
+        guard let week = cal.dateInterval(of: .weekOfYear, for: shown) else { return nil }
+        let done = Habit.week(shown) == Habit.week(Clock.now) ? h.thisWeekCount : 0
+        let missing = h.rhythm.target - done
+        let daysLeft = Clock.day(week.end.addingTimeInterval(-1)) - Clock.day(shown) + 1
+        guard missing > 0, daysLeft <= missing + 1 else { return nil }
+        if daysLeft == 1 {
+            return missing == 1 ? L("Ti manca 1 volta: oggi è l'ultimo giorno della settimana.")
+                                : Lf("Ti mancano %d volte: oggi è l'ultimo giorno della settimana.", missing)
+        }
+        let f = DateFormatter()
+        f.locale = Locale(identifier: Lang.code)
+        f.dateFormat = "EEEE"
+        let last = f.string(from: week.end.addingTimeInterval(-1))
+        return missing == 1 ? Lf("Ti manca 1 volta, hai tempo fino a %@.", last)
+                            : Lf("Ti mancano %d volte, hai tempo fino a %@.", missing, last)
     }
 
     private static func body(_ h: Habit, silentDays: Int) -> String {

@@ -12,7 +12,7 @@ enum AnimalArt {
     static func hasLegs(_ id: String) -> Bool { id != "glowsnail" }
 
     static func body(_ l: Look, id: String) -> ArtImage {
-        let w = l.bodyW + 16, h = l.bodyH + 16 + l.neck * 2
+        let w = l.bodyW + 16, h = l.bodyH + 16 + l.neck * 2 + bodyTopPad(l)
         let cx = w / 2, cy = h - 8 - l.bodyH / 2
         if id == "stagbeetle" {
             return Paint.image(w, h, base: h - cy) { g in
@@ -50,6 +50,7 @@ enum AnimalArt {
         }
         return Paint.image(w, h, base: h - cy) { g in
             let main = c(l.body)
+            backBehind(g, l, cx, cy)
             if l.neck > 0 {
                 let p = CGMutablePath()
                 p.move(to: CGPoint(x: cx + l.bodyW * 0.18, y: cy - l.bodyH * 0.15))
@@ -77,7 +78,9 @@ enum AnimalArt {
                     }
                 default: break
                 }
+                backOnBody(g, l, cx, cy, id: id)
             }
+            bodyFront(g, l, cx, cy)
             if l.pattern == .spines {
                 var r = RNG("spines\(id)")
                 let dark = c(l.dark)
@@ -115,8 +118,9 @@ enum AnimalArt {
 
     static func head(_ l: Look, id: String, sleeping: Bool = false) -> ArtImage {
         let r0 = l.headR
-        let w = r0 * 2 + r0 * l.snout + 22, h = r0 * 2 + 26
-        let cx = r0 + 10, cy = h - r0 - 8
+        let (padX, padTop, padBottom) = headPad(l)
+        let w = r0 * 2 + r0 * l.snout + 22 + padX * 2, h = r0 * 2 + 26 + padTop + padBottom
+        let cx = r0 + 10 + padX, cy = h - r0 - 8 - padBottom
         let closedEye = { (g: CGContext) in
             let p = CGMutablePath()
             p.move(to: CGPoint(x: cx + r0 * 0.1, y: cy - r0 * 0.1))
@@ -181,6 +185,7 @@ enum AnimalArt {
         }
         return Paint.image(w, h, base: h - cy) { g in
             let main = c(l.body), dark = c(l.dark), acc = c(l.accent)
+            crestBehind(g, l, cx, cy)
             // Orecchie e corna dietro la testa
             switch l.ears {
             case .round:
@@ -252,6 +257,9 @@ enum AnimalArt {
                         Paint.fill(g, CGPath(roundedRect: CGRect(x: cx - r0 * 1.2, y: cy + dy * r0 - r0 * 0.14, width: r0 * 2.2, height: r0 * 0.3),
                                              cornerWidth: r0 * 0.15, cornerHeight: r0 * 0.15, transform: nil), c(l.belly))
                     }
+                } else if l.pattern == .bandit {
+                    Paint.fill(g, Paint.ellipse(cx + r0 * 0.42, cy + r0 * 0.4, r0 * 0.6, r0 * 0.4), c(l.belly))
+                    Paint.fill(g, Paint.ellipse(cx + r0 * 0.3, cy + r0 * 0.04, r0 * 0.5, r0 * 0.34), c(l.accent))
                 }
             }
             // Muso
@@ -279,6 +287,7 @@ enum AnimalArt {
                 p.addQuadCurve(to: CGPoint(x: cx - r0 * 1.9, y: cy - r0 * 0.9), control: CGPoint(x: cx - r0 * 1.2, y: cy - r0 * 1.4))
                 Paint.stroke(g, p, dark, 1.2)
             }
+            crestFront(g, l, cx, cy)
             // Guance e occhio chiuso (l'occhio aperto è uno sprite a parte, per sbattere le palpebre)
             Paint.fill(g, Paint.ellipse(cx + r0 * 0.15, cy + r0 * 0.45, r0 * 0.26, r0 * 0.16), UIColor(hex: 0xFF8FA0, alpha: 0.55))
             if sleeping {
@@ -312,7 +321,7 @@ enum AnimalArt {
     }
 
     static func leg(_ l: Look, far: Bool) -> ArtImage {
-        let w: CGFloat = max(2.6, l.bodyW * 0.13), len = l.legLen + 3
+        let w: CGFloat = l.biped ? max(3.4, l.bodyW * 0.19) : max(2.6, l.bodyW * 0.13), len = l.legLen + 3
         return Paint.image(w + 2, len + 2, base: len + 1) { g in
             let col = far ? c(l.body).shade(0.35) : c(l.body).shade(0.08)
             let p = CGPath(roundedRect: CGRect(x: 1, y: 1, width: w, height: len), cornerWidth: w / 2, cornerHeight: w / 2, transform: nil)
@@ -370,6 +379,34 @@ enum AnimalArt {
                 Paint.stroke(g, p, main, 2.6)
                 Paint.fill(g, Paint.circle(3, 3, 2), dark)
             }
+        case .nine:
+            // Nove pennacchi che salgono dalla stessa radice: prima quelli dietro, più scuri.
+            return Paint.image(34, 34, base: 12) { g in
+                let root = CGPoint(x: 30, y: 22)
+                for i in [0, 8, 1, 7, 2, 6, 3, 5, 4] {
+                    let f = CGFloat(i) / 8
+                    let a = .pi + 0.05 + f * 1.4
+                    let len: CGFloat = (i % 2 == 0 ? 19 : 15) + sin(f * .pi) * 2
+                    var t = CGAffineTransform(translationX: root.x, y: root.y).rotated(by: a)
+                    let p = CGMutablePath()
+                    p.move(to: CGPoint(x: 0, y: -1))
+                    p.addQuadCurve(to: CGPoint(x: len - 2, y: -2.2), control: CGPoint(x: len * 0.5, y: -3.2))
+                    p.addQuadCurve(to: CGPoint(x: len - 2, y: 2.2), control: CGPoint(x: len + 1.8, y: 0))
+                    p.addQuadCurve(to: CGPoint(x: 0, y: 1), control: CGPoint(x: len * 0.5, y: 3.2))
+                    p.closeSubpath()
+                    guard let tail = p.copy(using: &t) else { continue }
+                    let tip = CGPoint(x: len, y: 0).applying(t)
+                    let back = abs(f - 0.5) * 2
+                    let col = main.shade(0.04 + back * 0.1)
+                    Paint.fill(g, tail, col)
+                    Paint.clipped(g, tail) {
+                        Paint.fill(g, Paint.circle(tip.x, tip.y, 3), c(l.accent).alpha(0.85))
+                    }
+                    Paint.stroke(g, tail, col.shade(0.22), 0.6)
+                }
+            }
+        case .dino, .club, .spiked, .feather, .tuft:
+            return longTailArt(l)
         case .fan, .none:
             return Paint.image(2, 2, base: 1) { _ in }
         }
@@ -379,14 +416,18 @@ enum AnimalArt {
         switch l.tail {
         case .squirrel: return CGPoint(x: -l.bodyW * 0.48, y: l.bodyH * 0.1)
         case .bushy: return CGPoint(x: -l.bodyW * 0.58, y: -l.bodyH * 0.05)
+        case .nine: return CGPoint(x: -l.bodyW * 0.5 - 9, y: -l.bodyH * 0.05)
         case .long: return CGPoint(x: -l.bodyW * 0.62, y: -l.bodyH * 0.05)
+        case .dino, .club, .spiked, .feather: return CGPoint(x: -l.bodyW * 0.4, y: l.bodyH * 0.08)
+        case .tuft: return CGPoint(x: -l.bodyW * 0.46, y: l.bodyH * 0.2)
         default: return CGPoint(x: -l.bodyW * 0.48, y: l.bodyH * 0.05)
         }
     }
 
     // MARK: Uccelli
 
-    static func isOwl(_ id: String) -> Bool { ["owl", "snowowl", "starowl", "lightowl", "eagleowl"].contains(id) }
+    static func isOwl(_ id: String) -> Bool { ["owl", "snowowl", "starowl", "lightowl", "eagleowl", "scopsowl", "africaneagleowl",
+                                                       "borealowl", "crystalowl"].contains(id) }
 
     private enum Beak { case short, long, dagger, curved, crossed, thick }
     private enum BirdTail { case wedge, long, cocked, stub, forked }
@@ -403,6 +444,20 @@ enum AnimalArt {
         case "crossbill": return (.crossed, .forked, false)
         case "dipper": return (.short, .stub, true)
         case "rainbowbird": return (.long, .forked, true)
+        case "archaeopteryx", "microraptor": return (.short, .long, false)
+        case "weaver", "pinkweaver": return (.thick, .wedge, true)
+        case "beeeater": return (.curved, .long, false)
+        case "sunbird", "emeraldsunbird": return (.curved, .forked, false)
+        case "malachite": return (.dagger, .stub, true)
+        case "fisheagle": return (.thick, .wedge, false)
+        case "oxpecker": return (.thick, .long, false)
+        case "hornbill": return (.dagger, .long, false)
+        case "snowbunting", "pinegrosbeak": return (.thick, .wedge, true)
+        case "redpoll", "goldredpoll": return (.short, .forked, true)
+        case "ptarmigan", "goldptarmigan": return (.short, .stub, true)
+        case "puffin", "goldpuffin": return (.thick, .stub, true)
+        case "tern": return (.long, .forked, false)
+        case "gyrfalcon": return (.thick, .long, false)
         default: return (.short, .wedge, false)
         }
     }
@@ -410,6 +465,7 @@ enum AnimalArt {
     static func birdBody(_ l: Look, id: String, sleeping: Bool = false) -> ArtImage {
         if isOwl(id) { return owl(l, id: id, sleeping: sleeping) }
         if id == "bat" { return bat(l, sleeping: sleeping) }
+        if isPtero(id) { return pterosaur(l, id: id, sleeping: sleeping) }
         let shape = birdShape(id)
         return Paint.image(30, 24, base: 6) { g in
             let main = c(l.body), belly = c(l.belly), acc = c(l.accent), dark = c(l.dark)
@@ -511,6 +567,14 @@ enum AnimalArt {
             } else {
                 beak.closeSubpath()
                 Paint.fill(g, beak, beakColor)
+            }
+            if id == "hornbill" {
+                let casque = CGMutablePath()
+                casque.move(to: CGPoint(x: 23.6, y: 7))
+                casque.addQuadCurve(to: CGPoint(x: 28.6, y: 7.6), control: CGPoint(x: 26.8, y: 3.4))
+                casque.closeSubpath()
+                Paint.fill(g, casque, acc.light(0.1))
+                Paint.stroke(g, casque, acc.shade(0.3), 0.4)
             }
             Paint.fill(g, Paint.ellipse(19.5, 10, 1.4, 0.9), UIColor(hex: 0xFF8FA0, alpha: 0.5))
             if sleeping {
@@ -637,6 +701,7 @@ enum AnimalArt {
     }
 
     static func wing(_ l: Look, id: String) -> ArtImage {
+        if isPtero(id) { return membrane(l) }
         if id == "bat" {
             return Paint.image(20, 13, base: 10) { g in
                 let col = c(l.body).shade(0.2)
@@ -684,6 +749,7 @@ enum AnimalArt {
     // MARK: Nuotatori
 
     static func swimmer(_ l: Look, id: String, dip: Bool) -> ArtImage {
+        if let wild = wildSwimmer(l, id: id, dip: dip) { return wild }
         let main = c(l.body), belly = c(l.belly), acc = c(l.accent), dark = c(l.dark)
         if id == "otter" {
             return Paint.image(34, 22, base: 7) { g in
@@ -700,7 +766,7 @@ enum AnimalArt {
                 }
             }
         }
-        if id == "turtle" {
+        if id == "turtle" || id == "archelon" {
             return Paint.image(36, 24, base: 7) { g in
                 let wl: CGFloat = 17
                 if !dip {
@@ -999,12 +1065,22 @@ enum AnimalArt {
             }
             switch sp.move {
             case .walk, .hop:
-                let k = min(1.6, 40 / (l.bodyW + l.headR * 2.4))
-                let center = CGPoint(x: size / 2 - 4, y: size / 2 + 6)
+                var k = min(1.6, 40 / (l.bodyW + l.headR * 2.4))
+                var center = CGPoint(x: size / 2 - 4, y: size / 2 + 6)
+                if l.neck > 8 || longTail(l.tail) || l.back == .sail || l.back == .plates {
+                    let n = neckTop(l)
+                    let tailLen = longTail(l.tail) ? l.bodyW * 0.7 : 0
+                    let up = max(n.y + l.headR + headPad(l).1, l.bodyH * 0.5 + bodyTopPad(l)) + 2
+                    let down = l.bodyH * 0.22 + l.legLen + 3
+                    let left = l.bodyW * 0.5 + tailLen, right = max(n.x + l.headR * (1.2 + l.snout), l.bodyW * 0.5)
+                    k = min(1.6, 54 / (up + down), 56 / (left + right))
+                    center = CGPoint(x: size / 2 + (left - right) / 2 * k, y: size / 2 + (up - down) / 2 * k)
+                }
                 let legs = leg(l, far: false)
-                for dx in [-0.3, 0.3] as [CGFloat] where hasLegs(sp.id) {
-                    draw(leg(l, far: true), at: CGPoint(x: center.x + (dx * l.bodyW + 2) * k, y: center.y + (l.bodyH * 0.25 + l.legLen + 3) * k), scale: k)
-                    draw(legs, at: CGPoint(x: center.x + dx * l.bodyW * k, y: center.y + (l.bodyH * 0.3 + l.legLen + 3) * k), scale: k)
+                for dx in (l.biped ? [-0.12] : [-0.3, 0.3]) as [CGFloat] where hasLegs(sp.id) {
+                    let far = l.biped ? l.bodyW * 0.18 + 1 : 2
+                    draw(leg(l, far: true), at: CGPoint(x: center.x + (dx * l.bodyW + far) * k, y: center.y + (l.bodyH * 0.22 - 1) * k), scale: k)
+                    draw(legs, at: CGPoint(x: center.x + dx * l.bodyW * k, y: center.y + l.bodyH * 0.22 * k), scale: k)
                 }
                 let t = tailOffset(l)
                 draw(tail(l), at: CGPoint(x: center.x + t.x * k, y: center.y - t.y * k), scale: k)
@@ -1033,9 +1109,9 @@ enum AnimalArt {
             case .swim:
                 draw(swimmer(l, id: sp.id, dip: false), at: CGPoint(x: size / 2, y: size / 2 + 14), scale: 1.5)
             case .flutter, .glow:
-                if sp.id == "dragonfly" {
+                if dragonflies.contains(sp.id) {
                     draw(dragonfly(l), at: CGPoint(x: size / 2, y: size / 2), scale: 2.2)
-                } else if sp.id == "firefly" {
+                } else if fireflies.contains(sp.id) {
                     Paint.radial(g, [c(l.body).alpha(0.9), c(l.body).alpha(0)], CGPoint(x: size / 2, y: size / 2), 22)
                     draw(firefly(l), at: CGPoint(x: size / 2, y: size / 2), scale: 2)
                 } else {

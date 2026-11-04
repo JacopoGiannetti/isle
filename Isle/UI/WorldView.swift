@@ -1,10 +1,12 @@
 import SwiftUI
 import SpriteKit
+import StoreKit
 
 struct WorldView: View {
     let habitID: String
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.requestReview) private var requestReview
     @State private var c: WorldController
     @State private var sheet: Sheet?
     @State private var note: String?
@@ -13,9 +15,13 @@ struct WorldView: View {
     @State private var confirmDelete = false
     @State private var confirmSlip = false
     @State private var hourMenu = false
+    @State private var bonus: Gain?
+    @State private var weatherInfo = false
+    /// Dalla scheda del primo animale si può aprire il Sentiero: recensione e paywall aspettano che si chiuda.
+    @State private var guestAfterPath = false
 
     enum Sheet: String, Identifiable {
-        case seeds, diary, path
+        case seeds, diary, path, calendar
         var id: String { rawValue }
     }
 
@@ -26,6 +32,7 @@ struct WorldView: View {
 
     private var habit: Habit? { store.habit(habitID) }
     private var tutorialKey: String { "tutorial.\(habitID)" }
+    private var chromeHidden: Bool { c.uiHidden && !c.editing && c.placing == nil && c.welcome == nil }
 
     private func endTutorial() {
         UserDefaults.standard.set(true, forKey: tutorialKey)
@@ -33,6 +40,7 @@ struct WorldView: View {
     }
 
     var body: some View {
+        let _ = Perf.count("worldView")
         ZStack {
             SkyView(scene: c.scene)
             LitScene(scene: c.scene, debug: Self.showFPS ? [.showsFPS, .showsNodeCount, .showsDrawCount] : [])
@@ -43,6 +51,7 @@ struct WorldView: View {
                     if !c.tray.isEmpty { trayPanel }
                 } else {
                     topBar.zIndex(2)
+                    if weatherInfo { weatherCard }
                     toasts
                 }
                 Spacer()
@@ -51,6 +60,8 @@ struct WorldView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
             .modifier(SkyLit(light: c.scene.light))
+            .opacity(chromeHidden ? 0 : 1)
+            .allowsHitTesting(!chromeHidden)
             if c.craving {
                 CravingView(controller: c)
                     .transition(.opacity)
@@ -58,6 +69,14 @@ struct WorldView: View {
             if let name = c.celebration {
                 RareBanner(name: name) { withAnimation { c.celebration = nil } }
                     .transition(.scale(scale: 0.6).combined(with: .opacity))
+            }
+            if let g = bonus {
+                RareBanner(name: L("+1 seme bonus"), kicker: g.bonus == .streak ? Lf("%d giorni di fila!", g.run) : L("Più del previsto!"),
+                           line: g.bonus == .streak ? L("La costanza fa crescere qualcosa di speciale.") : L("Hai fatto più del tuo obiettivo.")) {
+                    withAnimation { bonus = nil }
+                }
+                .padding(.horizontal, 40)
+                .transition(.scale(scale: 0.6).combined(with: .opacity))
             }
             if tutorial, let h = habit {
                 TutorialView(habit: h, onPlant: {
@@ -77,6 +96,9 @@ struct WorldView: View {
             #if DEBUG
             switch Launch.once("sheet") {
             case "path": sheet = .path
+            case "diary": sheet = .diary
+            case "calendar": sheet = .calendar
+            case "seeds": sheet = .seeds
             case "delete": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { confirmDelete = true }
             default: break
             }
@@ -110,9 +132,24 @@ struct WorldView: View {
             if Launch.once("slip") != nil {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { slip() }
             }
-            if let id = Launch.once("firstSeed"), let sp = speciesByID[id] {
+            if let ids = Launch.once("firstSeed") {
                 endTutorial()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { c.devPlant(sp) }
+                for (i, id) in ids.split(separator: ",").enumerated() {
+                    guard let sp = speciesByID[String(id)] else { continue }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1 + Double(i) * 2.5) { c.devPlant(sp) }
+                }
+            }
+            if Launch.once("hideUI") != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { c.uiHidden = true } }
+            }
+            if Launch.once("weatherInfo") != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { weatherInfo = true } }
+            }
+            if let s = Launch.once("closeWelcome").flatMap(Double.init) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + s) { withAnimation { c.closeWelcome() } }
+            }
+            if let s = Launch.once("answerAfter").flatMap(Double.init) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + s) { answer(UserDefaults.standard.bool(forKey: "answerYes")) }
             }
             #endif
         }
@@ -121,18 +158,27 @@ struct WorldView: View {
             Button(L("Sì, ho sgarrato"), role: .destructive) { slip() }
             Button(L("Annulla"), role: .cancel) {}
         } message: {
-            Text(L("Succede. Cadrà un meteorite sull'isola e i giorni puliti ripartiranno da zero. Il cratere, col tempo, diventerà uno stagno."))
+            if let h = habit, h.isHard, !h.bornToday {
+                Text(L("Succede. Cadrà un meteorite sull'isola e i giorni di fila ripartiranno da zero. Il cratere, col tempo, diventerà uno stagno."))
+            } else {
+                Text(L("Succede. Oggi niente seme e i giorni di fila ripartono da zero, ma l'isola resta com'è."))
+            }
         }
         .deleteIsleAlert(isPresented: $confirmDelete) {
             dismiss()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { store.delete(habitID) }
         }
-        .sheet(item: $sheet) { s in
+        .sheet(item: $sheet, onDismiss: {
+            guard guestAfterPath else { return }
+            guestAfterPath = false
+            Premium.afterFirstGuest { requestReview() }
+        }) { s in
             Group {
                 switch s {
                 case .seeds: SeedPicker(controller: c) { sheet = nil }
                 case .diary: DiaryView(controller: c) { sel in sheet = nil; DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { c.focus(sel) } }
                 case .path: PathView(controller: c)
+                case .calendar: if let h = habit { HabitCalendar(habit: h) }
                 }
             }
             .presentationDetents(s == .seeds ? [.medium, .large] : [.large])
@@ -164,6 +210,7 @@ struct WorldView: View {
             HStack(spacing: 12) {
                 GlassButton(icon: "book.closed.fill") { sheet = .diary }.accessibilityLabel(L("Diario"))
                 GlassButton(icon: "map.fill") { sheet = .path }.accessibilityLabel(L("Sentiero"))
+                GlassButton(icon: "calendar") { sheet = .calendar }.accessibilityLabel(L("Calendario"))
                 toolsButton
             }
         }
@@ -229,16 +276,55 @@ struct WorldView: View {
         let storm = c.world.storm > 0
         let f = c.forecast
         let rare = !storm && (f?.sky.rare ?? false)
-        let icon = storm ? "cloud.bolt.rain.fill" : (f?.sky.icon ?? "sun.max.fill")
-        let text = storm ? "Tempesta" : (f?.sky.name ?? "")
-        return HStack(spacing: 5) {
-            Image(systemName: icon).font(.system(size: 11, weight: .bold))
-            Text(text).font(.cozy(12, .bold)).lineLimit(1)
+        let land = c.world.habitat
+        let icon = storm ? StormInfo.icon(c.world.storm, snowy: land.snowy) : (f?.sky.icon(on: land) ?? "sun.max.fill")
+        let text = storm ? StormInfo.name(c.world.storm, snowy: land.snowy) : (f?.sky.name(on: land) ?? "")
+        return Button { withAnimation(.spring(duration: 0.35)) { weatherInfo.toggle() } } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon).font(.system(size: 11, weight: .bold))
+                Text(text).font(.cozy(12, .bold)).lineLimit(1)
+                if storm { StormInfo.Badge() }
+            }
+            .foregroundStyle(.white)
+            .padding(.leading, 10).padding(.trailing, storm ? 4 : 10).padding(.vertical, 4)
+            .background(rare ? AnyShapeStyle(Theme.rarity(.rare).opacity(0.8)) : AnyShapeStyle(Color.black.opacity(0.16)), in: Capsule())
+            .shadow(color: rare ? Theme.rarity(.rare).opacity(0.7) : .clear, radius: 8)
         }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 10).padding(.vertical, 4)
-        .background(rare ? AnyShapeStyle(Theme.rarity(.rare).opacity(0.8)) : AnyShapeStyle(Color.black.opacity(0.16)), in: Capsule())
-        .shadow(color: rare ? Theme.rarity(.rare).opacity(0.7) : .clear, radius: 8)
+        .buttonStyle(PressStyle())
+    }
+
+    /// Cosa vuol dire il meteo che vedi: tempesta perché manchi, nuvole per la settimana, o solo il cielo dell'isola.
+    private var weatherCard: some View {
+        let w = c.world
+        let quit = habit?.kind == .quit
+        return Button { withAnimation(.spring(duration: 0.35)) { weatherInfo = false } } label: {
+            VStack(alignment: .leading, spacing: 10) {
+                if let missed = w.weekMissed, let h = habit {
+                    StormInfo.header(L("Settimana sotto l'obiettivo"), Lf("La settimana scorsa: %d di %d.", missed, h.rhythm.target))
+                    Text(L("Il cielo resta nuvoloso finché non lo rifai. Nessun danno: appena segni «Fatto» torna il sole."))
+                        .font(.cozy(14)).foregroundStyle(Theme.ink.opacity(0.75))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else if w.storm > 0 {
+                    StormInfo.header(L("Tempesta perché manchi da un po'"), nil)
+                    StormInfo.Stages(current: w.storm, snowy: w.habitat.snowy)
+                    Text(quit ? L("Basta una risposta per far tornare il sole.") : L("Basta segnare «Fatto» per far tornare il sole."))
+                        .font(.cozy(14, .bold)).foregroundStyle(Theme.ink)
+                } else if let f = c.forecast {
+                    HStack(spacing: 8) {
+                        Image(systemName: f.sky.icon(on: w.habitat)).font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.violet)
+                        Text(f.sky.name(on: w.habitat)).font(.cozy(16, .bold)).foregroundStyle(Theme.ink)
+                    }
+                    Text(L("È il meteo dell'isola, non dipende da te.") + " " + Lf("Fino alle %@.", Forecast.time(f.end)))
+                        .font(.cozy(14)).foregroundStyle(Theme.ink.opacity(0.75))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .surface(20)
+        }
+        .buttonStyle(.plain)
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     /// Entra in modalità modifica. In sviluppo, tenendolo premuto si aprono gli strumenti di prova.
@@ -418,9 +504,13 @@ struct WorldView: View {
         guard let h = habit else { return "" }
         if h.kind == .quit {
             let s = h.streak
-            return s == 1 ? L("1 giorno pulito") : Lf("%d giorni puliti", s)
+            return s == 1 ? L("1 giorno di fila") : Lf("%d giorni di fila", s)
         }
-        if case .weekly(let n) = h.rhythm { return Lf("%d/%d settimana", h.thisWeekCount, n) }
+        switch h.rhythm {
+        case .weekly(let n): return Lf("%d/%d settimana", h.thisWeekCount, n)
+        case .perDay(let n): return Lf("%d/%d oggi", h.todayCount, n)
+        case .daily: break
+        }
         return h.streak == 1 ? L("1 giorno di fila") : Lf("%d giorni di fila", h.streak)
     }
 
@@ -463,8 +553,12 @@ struct WorldView: View {
         } else if let sp = c.placing {
             placingCard(sp)
         } else if let id = c.welcome {
-            WelcomeCard(controller: c, residentID: id, onClose: c.closeWelcome) {
+            WelcomeCard(controller: c, residentID: id) {
                 c.closeWelcome()
+                Premium.afterFirstGuest { requestReview() }
+            } onPath: {
+                c.closeWelcome()
+                guestAfterPath = true
                 sheet = .path
             }
             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -491,8 +585,11 @@ struct WorldView: View {
                 }
                 if h.needsAnswerToday || h.seedsPending > 0 {
                     mainAction(h)
+                } else if h.canMark {
+                    markCard(h)
                 } else {
                     doneTag(h)
+                    if h.canExtra { extraButton }
                     if canSlip(h) { slipButton }
                 }
             }
@@ -501,6 +598,56 @@ struct WorldView: View {
 
     private func canSlip(_ h: Habit) -> Bool {
         h.kind == .quit
+    }
+
+    /// Chi inizia segna quando lo fa, a qualsiasi ora: una riga discreta, non una domanda che blocca.
+    private func markCard(_ h: Habit) -> some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(h.question)
+                    .font(.cozy(14, .bold))
+                    .foregroundStyle(Theme.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let n = h.daysToStreakBonus, h.streak > 0 {
+                    bonusHint(n).font(.cozy(12, .semibold))
+                } else {
+                    Text(h.progressText)
+                        .font(.cozy(12, .medium))
+                        .foregroundStyle(Theme.ink.opacity(0.65))
+                }
+            }
+            Spacer(minLength: 0)
+            Button { answer(true) } label: {
+                Label(L("Fatto"), systemImage: "checkmark")
+                    .font(.cozy(14, .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 9)
+                    .background(AccentFill().clipShape(Capsule()))
+                    .overlay(Capsule().stroke(.white.opacity(0.75), lineWidth: 1))
+                    .shadow(color: Color(hex: 0x7A5CFF).opacity(0.3), radius: 8, y: 4)
+            }
+            .buttonStyle(PressStyle())
+        }
+        .padding(.leading, 18).padding(.trailing, 8).padding(.vertical, 8)
+        .surface(18)
+    }
+
+    private func bonusHint(_ days: Int) -> some View {
+        Label(days == 1 ? L("Seme bonus domani") : Lf("Seme bonus tra %d giorni", days), systemImage: "sparkles")
+            .font(.cozy(13, .semibold))
+            .foregroundStyle(Theme.gold.mix(with: Theme.ink, by: 0.25))
+            .lineLimit(1)
+    }
+
+    private var extraButton: some View {
+        Button { answer(true) } label: {
+            Label(L("L'ho fatto un'altra volta"), systemImage: "plus")
+                .font(.cozy(14, .semibold))
+                .foregroundStyle(Theme.ink)
+                .padding(.horizontal, 14).padding(.vertical, 9)
+                .surface(13)
+        }
+        .buttonStyle(PressStyle())
     }
 
     private var slipButton: some View {
@@ -514,21 +661,43 @@ struct WorldView: View {
         .buttonStyle(PressStyle())
     }
 
+    private func doneLines(_ h: Habit) -> (String, String) {
+        if h.kind == .build && h.rhythm.allowsExtra && h.targetReached {
+            let title = h.rhythm.isWeekly ? L("Obiettivo della settimana raggiunto!") : L("Obiettivo di oggi raggiunto!")
+            return (title, h.canExtra ? L("Ogni volta in più vale un seme bonus, fino a 2 a settimana.")
+                                      : L("Hai già preso i semi bonus di questa settimana."))
+        }
+        if h.kind == .build && h.rhythm.isWeekly {
+            return (L("Per oggi è tutto"), h.progressText)
+        }
+        if h.waitingForQuestion {
+            return (L("Per ora è tutto"), String(format: L("La domanda di oggi arriva alle %d:%02d"), h.reminderHour, h.reminderMinute))
+        }
+        return (L("Per oggi è tutto"), String(format: L("Ci sentiamo domani alle %d:%02d"), h.reminderHour, h.reminderMinute))
+    }
+
     private func doneTag(_ h: Habit) -> some View {
-        HStack(spacing: 12) {
+        let (title, line) = doneLines(h)
+        return HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 1) {
-                Text(h.waitingForQuestion ? L("Per ora è tutto") : L("Per oggi è tutto"))
+                Text(title)
                     .font(.cozy(14, .bold))
                     .foregroundStyle(Theme.ink)
-                Text(String(format: h.waitingForQuestion ? L("La domanda di oggi arriva alle %d:%02d") : L("Ci sentiamo domani alle %d:%02d"), h.reminderHour, h.reminderMinute))
+                Text(line)
                     .font(.cozy(12, .medium))
                     .foregroundStyle(Theme.ink.opacity(0.65))
+                    .fixedSize(horizontal: false, vertical: true)
+                if let n = h.daysToStreakBonus, h.streak > 0 {
+                    bonusHint(n).font(.cozy(12, .semibold))
+                }
             }
+            .layoutPriority(1)
             if h.kind == .quit {
                 Button {
                     withAnimation(.easeInOut(duration: 0.4)) { c.startCraving() }
                 } label: {
                     Label(L("Ho voglia"), systemImage: "hand.raised.fill")
+                        .fixedSize()
                         .font(.cozy(13, .semibold))
                         .foregroundStyle(Theme.red)
                         .padding(.horizontal, 12).padding(.vertical, 7)
@@ -545,20 +714,12 @@ struct WorldView: View {
         Card {
             VStack(spacing: 12) {
                 if h.needsAnswerToday {
-                    if case .weekly(let n) = h.rhythm {
-                        Text(Lf("%d di %d questa settimana", h.thisWeekCount, n))
-                            .font(.cozy(14, .semibold)).foregroundStyle(Theme.muted)
-                        Text(h.question).font(.cozy(20, .bold)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
-                        Button(L("Sì, fatto")) { answer(true) }.buttonStyle(PrimaryButton())
-                    } else {
-                        Text(h.question).font(.cozy(21, .bold)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
-                        if h.kind == .quit {
-                            Button(h.noLabel) { answer(false) }.buttonStyle(PrimaryButton())
-                            Button(h.yesLabel) { answer(true) }.buttonStyle(SoftButton())
-                        } else {
-                            Button(h.yesLabel) { answer(true) }.buttonStyle(PrimaryButton())
-                            Button(h.noLabel) { answer(false) }.buttonStyle(SoftButton())
-                        }
+                    Text(h.question).font(.cozy(21, .bold)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
+                    Button(h.noLabel) { answer(false) }.buttonStyle(PrimaryButton())
+                    Button(h.yesLabel) { answer(true) }.buttonStyle(SoftButton())
+                    if h.bornToday {
+                        Text(L("Il primo giorno non ci sono conseguenze: al massimo niente seme."))
+                            .font(.cozy(13, .medium)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
                     }
                 } else if h.seedsPending > 0 {
                     Button {
@@ -611,25 +772,66 @@ struct WorldView: View {
     }
 
     private func answer(_ yes: Bool) {
+        guard let before = habit else { return }
         let outcome = c.answer(yes: yes)
-        let h = habit
         switch outcome {
-        case .seed:
-            say(h?.kind == .quit ? L("Un altro giorno pulito. L'isola si allarga.") : L("Fatto! L'isola si allarga."))
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { sheet = .seeds }
+        case .seed(let g):
+            say(gainText(g, before), for: g.bonus != nil || g.done == g.target && before.rhythm.allowsExtra ? 7 : 4)
+            if g.bonus != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { withAnimation(.spring(duration: 0.5)) { bonus = g } }
+            }
+            if g.seeds > 0 || g.bonus != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + (g.bonus != nil ? 4.2 : 1.6)) { sheet = .seeds }
+            }
         case .relapse:
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.4) {
                 say(L("È caduto un meteorite. Il cratere diventerà uno stagno: anche questo fa parte della tua isola. Si riparte da domani."), for: 7)
             }
         case .missed:
-            say(L("Va bene. L'isola ti aspetta domani."))
+            if before.kind == .quit && yes {
+                say(softRelapseText(before), for: 6)
+            } else {
+                say(L("Va bene. L'isola ti aspetta domani."))
+            }
         case .already:
             break
         }
     }
 
+    private func gainText(_ g: Gain, _ h: Habit) -> String {
+        switch g.bonus {
+        case .streak: return Lf("%d giorni di fila! +1 seme bonus", g.run)
+        case .extra: return L("+1 seme bonus perché hai fatto più del previsto")
+        case nil: break
+        }
+        var text: String
+        if g.seeds == 0 {
+            text = Lf("Fatto! %d di %d oggi.", g.done, g.target)
+        } else if h.kind == .quit {
+            text = L("Un altro giorno di fila. L'isola si allarga.")
+        } else if g.seeds > 1 {
+            text = Lf("Fatto! +%d semi, l'isola si allarga.", g.seeds)
+        } else {
+            text = L("Fatto! L'isola si allarga.")
+        }
+        if h.rhythm.allowsExtra && g.done == g.target {
+            text += " " + L("Obiettivo raggiunto! Ogni volta in più vale un seme bonus, fino a 2 a settimana.")
+        }
+        return text
+    }
+
+    private func softRelapseText(_ h: Habit) -> String {
+        h.bornToday
+            ? L("Il primo giorno non conta: oggi niente seme, l'isola resta com'è.")
+            : L("Succede. Oggi niente seme e i giorni di fila ripartono da zero. L'isola resta com'è.")
+    }
+
     private func slip() {
-        guard c.slip() else { return }
+        guard let h = habit else { return }
+        guard c.slip() else {
+            say(softRelapseText(h), for: 6)
+            return
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.4) {
             say(L("È caduto un meteorite. Il cratere diventerà uno stagno: anche questo fa parte della tua isola. Si riparte da adesso."), for: 7)
         }
@@ -692,6 +894,8 @@ struct Breathing: ViewModifier {
 
 struct RareBanner: View {
     let name: String
+    var kicker = L("Variante rara!")
+    var line = L("Qualcosa di speciale potrebbe arrivare qui.")
     let onClose: () -> Void
     @State private var spin = false
 
@@ -710,9 +914,9 @@ struct RareBanner: View {
                     .foregroundStyle(Theme.gold.gradient)
             }
             .frame(height: 100)
-            Text(L("Variante rara!")).font(.cozy(15, .bold)).foregroundStyle(Theme.gold)
-            Text(name).font(.cozy(26, .bold)).foregroundStyle(Theme.ink)
-            Text(L("Qualcosa di speciale potrebbe arrivare qui.")).font(.cozy(14)).foregroundStyle(Theme.muted)
+            Text(kicker).font(.cozy(15, .bold)).foregroundStyle(Theme.gold)
+            Text(name).font(.cozy(26, .bold)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
+            Text(line).font(.cozy(14)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
         }
         .padding(28)
         .background(Theme.paper, in: RoundedRectangle(cornerRadius: 32, style: .continuous))

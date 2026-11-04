@@ -32,6 +32,9 @@ struct IntroView: View {
     @State private var subtitle: Double = 0
     @State private var buttonIn = false
     @State private var art: [BubbleArt] = []
+    /// "Ho già delle isole": si cercano su iCloud.
+    @State private var checking = false
+    @State private var restoreNote: String?
 
     private let shows = Showcase.all
     private static let launchSky = Color(hex: 0xA0D9E5)
@@ -170,14 +173,49 @@ struct IntroView: View {
     // MARK: arrivo
 
     private var continueButton: some View {
-        Button(L("Continua"), action: onStart)
-        .buttonStyle(PrimaryButton())
+        VStack(spacing: 6) {
+            if let restoreNote {
+                Text(restoreNote)
+                    .font(.cozy(14, .medium))
+                    .foregroundStyle(Theme.muted)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity)
+            }
+            Button(L("Continua"), action: onStart)
+                .buttonStyle(PrimaryButton())
+            Button(action: restore) {
+                ZStack {
+                    Text(L("Ho già delle isole")).opacity(checking ? 0 : 1)
+                    if checking { ProgressView() }
+                }
+                .font(.cozy(16, .semibold))
+                .foregroundStyle(Theme.ink.opacity(0.7))
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .disabled(checking)
+        }
         .padding(.horizontal, 24)
-        .padding(.bottom, 10)
         .frame(maxHeight: .infinity, alignment: .bottom)
         .opacity(buttonIn ? 1 : 0)
         .offset(y: buttonIn ? 0 : 16)
         .allowsHitTesting(buttonIn)
+    }
+
+    /// Le isole trovate su iCloud le prende `Store`; poi si entra come con "Continua".
+    private func restore() {
+        checking = true
+        withAnimation { restoreNote = nil }
+        Task {
+            await Cloud.sync()
+            checking = false
+            guard Store.shared.habits.isEmpty else { return onStart() }
+            let status = Cloud.status
+            let note = status.account == false ? L("Accedi a iCloud nelle impostazioni di iPhone, poi riprova.")
+                : status.failed ? L("iCloud non risponde. Riprova tra poco.")
+                : L("Non ci sono isole salvate su questo iCloud.")
+            withAnimation { restoreNote = note }
+        }
     }
 
     // MARK: testo
@@ -320,9 +358,15 @@ struct IntroView: View {
                 dragging = false
                 motion.glowOn = false
                 motion.playOn = false
-                let p = layout.progress(motion.y)
-                let flung = layout.progress(motion.y + v.predictedEndTranslation.height - v.translation.height)
-                if p > 0.5 || (p > 0.25 && flung > 0.9) {
+                // Il dito, non la bolla: la molla resta indietro e uno swipe veloce sembrerebbe fermo.
+                let p = layout.progress(motion.ty)
+                let flung = layout.progress(motion.ty + v.predictedEndTranslation.height - v.translation.height)
+                let speed = v.velocity.height
+                if speed < -300 && v.translation.height < -10 {
+                    arrive(layout)
+                } else if speed > 300 {
+                    dropBack(layout)
+                } else if p > 0.5 || flung > 0.9 {
                     arrive(layout)
                 } else {
                     dropBack(layout)
@@ -550,7 +594,7 @@ struct CloudPass {
     static let throughTime = 1.3
 }
 
-private struct CloudLayer: View {
+struct CloudLayer: View {
     let pass: CloudPass
 
     private struct Puff {

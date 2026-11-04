@@ -19,20 +19,18 @@ struct TutorialView: View {
 
     private var pages: [Page] {
         let time = String(format: "%d:%02d", habit.reminderHour, habit.reminderMinute)
-        let ask: String
-        switch (habit.kind, habit.rhythm) {
-        case (.quit, _):
-            ask = Lf("Da domani, alle %@, ti chiediamo: «%@». Ogni giorno pulito vale un seme e un pezzo d'isola in più. Se ricadi cade un meteorite, ma il cratere col tempo diventa uno stagno.", time, habit.question)
-        case (.build, .weekly):
-            ask = L("Da domani, ogni volta che lo fai, segnalo qui. Ogni volta vale un seme e un pezzo d'isola in più.")
-        case (.build, .daily):
-            ask = Lf("Da domani, alle %@, ti chiediamo: «%@». Ogni «sì» vale un seme e un pezzo d'isola in più.", time, habit.question)
-        }
+        let ask = habit.kind == .quit
+            ? Page(title: L("La domanda del giorno"),
+                   text: Lf("Alle %@ ti chiediamo: «%@». Ogni «No» fa crescere l'isola.", time, habit.question),
+                   colors: [0xF7C9A8, 0xB98AB8], art: .question)
+            : Page(title: L("Segna quando lo fai"),
+                   text: L("Quando lo fai, tocca «Fatto», a qualsiasi ora: l'isola cresce subito."),
+                   colors: [0xF7C9A8, 0xB98AB8], art: .question)
         return [
             Page(title: L("Questa è la tua isola"),
                  text: L("Per ora è piccola. Ogni giorno in cui ce la fai si allarga, e la vita arriva da sola."),
                  colors: [0xBFE6EE, 0x8CCFDD], art: .island),
-            Page(title: L("La domanda del giorno"), text: ask, colors: [0xF7C9A8, 0xB98AB8], art: .question),
+            ask,
             Page(title: L("Semi e animali"),
                  text: L("Scegli tu cosa piantare. Ogni pianta attira animali diversi: la quercia porta scoiattoli, i fiori portano conigli. Più l'isola cresce, più animali ci stanno."),
                  colors: [0xD5EDB8, 0x9CCB86], art: .seeds),
@@ -40,7 +38,7 @@ struct TutorialView: View {
                  text: L("Ogni tanto un seme sboccia in una variante rara. È l'unico modo per attirare gli animali rari: chissà chi arriverà."),
                  colors: [0xE3D2F5, 0xB596DE], art: .rare),
             Page(title: L("Si comincia"),
-                 text: Lf("Hai %d semi per cominciare. Pianta il primo e guarda cosa succede.", Habit.startSeeds),
+                 text: Lf("Hai %d semi per cominciare. Piantali e guarda cosa succede.", Habit.startSeeds),
                  colors: [0xFBE3A6, 0xF2B865], art: .start),
         ]
     }
@@ -80,7 +78,7 @@ struct TutorialView: View {
                 }
                 .animation(.spring(duration: 0.4), value: page)
                 .padding(.bottom, 16)
-                Button(last ? L("Pianta il primo seme") : L("Avanti")) {
+                Button(last ? L("Pianta i primi semi") : L("Avanti")) {
                     if last { finish(plant: true) } else { withAnimation(.spring(duration: 0.45)) { page += 1 } }
                 }
                 .buttonStyle(PrimaryButton())
@@ -313,7 +311,7 @@ struct TutorialView: View {
     }
 }
 
-/// La spiegazione che accompagna il primo animale arrivato col primo seme.
+/// La spiegazione che accompagna il primo animale, arrivato col secondo seme.
 struct WelcomeCard: View {
     let controller: WorldController
     let residentID: String

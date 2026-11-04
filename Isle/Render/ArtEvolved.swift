@@ -26,7 +26,7 @@ extension Art {
             Paint.fill(g, CGPath(roundedRect: CGRect(x: 3, y: 34, width: 74, height: 4), cornerWidth: 1.5, cornerHeight: 1.5, transform: nil), wood)
         case "glowshroom":
             ring(g, back: true)
-        default: break
+        default: wildEvolved(id, rare: false, front: false, g, &r)
         }
     }
 
@@ -185,19 +185,19 @@ extension Art {
         case "ancientoak":
             treehouse(g)
 
-        default: break
+        default: wildEvolved(id, rare: rare, front: true, g, &r)
         }
     }
 
     // MARK: pezzi
 
     /// Un punto a caso dentro un'ellisse, più fitto al centro.
-    private static func spot(_ r: inout RNG, _ cx: CGFloat, _ cy: CGFloat, _ rx: CGFloat, _ ry: CGFloat) -> CGPoint {
+    static func spot(_ r: inout RNG, _ cx: CGFloat, _ cy: CGFloat, _ rx: CGFloat, _ ry: CGFloat) -> CGPoint {
         let a = r.range(0, 6.283), d = sqrt(r.range(0, 1))
         return CGPoint(x: cx + cos(a) * rx * d, y: cy + sin(a) * ry * d)
     }
 
-    private static func blossom(_ g: CGContext, _ x: CGFloat, _ y: CGFloat, _ rr: CGFloat, _ col: UIColor, center: UIColor) {
+    static func blossom(_ g: CGContext, _ x: CGFloat, _ y: CGFloat, _ rr: CGFloat, _ col: UIColor, center: UIColor) {
         for k in 0..<5 {
             let a = CGFloat(k) / 5 * 6.283
             Paint.fill(g, Paint.circle(x + cos(a) * rr, y + sin(a) * rr * 0.85, rr * 0.72), col.shade(0.12))
@@ -215,7 +215,7 @@ extension Art {
     }
 
     /// Una lucina con l'alone: lucciole, palline, pigne che brillano.
-    private static func light(_ g: CGContext, _ x: CGFloat, _ y: CGFloat, _ hex: UInt32, _ s: CGFloat) {
+    static func light(_ g: CGContext, _ x: CGFloat, _ y: CGFloat, _ hex: UInt32, _ s: CGFloat) {
         let c = UIColor(hex: hex)
         Paint.radial(g, [c.alpha(0.8), c.alpha(0)], CGPoint(x: x, y: y), 3.2 * s)
         Paint.fill(g, Paint.circle(x, y, s), c.light(0.6))

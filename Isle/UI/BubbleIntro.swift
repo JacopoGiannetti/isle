@@ -71,7 +71,7 @@ struct BubbleArt {
         ]
         var flora = plants.map { id, rare, evolved in (evolved ? Art.evolved(id, rare: rare) : Art.plant(id, rare: rare)).image }
         flora += ["amanita", "bluebell", "strawberry", "tenacity", "wildglow", "fourleaf"].map { Art.flora($0, variant: 0).image }
-        var animals = animalList.map { AnimalArt.portrait($0) }
+        var animals = forestAnimals.map { AnimalArt.portrait($0) }
         if let whale = animalByID["skywhale"] { animals.append(AnimalArt.skyWhale(whale.look).image) }
         func spread(_ list: [UIImage], _ salt: Double) -> [(Double, UIImage)] {
             list.enumerated().map { ((Double($0.offset) + salt) / Double(list.count), $0.element) }

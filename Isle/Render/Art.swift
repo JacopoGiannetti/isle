@@ -7,30 +7,29 @@ enum Art {
 
     static let tileSide: CGFloat = 14
 
-    static func tile(_ variant: Int) -> ArtImage {
+    static func tile(_ variant: Int, _ t: Terrain) -> ArtImage {
         let s = tileSide
         let w: CGFloat = 66, h: CGFloat = 34 + s + 1
         var r = RNG("tile\(variant)")
-        let grass = [UIColor(hex: 0x8DC56A), UIColor(hex: 0x88C066), UIColor(hex: 0x93CA6F), UIColor(hex: 0x86BE62)][variant % 4]
+        let grass = UIColor(hex: t.top[variant % 4])
+        let snow = t.surface == .snow
         let img = Paint.image(w, h, base: h - 17) { g in
             let top = CGPoint(x: 33, y: 0.4), right = CGPoint(x: 65.6, y: 17), bottom = CGPoint(x: 33, y: 33.6), left = CGPoint(x: 0.4, y: 17)
             // Fianchi di terra
             let lf = CGMutablePath()
             lf.addLines(between: [left, bottom, CGPoint(x: 33, y: 33.6 + s), CGPoint(x: 0.4, y: 17 + s)])
             lf.closeSubpath()
-            Paint.linear(g, lf, [UIColor(hex: 0xC99A66), UIColor(hex: 0xA77A52), UIColor(hex: 0x6E8C8A)],
-                         CGPoint(x: 0, y: 17), CGPoint(x: 0, y: 33 + s))
+            Paint.linear(g, lf, t.left.map { UIColor(hex: $0) }, CGPoint(x: 0, y: 17), CGPoint(x: 0, y: 33 + s))
             let rf = CGMutablePath()
             rf.addLines(between: [bottom, right, CGPoint(x: 65.6, y: 17 + s), CGPoint(x: 33, y: 33.6 + s)])
             rf.closeSubpath()
-            Paint.linear(g, rf, [UIColor(hex: 0xA97B52), UIColor(hex: 0x87603F), UIColor(hex: 0x557775)],
-                         CGPoint(x: 0, y: 17), CGPoint(x: 0, y: 33 + s))
+            Paint.linear(g, rf, t.right.map { UIColor(hex: $0) }, CGPoint(x: 0, y: 17), CGPoint(x: 0, y: 33 + s))
             // Venature e sassolini nella terra
             for _ in 0..<5 {
                 let x = r.range(4, 62)
                 let yTop = x < 33 ? 17 + (x / 33) * 16.6 : 33.6 - ((x - 33) / 33) * 16.6
                 let y = yTop + r.range(5, s - 3)
-                Paint.fill(g, Paint.ellipse(x, y, r.range(0.8, 1.6), r.range(0.6, 1.0)), UIColor(hex: 0x7A5A3E, alpha: 0.5))
+                Paint.fill(g, Paint.ellipse(x, y, r.range(0.8, 1.6), r.range(0.6, 1.0)), UIColor(hex: t.grit, alpha: 0.5))
             }
             // Bordo d'erba che sporge sui fianchi
             let lip = CGMutablePath()
@@ -54,7 +53,7 @@ enum Art {
                 }
             }
             lip.closeSubpath()
-            Paint.fill(g, lip, grass.shade(0.22))
+            Paint.fill(g, lip, snow ? UIColor(hex: 0xD6E4F0) : grass.shade(0.22))
             for (dx, dy, dw) in drips {
                 Paint.fill(g, Paint.ellipse(dx - dw * 0.3, dy - 1.6, dw * 0.35, 1.4), grass.alpha(0.55))
             }
@@ -65,6 +64,44 @@ enum Art {
             Paint.fill(g, topPath, grass)
             Paint.clipped(g, topPath) {
                 Paint.linear(g, topPath, [grass.light(0.1), grass, grass.shade(0.06)], CGPoint(x: 10, y: 0), CGPoint(x: 50, y: 34))
+                switch t.surface {
+                case .snow:
+                    // Neve: ombre azzurre morbide e qualche scintilla.
+                    for _ in 0..<4 {
+                        Paint.fill(g, Paint.ellipse(r.range(10, 56), r.range(8, 28), r.range(5, 9), r.range(1.6, 2.6)), UIColor(hex: 0xBCD2E6, alpha: 0.35))
+                    }
+                    for _ in 0..<7 {
+                        Paint.fill(g, Paint.circle(r.range(6, 60), r.range(5, 30), r.range(0.4, 0.8)), UIColor.white)
+                    }
+                    return
+                case .dry:
+                    // Erba secca: ciuffi lunghi e qualche chiazza di terra rossa.
+                    for _ in 0..<2 {
+                        Paint.fill(g, Paint.ellipse(r.range(12, 54), r.range(9, 26), r.range(3, 6), r.range(1.2, 2)), UIColor(hex: 0xC9874E, alpha: 0.35))
+                    }
+                    for _ in 0..<16 {
+                        let px = r.range(6, 60), py = r.range(5, 30)
+                        let c = r.chance(0.5) ? grass.shade(0.22).alpha(0.6) : grass.light(0.3).alpha(0.7)
+                        let p = CGMutablePath()
+                        p.move(to: CGPoint(x: px, y: py))
+                        p.addQuadCurve(to: CGPoint(x: px + r.range(1, 2.5), y: py - r.range(3, 4.5)), control: CGPoint(x: px + 0.2, y: py - 2))
+                        p.move(to: CGPoint(x: px + 0.6, y: py))
+                        p.addQuadCurve(to: CGPoint(x: px - r.range(0.5, 1.8), y: py - r.range(2.5, 3.8)), control: CGPoint(x: px + 0.4, y: py - 2))
+                        Paint.stroke(g, p, c, 0.6)
+                    }
+                    return
+                case .fern:
+                    // Muschio e sabbia: qualche fronda scura e granelli chiari.
+                    for _ in 0..<3 {
+                        let px = r.range(10, 56), py = r.range(8, 28)
+                        Art.leaf(g, px, py, -2.6, r.range(3, 4.5), grass.shade(0.25).alpha(0.7))
+                        Art.leaf(g, px, py, -0.5, r.range(3, 4.5), grass.shade(0.18).alpha(0.7))
+                    }
+                    for _ in 0..<6 {
+                        Paint.fill(g, Paint.circle(r.range(6, 60), r.range(5, 30), 0.5), UIColor(hex: 0xF2DC9E, alpha: 0.7))
+                    }
+                case .grass: break
+                }
                 for _ in 0..<18 {
                     let px = r.range(6, 60), py = r.range(4, 30)
                     let dark = r.chance(0.6)
@@ -133,7 +170,10 @@ enum Art {
         case "maple": return maple(rare)
         case "log": return log(rare)
         case "pond": return pond(rare)
-        case "source": return sourcePond()
+        case "source": return sourcePond(.forest)
+        case "source-pre": return sourcePond(.prehistoric)
+        case "source-sav": return sourcePond(.savanna)
+        case "source-arc": return sourcePond(.arctic)
         case "willow": return willow(rare)
         case "wisteria": return wisteria(rare)
         case "bluefir": return fir(rare ? 0xB3C6D3 : 0x4F86A8, snow: false, tall: true)
@@ -144,7 +184,7 @@ enum Art {
         case "lighttree": return lighttree(rare)
         case "ancientoak": return ancientOak(rare)
         case "goldcherry": return cherry(0xF4C65C, specks: 0xFFF2C2, gold: true)
-        default: return sprout()
+        default: return wildPlant(id, rare: rare) ?? sprout()
         }
     }
 
@@ -387,8 +427,15 @@ enum Art {
     }
 
     /// Lo stagno sorgente: piccolo, rotondo, acqua che brilla dal fondo e un anello di luci dorate.
-    static func sourcePond() -> ArtImage {
+    static func sourcePond(_ land: Habitat) -> ArtImage {
         var r = RNG("sourcepond")
+        let stones: [UInt32], cap: UInt32, lights: UInt32
+        switch land {
+        case .forest: (stones, cap, lights) = ([0x6E6A7E, 0x7C7790, 0x625E72], 0x6FA850, 0xFFE7A0)
+        case .prehistoric: (stones, cap, lights) = ([0x4A3E44, 0x5A4C50, 0x3E3238], 0xF2A23A, 0xFFC86A)
+        case .savanna: (stones, cap, lights) = ([0xB2683E, 0xC27A4A, 0x9A5634], 0xDDBE68, 0xFFE7A0)
+        case .arctic: (stones, cap, lights) = ([0x8AA2C0, 0x9AB2CE, 0x7A92B2], 0xF6FAFD, 0xCFF2FF)
+        }
         return Paint.image(56, 34, base: 17) { g in
             let cx: CGFloat = 28, cy: CGFloat = 17
             Paint.fill(g, Paint.ellipse(cx, cy + 1.5, 22, 11), UIColor(hex: 0x4E6B4A, alpha: 0.4))
@@ -400,16 +447,16 @@ enum Art {
             Paint.fill(g, Paint.ellipse(cx - 6, cy - 3, 4.5, 1.2), UIColor.white.alpha(0.5))
             for i in 0..<12 {
                 let a = CGFloat(i) / 12 * 6.283 + 0.2
-                Paint.fill(g, Paint.circle(cx + cos(a) * 12.5, cy + sin(a) * 6.2, 0.7), UIColor(hex: 0xFFE7A0, alpha: 0.85))
+                Paint.fill(g, Paint.circle(cx + cos(a) * 12.5, cy + sin(a) * 6.2, 0.7), UIColor(hex: lights, alpha: 0.85))
             }
             for i in 0..<11 {
                 let a = CGFloat(i) / 11 * 6.283 + r.range(-0.12, 0.12)
                 let x = cx + cos(a) * 18, y = cy + sin(a) * 9
                 let sz = r.range(3, 4.2)
-                let stone = UIColor(hex: [0x6E6A7E, 0x7C7790, 0x625E72][i % 3])
+                let stone = UIColor(hex: stones[i % 3])
                 Paint.fill(g, Paint.ellipse(x, y + 0.8, sz, sz * 0.72), stone.shade(0.35))
                 Paint.fill(g, Paint.ellipse(x, y, sz, sz * 0.68), stone)
-                Paint.fill(g, Paint.ellipse(x, y - sz * 0.35, sz * 0.8, sz * 0.32), UIColor(hex: 0x6FA850, alpha: 0.95))
+                Paint.fill(g, Paint.ellipse(x, y - sz * 0.35, sz * 0.8, sz * 0.32), UIColor(hex: cap, alpha: 0.95))
             }
             for k in 0..<3 {
                 let x = cx - 7 + CGFloat(k) * 7, y = cy - 10 - CGFloat(k % 2) * 4
@@ -917,16 +964,22 @@ enum Art {
                 Paint.fill(g, Paint.circle(11, 9, 1.4), UIColor(hex: 0xFFF3C4))
             }
         default:
-            return sprout()
+            return wildFlora(id, &r) ?? sprout()
         }
     }
 
     // MARK: Cratere
 
-    static func crater(_ stage: Int) -> ArtImage {
+    static func crater(_ stage: Int, land: Habitat = .forest) -> ArtImage {
         var r = RNG("crater\(stage)")
+        let ground = UIColor(hex: land.terrain.top[0])
+        let rim = land == .forest ? UIColor(hex: 0x7F9A5A) : ground.shade(0.18)
         return Paint.image(80, 46, base: 23) { g in
             let cx: CGFloat = 40, cy: CGFloat = 23
+            if stage >= 3 && land != .forest {
+                healedCrater(g, land, cx, cy, &r)
+                return
+            }
             switch stage {
             case 0:
                 Paint.fill(g, Paint.ellipse(cx, cy + 1, 34, 17), UIColor(hex: 0x6E5440))
@@ -943,17 +996,17 @@ enum Art {
                     Paint.radial(g, [UIColor(hex: 0xFFB060, alpha: 0.95), UIColor(hex: 0xFF6A2A, alpha: 0)], CGPoint(x: x, y: y), r.range(1.6, 3))
                 }
             case 1:
-                Paint.fill(g, Paint.ellipse(cx, cy + 1, 33, 16.5), UIColor(hex: 0x7F9A5A))
+                Paint.fill(g, Paint.ellipse(cx, cy + 1, 33, 16.5), rim)
                 Paint.fill(g, Paint.ellipse(cx, cy + 1, 28, 13.5), UIColor(hex: 0x6E5240))
                 for _ in 0..<22 {
                     let x = cx + r.range(-24, 24), y = cy + r.range(-10, 11)
                     let p = CGMutablePath()
                     p.move(to: CGPoint(x: x, y: y + 2))
                     p.addLine(to: CGPoint(x: x + r.range(-1, 1), y: y - r.range(1.5, 3.5)))
-                    Paint.stroke(g, p, UIColor(hex: 0x7CC260), 1)
+                    Paint.stroke(g, p, land == .forest ? UIColor(hex: 0x7CC260) : ground.shade(0.05), 1)
                 }
             case 2:
-                Paint.fill(g, Paint.ellipse(cx, cy + 1, 33, 16.5), UIColor(hex: 0x86A260))
+                Paint.fill(g, Paint.ellipse(cx, cy + 1, 33, 16.5), land == .forest ? UIColor(hex: 0x86A260) : rim.light(0.05))
                 Paint.fill(g, Paint.ellipse(cx, cy + 1, 28, 13.5), UIColor(hex: 0x7C6448))
                 Paint.linear(g, Paint.ellipse(cx, cy + 2, 22, 10), [UIColor(hex: 0x6E9A94), UIColor(hex: 0x9CC2B4)], CGPoint(x: cx, y: cy - 8), CGPoint(x: cx, y: cy + 12))
                 Paint.fill(g, Paint.ellipse(cx - 6, cy, 6, 1.4), UIColor.white.alpha(0.3))
@@ -969,6 +1022,43 @@ enum Art {
                     lily(g, cx + cos(a) * r.range(8, 19), cy + 1 + sin(a) * r.range(3, 8), r.range(3.4, 4.4), flower: i % 2 == 0, pink: true)
                 }
             }
+        }
+    }
+
+    /// Il cratere guarito negli altri mondi: sorgente calda, pozza o sorgente termale.
+    private static func healedCrater(_ g: CGContext, _ land: Habitat, _ cx: CGFloat, _ cy: CGFloat, _ r: inout RNG) {
+        switch land {
+        case .savanna:
+            Paint.fill(g, Paint.ellipse(cx, cy + 1, 34, 17), UIColor(hex: 0xB86A3E))
+            Paint.fill(g, Paint.ellipse(cx, cy + 1.6, 31, 15), UIColor(hex: 0x8A4A2C))
+            let water = Paint.ellipse(cx, cy + 1.5, 27, 12.5)
+            Paint.linear(g, water, [UIColor(hex: 0x5E9AAE), UIColor(hex: 0x9AC8C4)], CGPoint(x: cx, y: cy - 11), CGPoint(x: cx, y: cy + 14))
+            Paint.fill(g, Paint.ellipse(cx - 8, cy - 1, 9, 1.8), UIColor.white.alpha(0.35))
+            for (dx, dy) in [(-24.0, -2.0), (-21.0, 4.0), (23.0, -3.0)] as [(CGFloat, CGFloat)] {
+                for k in 0..<4 {
+                    let p = CGMutablePath()
+                    let x = cx + dx + CGFloat(k) * 1.4
+                    p.move(to: CGPoint(x: x, y: cy + dy + 3))
+                    p.addQuadCurve(to: CGPoint(x: x + r.range(-1.5, 1.5), y: cy + dy - r.range(7, 11)), control: CGPoint(x: x - 0.5, y: cy + dy - 3))
+                    Paint.stroke(g, p, UIColor(hex: 0x8AA64A), 1)
+                }
+            }
+        case .prehistoric, .arctic:
+            let snow = land == .arctic
+            Paint.fill(g, Paint.ellipse(cx, cy + 1, 34, 17), snow ? UIColor(hex: 0xE4EEF7) : UIColor(hex: 0x4A3A3E))
+            Paint.fill(g, Paint.ellipse(cx, cy + 1.8, 31, 15), snow ? UIColor(hex: 0xBCD2E4) : UIColor(hex: 0x2E2428))
+            let water = Paint.ellipse(cx, cy + 1.5, 27, 12.5)
+            Paint.linear(g, water, [UIColor(hex: 0x3EC2C8), UIColor(hex: 0xA6F0E6)], CGPoint(x: cx, y: cy - 11), CGPoint(x: cx, y: cy + 14))
+            Paint.stroke(g, Paint.ellipse(cx, cy + 1.5, 20, 9), UIColor.white.alpha(0.3), 1)
+            Paint.fill(g, Paint.ellipse(cx - 8, cy - 1, 8, 1.6), UIColor.white.alpha(0.4))
+            for (x, y) in [(cx - 25, cy - 2), (cx + 24, cy + 1), (cx + 8, cy - 13)] as [(CGFloat, CGFloat)] {
+                crystal(g, x, y, snow ? UIColor(hex: 0xBEE6FF) : UIColor(hex: 0xF2A23A))
+            }
+            for k in 0..<3 {
+                Paint.radial(g, [UIColor.white.alpha(0.5), UIColor.white.alpha(0)], CGPoint(x: cx - 10 + CGFloat(k) * 10, y: cy - 6 - CGFloat(k % 2) * 4), 7)
+            }
+        case .forest:
+            break
         }
     }
 
@@ -1011,6 +1101,12 @@ enum Art {
         Paint.image(3, 22, base: 8) { g in
             Paint.linear(g, CGPath(roundedRect: CGRect(x: 0.6, y: 0, width: 1.8, height: 22), cornerWidth: 0.9, cornerHeight: 0.9, transform: nil),
                          [UIColor(hex: 0xDDEFFF, alpha: 0), UIColor(hex: 0xDDEFFF, alpha: 0.85)], CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 22))
+        }
+    }
+
+    static func snowfall() -> ArtImage {
+        Paint.image(8, 8, base: 4) { g in
+            Paint.radial(g, [UIColor.white, UIColor.white.alpha(0.85), UIColor.white.alpha(0)], CGPoint(x: 4, y: 4), 4)
         }
     }
 

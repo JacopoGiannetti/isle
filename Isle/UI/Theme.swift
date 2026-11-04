@@ -51,6 +51,11 @@ extension Font {
     static func cozy(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
         .system(size: size, weight: weight)
     }
+
+    /// I titoli: un serif morbido da libro illustrato.
+    static func book(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
+        .system(size: size, weight: weight, design: .serif)
+    }
 }
 
 // MARK: - Design system
@@ -128,6 +133,21 @@ struct PrimaryButton: ButtonStyle {
     }
 }
 
+/// L'azione principale sopra il cielo: carta e inchiostro, perché la sfumatura ci litigherebbe.
+struct PaperButton: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.cozy(17, .semibold))
+            .foregroundStyle(Theme.ink)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Theme.paper, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.25), value: configuration.isPressed)
+    }
+}
+
 /// L'azione secondaria: bianca, con l'ombra morbida.
 struct SoftButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -142,26 +162,12 @@ struct SoftButton: ButtonStyle {
     }
 }
 
-/// Per aggiungere qualcosa che ancora non c'è: bordo tratteggiato, niente fondo.
-struct DashedButton: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        let shape = RoundedRectangle(cornerRadius: 22, style: .continuous)
-        configuration.label
-            .font(.cozy(16, .semibold))
-            .foregroundStyle(Theme.muted)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .overlay(shape.strokeBorder(Theme.muted.opacity(0.45), style: StrokeStyle(lineWidth: 1.5, dash: [6, 5])))
-            .contentShape(shape)
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(duration: 0.25), value: configuration.isPressed)
-    }
-}
-
 /// Un pulsante con la sola icona: quadrato bianco arrotondato, o con la sfumatura se è l'azione principale.
 struct IconButton: View {
     let icon: String
     var accent = false
+    /// Pieno d'inchiostro: l'azione principale dove la sfumatura stonerebbe.
+    var ink = false
     let action: () -> Void
     @Environment(\.skyLight) private var light
 
@@ -170,13 +176,13 @@ struct IconButton: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(accent ? Color.white : Theme.ink.opacity(0.7))
+                .foregroundStyle(accent || ink ? Color.white : Theme.ink.opacity(0.7))
                 .frame(width: 46, height: 46)
                 .background {
-                    if accent { AccentFill().clipShape(shape) } else { shape.fill(Theme.paper(light)) }
+                    if accent { AccentFill().clipShape(shape) } else if ink { shape.fill(Theme.ink.opacity(0.88)) } else { shape.fill(Theme.paper(light)) }
                 }
                 .overlay(shape.stroke(.white.opacity(accent ? 0.75 : (light == nil ? 0 : 0.45)), lineWidth: accent ? 1.5 : 1))
-                .shadow(color: accent ? Color(hex: 0x7A5CFF).opacity(0.35) : .black.opacity(0.08), radius: accent ? 10 : 12, y: 5)
+                .shadow(color: accent ? Color(hex: 0x7A5CFF).opacity(0.35) : .black.opacity(ink ? 0.2 : 0.08), radius: accent ? 10 : 12, y: 5)
         }
         .buttonStyle(PressStyle())
     }
@@ -282,6 +288,7 @@ struct RarityBadge: View {
 
 func animalRarity(_ sp: AnimalSpecies) -> Rarity {
     if sp.evolvesFrom != nil { return .special }
+    if sp.legendary { return .legendary }
     if sp.rare { return sp.phase >= 5 ? .legendary : .rare }
     return sp.phase >= 3 ? .uncommon : .common
 }
@@ -354,7 +361,7 @@ enum Thumbs {
         case .sapling where !el.mature: return sprout
         case .plant(let s), .sapling(let s): return el.evolved ? evolved(s, rare: el.rare) : plant(s, rare: el.rare)
         case .flora(let f): return flora(f)
-        case .crater: return Art.crater(el.rare ? 3 : 0).image
+        case .crater: return Art.crater(el.rare ? 3 : 0, land: el.land).image
         }
     }
 }

@@ -35,6 +35,8 @@ struct Element: Identifiable {
     var dry = false
     /// La prima pianta di una specie, dopo qualche giorno, sale di livello.
     var evolved = false
+    /// Il mondo dell'isola: decide come appaiono la sorgente e i crateri.
+    var land = Habitat.forest
 
     var speciesID: String? {
         switch kind {
@@ -57,13 +59,14 @@ struct Element: Identifiable {
         e.mature = mature
         e.dry = dry
         e.evolved = evolved
+        e.land = land
         return e
     }
 
     var isSource: Bool { id == Sim.sourceID }
 
     var name: String {
-        if isSource { return L("Stagno sorgente") }
+        if isSource { return land.sourceName }
         switch kind {
         case .sapling(let s) where !mature: return Lf("Germoglio di %@", speciesByID[s]?.name ?? s)
         case .plant(let s), .sapling(let s):
@@ -171,12 +174,17 @@ struct World {
     var weather = Weather.clear
     /// Fase della tempesta di chi ha smesso di rispondere: 0 sereno, 5 isola spazzata via.
     var storm = 0
+    /// Settimanali: la settimana scorsa chiusa sotto l'obiettivo (volte fatte). Solo nuvole.
+    var weekMissed: Int?
     /// Per ogni pianta "prima" della sua specie, quando si evolverà.
     var evolveAt: [String: Date] = [:]
     var progress = 0.0
+    /// Il giorno del Sentiero: uno in più a ogni mezzanotte, fermo dal terzo giorno di tempesta.
+    var pathDay = 1
     var now = Date()
     /// L'isola a cui appartiene: serve al meteo, che è diverso per ogni isola.
     var island = ""
+    var habitat = Habitat.forest
 
     func element(_ id: String) -> Element? { elements.first { $0.id == id } }
 
@@ -337,8 +345,10 @@ enum Sim {
     static let seedDays: [Double] = [3, 6.5, 11, 17]
     /// Giorni perché un germoglio diventi un albero.
     static let saplingDays = 5.0
-    /// Secondi dopo il primo seme in cui arriva il primo animale.
-    static let welcomeDelay = 5.0
+    /// Secondi dopo il secondo seme in cui arriva il primo animale: subito, ma dopo che la pianta c'è.
+    static let welcomeDelay = 0.2
+    /// Dalla fase di tempesta in cui gli animali se ne vanno il Sentiero si ferma.
+    static let pathStopStage = 3
 
     static func run(_ h: Habit, until now: Date = Clock.now) -> World {
         var s = State(habit: h, now: now)
@@ -421,6 +431,9 @@ private struct State {
     var lastCalm: (at: Date, stage: Int)?
     /// Per ogni specie, la pianta più vecchia ancora verde e da quando lo è.
     var firstOf: [String: (id: String, since: Date)] = [:]
+    let steps: [Step]
+    /// Giorno del Sentiero per ogni giorno di calendario dalla nascita dell'isola.
+    private var pathDays: [Int] = [1]
 
     init(habit: Habit, now: Date) {
         h = habit
@@ -428,12 +441,25 @@ private struct State {
         order = Island.order(seed: habit.seed)
         goodTimes = habit.goodAnswers.map(\.at)
         answerTimes = habit.answers.map { (day: $0.day, at: $0.at) }.sorted { $0.at < $1.at }
+        steps = habit.steps
+        let born = Clock.day(habit.created)
+        if Clock.day(now) > born {
+            for day in (born + 1)...Clock.day(now) {
+                let last = answerTimes.last { $0.day < day && $0.at <= now }?.day ?? born
+                let paused = Storm.stage(silentDays: day - last, habit.rhythm) >= Sim.pathStopStage
+                pathDays.append(pathDays[pathDays.count - 1] + (paused ? 0 : 1))
+            }
+        }
     }
 
     /// Fase della tempesta in un certo momento.
     func stormStage(at t: Date) -> Int {
         let last = answerTimes.last { $0.at <= t }?.day ?? Clock.day(h.created)
         return Storm.stage(silentDays: Clock.day(t) - last, h.rhythm)
+    }
+
+    func pathDay(at t: Date) -> Int {
+        pathDays[(Clock.day(t) - Clock.day(h.created)).clamp(0, pathDays.count - 1)]
     }
 
     /// Ogni silenzio tra due risposte diventa una tempesta che cresce un giorno alla volta.
@@ -464,22 +490,25 @@ private struct State {
         heap.push(Timed(t: t, seq: seq, ev: ev))
     }
 
-    func day(at t: Date) -> Int {
-        Int((Double(goodTimes.filter { $0 <= t }.count) * h.rhythm.weight).rounded(.down))
-    }
+    func day(at t: Date) -> Int { pathDay(at: t) }
+
+    /// Le ricadute che fanno cadere un meteorite: le altre non toccano l'isola.
+    var meteors: [Relapse] { h.relapses.filter { $0.soft != true } }
 
     mutating func run() {
         push(h.created, .land(Island.tiles(days: 0), 0))
         push(h.created.addingTimeInterval(0.2), .source)
-        let weight = h.rhythm.weight
-        for (i, a) in h.goodAnswers.enumerated() {
-            push(a.at.addingTimeInterval(0.5), .land(Island.tiles(days: Double(i + 1) * weight), Double(i + 1)))
+        var grown = 0.0
+        for (i, s) in steps.enumerated() where s.credit > 0 {
+            grown += s.credit
+            push(s.at.addingTimeInterval(0.5), .land(Island.tiles(days: grown), Double(i + 1)))
         }
         for p in h.placements { push(p.at, .place(p)) }
-        if let first = h.placements.min(by: { $0.at < $1.at }) {
-            push(first.at.addingTimeInterval(Sim.welcomeDelay), .welcome(first.id))
+        let firstTwo = h.placements.sorted { $0.at < $1.at }.prefix(2)
+        if firstTwo.count == 2, let second = firstTwo.last {
+            push(second.at.addingTimeInterval(Sim.welcomeDelay), .welcome(second.id))
         }
-        for r in h.relapses { push(r.at, .relapse(r)) }
+        for r in meteors { push(r.at, .relapse(r)) }
         for (i, r) in h.resists.enumerated() { push(r, .resist(i, r)) }
         for (i, r) in (h.rearranges ?? []).enumerated() { push(r.at, .rearrange(i)) }
         scheduleStorms()
@@ -488,7 +517,7 @@ private struct State {
         if h.kind == .quit {
             var tick = 0
             var t = h.created.addingTimeInterval(3 * 3600)
-            let relapses = h.relapses.map(\.at).sorted()
+            let relapses = meteors.map(\.at).sorted()
             while t <= now && tick < 4000 {
                 let lastBreak = relapses.last { $0 < t } ?? h.created
                 if t.timeIntervalSince(lastBreak) >= 3 * 3600 { push(t, .clean(tick)) }
@@ -562,13 +591,13 @@ private struct State {
         case .source:
             // Mai su una casella che hai usato tu: così non cancella niente di tuo.
             let used = Set(h.placements.map { TileKey(x: $0.x, y: $0.y) }
-                + h.relapses.map { TileKey(x: $0.x, y: $0.y) }
+                + meteors.map { TileKey(x: $0.x, y: $0.y) }
                 + (h.rearranges ?? []).flatMap { $0.moves.map { TileKey(x: $0.x, y: $0.y) } })
             // Ogni casella ha un punteggio fisso e vince la libera più bassa: piantare altrove
             // non cambia la scelta, così la sorgente non salta da una casella all'altra.
             func score(_ k: TileKey) -> UInt64 { fnv("source\(h.id)/\(k.x)/\(k.y)") }
             guard let k = tiles.keys.filter({ !used.contains($0) && bigAt[$0] == nil }).min(by: { score($0) < score($1) }) else { return }
-            push(t, .place(Placement(id: Sim.sourceID, species: "source", rare: false, x: k.x, y: k.y, at: t, auto: true)))
+            push(t, .place(Placement(id: Sim.sourceID, species: h.land.source, rare: false, x: k.x, y: k.y, at: t, auto: true)))
 
         case .place(let p):
             let k = TileKey(x: p.x, y: p.y)
@@ -685,15 +714,18 @@ private struct State {
             let healed = Element(id: c.id, kind: .crater, rare: true, x: c.x, y: c.y, tile: c.tile, born: c.born, died: nil,
                              big: true, emits: Conds(water: 3, bloom: 1), day: c.day, source: nil)
             add(healed)
-            note(t, L("Il cratere è guarito: ora è un laghetto di ninfee."), focus: id, rare: true)
+            note(t, h.land.healedCrater, focus: id, rare: true)
 
         case .welcome(let id):
-            guard let el = elements[id], el.died == nil, let plant = el.speciesID else { return }
-            let lured = animalList.filter { !$0.rare && $0.named && $0.riddle == nil && $0.lure.contains(plant) }
+            let plants = Set(h.placements.sorted { $0.at < $1.at }.prefix(2).compactMap { p in
+                elements[p.id].flatMap { $0.died == nil ? $0.speciesID : nil }
+            })
+            guard !plants.isEmpty else { return }
+            let lured = h.land.animals.filter { sp in !sp.rare && sp.named && sp.riddle == nil && sp.move != .fly && sp.lure.contains { plants.contains($0) } }
             let early = lured.filter { $0.phase == 1 }
             var r = RNG("welcome/\(id)")
             let pool = early.isEmpty ? lured : early
-            guard let sp = pool.isEmpty ? animalByID["rabbit"] : r.pick(pool) else { return }
+            guard let sp = pool.isEmpty ? animalByID[h.land.firstGuest] : r.pick(pool) else { return }
             welcomeID = arrive(sp, at: t, rng: &r)
 
         case .storm(let k, let gap):
@@ -730,7 +762,9 @@ private struct State {
         (speciesByID[species]?.emits ?? Conds()) * (rare ? 1.25 : 1)
     }
 
-    mutating func add(_ el: Element) {
+    mutating func add(_ new: Element) {
+        var el = new
+        el.land = h.land
         elements[el.id] = el
         if el.big { bigAt[el.tile] = el.id } else { smallAt[el.tile, default: 0] += 1 }
         apply(el, sign: 1)
@@ -896,7 +930,7 @@ private struct State {
         guard tiles[k] != nil, (smallAt[k] ?? 0) < Sim.smallPerTile else { return false }
         if let b = bigAt[k], elements[b]?.isWater == true { return false }
         let local = field[k] ?? Conds()
-        let options = floraList.map { ($0, $0.weight(local, rareSource, sourceSpecies)) }
+        let options = h.land.flora.map { ($0, $0.weight(local, rareSource, sourceSpecies)) }
         guard let f = r.weighted(options) else { return false }
         let id = "f:" + key
         guard elements[id] == nil else { return false }
@@ -940,7 +974,7 @@ private struct State {
     mutating func census(at t: Date) {
         var st = stats(at: t)
         // Chi non ha più posto se ne va.
-        for sp in animalList {
+        for sp in h.land.animals {
             let adults = residents.values.filter { $0.species == sp.id && $0.babyOf == nil }.sorted { $0.arrived < $1.arrived }
             let space = room(sp, st)
             guard adults.count > space else { continue }
@@ -964,18 +998,18 @@ private struct State {
         }
 
         // Rari e speciali passano davanti a tutti, senza sorteggio.
-        for sp in animalList where sp.vip && hasRoom(sp) {
+        for sp in h.land.animals where sp.vip && hasRoom(sp) {
             arriveSoon(sp, after: t, stamp: stamp, st: &st)
         }
         // Poi uno con il nome e uno di contorno, pescati tra quelli che l'isola attira.
         var r = RNG("\(h.id)/census/\(stamp)")
         if st.commonAnimals < st.namedRoom {
-            let pool = animalList.filter { !$0.vip && $0.named && hasRoom($0) }
+            let pool = h.land.animals.filter { !$0.vip && $0.named && hasRoom($0) }
             if let sp = r.weighted(pool.map { ($0, weight($0)) }) { arriveSoon(sp, after: t, stamp: stamp, st: &st) }
         }
         let ambient = residents.values.filter { animalByID[$0.species].map { !$0.named && !$0.vip } ?? false }.count
         if ambient < st.ambientRoom {
-            let pool = animalList.filter { !$0.vip && !$0.named && hasRoom($0) }
+            let pool = h.land.animals.filter { !$0.vip && !$0.named && hasRoom($0) }
             if let sp = r.weighted(pool.map { ($0, weight($0)) }) { arriveSoon(sp, after: t, stamp: stamp, st: &st) }
         }
         breed(at: t, st)
@@ -1040,14 +1074,14 @@ private struct State {
         case .water: fits = alive.filter(\.isWater)
         case .ground: fits = alive.filter { $0.big && !$0.isWater }
         case .flowers: fits = alive.filter { e in
-            if case .plant(let s) = e.kind { return ["flowers", "berry", "cherry", "wisteria", "glowshroom"].contains(s) }
-            if case .flora(let f) = e.kind { return ["daisy", "bluebell", "dandelion", "clover"].contains(f) }
+            if case .plant(let s) = e.kind, let sp = speciesByID[s] { return sp.kind == .flower || sp.emits.bloom >= 3 }
+            if case .flora(let f) = e.kind { return (floraByID[f]?.emits.bloom ?? 0) >= 0.3 }
             return false
         }
         }
         let lured = alive.filter { e in e.speciesID.map { sp.lure.contains($0) } ?? false }
         let evolved = sp.evolvesFrom.map { s in alive.filter { $0.speciesID == s && $0.evolved } }
-        let preferred = evolved ?? (sp.rare ? lured.filter(\.rare) : lured)
+        let preferred = evolved ?? (sp.rare && !sp.legendary ? lured.filter(\.rare) : lured)
         let home = (preferred.isEmpty ? (fits.isEmpty ? alive.filter(\.big) : fits) : preferred)
         if let e = home.isEmpty ? nil : r.pick(home) {
             a.homeID = e.id
@@ -1056,9 +1090,9 @@ private struct State {
         }
         if let l = preferred.first {
             let id = l.mature ? (l.speciesID ?? "") : ""
-            let fem = l.evolved ? evolutions[id]?.feminine == true
-                : ["oak", "birch", "spring", "waterfall", "lantern", "ancientoak"].contains(id)
-            let from = !l.evolved && ["flowers", "glowshroom"].contains(id) ? "dai tuoi" : fem ? "dalla tua" : "dal tuo"
+            let sp = speciesByID[id]
+            let fem = l.evolved ? evolutions[id]?.feminine == true : sp?.isFeminine == true
+            let from = !l.evolved && sp?.isPlural == true ? "dai tuoi" : fem ? "dalla tua" : "dal tuo"
             a.lure = "\(from) \(l.name.lowercased()) del giorno \(max(1, l.day))"
         }
     }
@@ -1135,14 +1169,20 @@ private struct State {
         w.bigAt = bigAt
         w.stats = stats(at: now)
         w.chronicle = chronicle.filter { !($0.kind == .arrival && cancelled.contains($0.focus ?? "")) }.sorted { $0.at < $1.at }
-        w.progress = h.progress(at: now)
+        w.progress = steps.reduce(0) { $0 + $1.credit }
+        w.pathDay = pathDay(at: now)
         w.storm = stormStage(at: now)
+        if w.storm == 0, let missed = weekMissed() {
+            w.storm = 1
+            w.weekMissed = missed
+        }
         for (sp, f) in firstOf {
             guard let s = speciesByID[sp] else { continue }
             w.evolveAt[f.id] = f.since.addingTimeInterval(Double(s.evolveDays) * 86400)
         }
         (w.wither, w.weather) = mood(storm: w.storm)
         w.island = h.id
+        w.habitat = h.land
         return w
     }
 
@@ -1150,20 +1190,32 @@ private struct State {
     func mood(storm: Int) -> (Double, Weather) {
         if storm > 0 { return ([0, 0.06, 0.14, 0.26, 0.38, 0.5][storm], storm >= 2 ? .rain : .clear) }
         if let c = lastCalm, c.stage >= 2, now.timeIntervalSince(c.at) < 36 * 3600 { return (0, .rainbow) }
-        switch h.rhythm {
-        case .daily:
+        guard h.rhythm.isWeekly, let (thisWeek, lastWeek) = weeks() else { return (0, .clear) }
+        guard lastWeek.start >= Clock.calendar.startOfDay(for: h.created)
+                || Clock.calendar.isDate(h.created, equalTo: lastWeek.start, toGranularity: .weekOfYear) else {
             return (0, .clear)
-        case .weekly(let target):
-            let cal = Clock.calendar
-            guard let thisWeek = cal.dateInterval(of: .weekOfYear, for: now),
-                  let lastWeekDate = cal.date(byAdding: .day, value: -7, to: now),
-                  let lastWeek = cal.dateInterval(of: .weekOfYear, for: lastWeekDate) else { return (0, .clear) }
-            guard lastWeek.start >= cal.startOfDay(for: h.created) || cal.isDate(h.created, equalTo: lastWeekDate, toGranularity: .weekOfYear) else {
-                return (0, .clear)
-            }
-            let lastCount = h.goodAnswers.filter { lastWeek.contains($0.at) }.count
-            let fresh = now.timeIntervalSince(thisWeek.start) < 36 * 3600
-            return (0, lastCount >= target && fresh ? .rainbow : .clear)
         }
+        let lastCount = h.goodAnswers.filter { lastWeek.contains($0.at) }.count
+        let fresh = now.timeIntervalSince(thisWeek.start) < 36 * 3600
+        return (0, lastCount >= h.rhythm.target && fresh ? .rainbow : .clear)
+    }
+
+    func weeks() -> (this: DateInterval, last: DateInterval)? {
+        let cal = Clock.calendar
+        guard let thisWeek = cal.dateInterval(of: .weekOfYear, for: now),
+              let lastWeekDate = cal.date(byAdding: .day, value: -7, to: now),
+              let lastWeek = cal.dateInterval(of: .weekOfYear, for: lastWeekDate) else { return nil }
+        return (thisWeek, lastWeek)
+    }
+
+    /// Settimanali: una settimana intera chiusa sotto l'obiettivo lascia le nuvole
+    /// finché non lo rifai. Conta solo se l'isola c'era già tutta la settimana.
+    func weekMissed() -> Int? {
+        guard h.rhythm.isWeekly, let (thisWeek, lastWeek) = weeks(),
+              lastWeek.start >= Clock.calendar.startOfDay(for: h.created) else { return nil }
+        let good = h.goodAnswers
+        guard !good.contains(where: { thisWeek.contains($0.at) && $0.at <= now }) else { return nil }
+        let done = good.filter { lastWeek.contains($0.at) }.count
+        return done < h.rhythm.target ? done : nil
     }
 }

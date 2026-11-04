@@ -15,6 +15,8 @@ final class WorldController {
     /// Il primo animale dell'isola, da presentare con la sua spiegazione.
     var welcome: String?
     var craving = false
+    /// Un tocco sul vuoto nasconde pulsanti e schede per guardare solo l'isola; un altro li riporta.
+    var uiHidden = false
     private var busy = false
     private var timer: Timer?
     private var ticking = false
@@ -32,8 +34,12 @@ final class WorldController {
     init(habitID: String) {
         self.habitID = habitID
         scene = WorldScene(size: screenSize)
+        Perf.scene = scene
         scene.onSelect = { [weak self] sel in
-            withAnimation(.spring(duration: 0.35)) { self?.selection = sel }
+            guard let self else { return }
+            let empty = sel == nil && self.selection == nil && self.welcome == nil && !self.editing
+            withAnimation(.easeInOut(duration: 0.3)) { self.uiHidden = empty ? !self.uiHidden : false }
+            withAnimation(.spring(duration: 0.35)) { self.selection = sel }
         }
         scene.onPlaceTile = { [weak self] tile in
             guard let self else { return }
@@ -57,7 +63,12 @@ final class WorldController {
 
     func start() {
         Store.shared.autoPlant()
-        refresh(animated: false)
+        if let w = recentWorld() {
+            Perf.log("open: mondo già pronto dalla Home")
+            show(w, animated: false)
+        } else {
+            Perf.measure("openSim") { refresh(animated: false) }
+        }
         if let h = habit {
             let since = h.lastVisit ?? .distantPast
             toasts = Array(world.chronicle.filter { $0.at > since && ($0.kind.headline || $0.rare) }.suffix(4))
@@ -87,7 +98,9 @@ final class WorldController {
         ticking = true
         let gen = generation
         Task {
+            let t0 = CACurrentMediaTime()
             let w = await Task.detached(priority: .utility) { Sim.run(h) }.value
+            Perf.log(String(format: "tick sim %.0fms (fuori dal filo principale)", (CACurrentMediaTime() - t0) * 1000))
             ticking = false
             // Se nel frattempo è cambiato qualcosa (una risposta, una pianta), quel risultato è già vecchio.
             guard gen == generation, !busy, !editing, timer != nil else { return }
@@ -100,10 +113,24 @@ final class WorldController {
         show(Sim.run(h), animated: animated)
     }
 
+    /// I mondi che la Home ha appena calcolato in sottofondo: aprendo un'isola si riparte da lì
+    /// invece di rifare la simulazione sul filo principale proprio mentre la vista si apre.
+    private static var recent: [String: (revision: Int, world: World)] = [:]
+
+    static func remember(_ w: World, for id: String, revision: Int) {
+        recent[id] = (revision, w)
+    }
+
+    private func recentWorld() -> World? {
+        guard let r = Self.recent[habitID], r.revision == Store.shared.revision,
+              Clock.now.timeIntervalSince(r.world.now) < 90 else { return nil }
+        return r.world
+    }
+
     private func show(_ w: World, animated: Bool) {
         generation += 1
-        world = w
-        scene.apply(world, animated: animated)
+        Perf.measure("world=") { world = w }
+        Perf.measure("apply") { scene.apply(world, animated: animated) }
         if world.chronicle.count > seenChronicle {
             let fresh = world.chronicle.suffix(world.chronicle.count - seenChronicle).filter { $0.at > Clock.now.addingTimeInterval(-3600) }
             withAnimation(.spring(duration: 0.4)) { toasts.append(contentsOf: fresh.suffix(3)) }
@@ -122,8 +149,12 @@ final class WorldController {
         return outcome
     }
 
+    /// Vero se è caduto un meteorite.
     func slip() -> Bool {
-        guard let r = Store.shared.slip(habitID) else { return false }
+        guard let r = Store.shared.slip(habitID) else {
+            refresh(animated: true)
+            return false
+        }
         playRelapse(r)
         return true
     }
@@ -168,11 +199,11 @@ final class WorldController {
                 self.scene.celebrateRare(at: p.id)
                 withAnimation(.spring(duration: 0.4)) { self.celebration = sp.rareName }
             }
-            if p != nil, self.habit?.placements.count == 1 { self.greetFirstGuest() }
+            if p != nil, self.habit?.placements.count == Habit.startSeeds { self.greetFirstGuest() }
         }
     }
 
-    /// Col primo seme arriva subito un animale: lo seguiamo e spieghiamo cos'è successo.
+    /// Col secondo seme arriva subito un animale: lo seguiamo e spieghiamo cos'è successo.
     private func greetFirstGuest() {
         DispatchQueue.main.asyncAfter(deadline: .now() + Sim.welcomeDelay + 0.3) { [weak self] in
             guard let self else { return }
@@ -181,7 +212,7 @@ final class WorldController {
             self.selection = nil
             self.scene.followLift = 95
             self.scene.focus(on: .animal(id))
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                 withAnimation(.spring(duration: 0.5)) { self.welcome = id }
             }
         }

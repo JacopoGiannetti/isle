@@ -1,11 +1,22 @@
 import Foundation
 import Observation
+import SuperwallKit
 
 enum AnswerOutcome {
-    case seed
+    case seed(Gain)
     case relapse(Relapse)
+    /// "Non oggi", o una ricaduta senza meteorite.
     case missed
     case already
+}
+
+/// Cosa ha portato una risposta buona.
+struct Gain {
+    var seeds: Int
+    var bonus: Bonus?
+    var run: Int
+    var done: Int
+    var target: Int
 }
 
 @MainActor
@@ -19,8 +30,12 @@ final class Store {
     }
     /// Meteorite caduto mentre l'app era chiusa (risposta da notifica): lo mostriamo all'apertura.
     var pendingImpact: [String: String] = [:]
+    /// Prima apertura dopo l'installazione: si aspetta iCloud prima di mostrare l'introduzione.
+    var restoring: Bool
+    /// Isole cancellate: non devono tornare da iCloud.
+    @ObservationIgnored private(set) var deleted: Set<String>
 
-    private let url: URL = {
+    private static let url: URL = {
         let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("isle.json")
@@ -28,30 +43,66 @@ final class Store {
 
     init() {
         seenIntro = UserDefaults.standard.bool(forKey: "seenIntro")
-        if let data = try? Data(contentsOf: url),
+        deleted = Set(UserDefaults.standard.stringArray(forKey: "deletedHabits") ?? [])
+        restoring = !FileManager.default.fileExists(atPath: Self.url.path)
+        if let data = try? Data(contentsOf: Self.url),
            let list = try? JSONDecoder().decode([Habit].self, from: data) {
             habits = list
         }
     }
 
+    /// Cresce a ogni salvataggio: un mondo calcolato prima non vale più.
+    @ObservationIgnored private(set) var revision = 0
+
     func save() {
+        write()
+        Cloud.changed()
+    }
+
+    private func write() {
+        revision += 1
         if let data = try? JSONEncoder().encode(habits) {
-            try? data.write(to: url, options: .atomic)
+            try? data.write(to: Self.url, options: .atomic)
         }
+    }
+
+    /// Le isole unite a quelle di iCloud. Non torna su iCloud: ci sono già.
+    func adopt(_ list: [Habit], deleted: Set<String>) {
+        if deleted != self.deleted {
+            self.deleted = deleted
+            UserDefaults.standard.set(deleted.sorted(), forKey: "deletedHabits")
+        }
+        guard (try? Cloud.encode(list)) != (try? Cloud.encode(habits)) else { return }
+        habits = list
+        write()
+        // Solo mentre l'app si apre: a metà introduzione le isole ritrovate aspettano nella Home.
+        if restoring && !list.isEmpty { seenIntro = true }
+        Notifier.reschedule(self)
+    }
+
+    private func forget(_ ids: [String]) {
+        deleted.formUnion(ids)
+        UserDefaults.standard.set(deleted.sorted(), forKey: "deletedHabits")
     }
 
     func habit(_ id: String) -> Habit? { habits.first { $0.id == id } }
 
-    func update(_ id: String, _ change: (inout Habit) -> Void) {
+    /// `stamp: false` per ciò che non è una scelta dell'utente: non deve vincere su un altro iPhone.
+    func update(_ id: String, stamp: Bool = true, _ change: (inout Habit) -> Void) {
         guard let i = habits.firstIndex(where: { $0.id == id }) else { return }
         change(&habits[i])
+        if stamp { habits[i].edited = Date() }
         save()
     }
 
     @discardableResult
-    func create(title: String, question: String, kind: HabitKind, rhythm: Rhythm, hour: Int, minute: Int) -> Habit {
-        let h = Habit(id: UUID().uuidString, title: title, question: question, kind: kind, rhythm: rhythm,
+    func create(title: String, question: String, kind: HabitKind, rhythm: Rhythm, hour: Int, minute: Int, hard: Bool = false,
+                habitat: Habitat = .forest) -> Habit {
+        var h = Habit(id: UUID().uuidString, title: title, question: question, kind: kind, rhythm: rhythm,
                       reminderHour: hour, reminderMinute: minute, created: Clock.now)
+        if kind == .quit && hard { h.hard = true }
+        h.habitat = habitat.rawValue
+        h.edited = Date()
         habits.append(h)
         save()
         Notifier.reschedule(self)
@@ -59,31 +110,47 @@ final class Store {
     }
 
     func delete(_ id: String) {
+        forget([id])
         habits.removeAll { $0.id == id }
         save()
         Notifier.reschedule(self)
+    }
+
+    /// Come una prima installazione: resta solo la lingua scelta.
+    func deleteAll() {
+        forget(habits.map(\.id))
+        habits = []
+        pendingImpact = [:]
+        save()
+        Clock.offset = 0
+        Clock.hourOverride = nil
+        seenIntro = false
+        Notifier.reschedule(self)
+        Superwall.shared.reset()
     }
 
     // MARK: azioni
 
     @discardableResult
     func answer(_ id: String, yes: Bool) -> AnswerOutcome {
-        guard let h = habit(id), !h.bornToday else { return .already }
-        let today = Clock.today
-        if h.rhythm == .daily, h.answers.contains(where: { $0.day == today }) { return .already }
-        if case .weekly = h.rhythm, h.answers.contains(where: { $0.day == today && $0.good }) { return .already }
-
+        guard let h = habit(id) else { return .already }
         let good = h.kind == .quit ? !yes : yes
+        if good {
+            guard h.unansweredToday || h.canExtra else { return .already }
+        } else if h.todayAnswer != nil {
+            return .already
+        }
+
+        let before = h.seedsEarned
         var outcome = AnswerOutcome.missed
         update(id) { h in
-            h.answers.append(Answer(day: today, good: good, at: Clock.now))
+            h.answers.append(Answer(day: Clock.today, good: good, at: Clock.now))
             if h.kind == .quit && yes {
-                let center = Sim.impactPoint(Sim.run(h))
-                let r = Relapse(id: UUID().uuidString, at: Clock.now, x: center.x, y: center.y)
-                h.relapses.append(r)
-                outcome = .relapse(r)
+                if let r = relapse(&h) { outcome = .relapse(r) }
             } else if good {
-                outcome = .seed
+                let step = h.steps.last
+                outcome = .seed(Gain(seeds: h.seedsEarned - before, bonus: step?.bonus, run: step?.run ?? 0,
+                                     done: h.periodDone, target: h.rhythm.target))
             }
         }
         Notifier.reschedule(self)
@@ -91,21 +158,36 @@ final class Store {
     }
 
     /// "Ho sgarrato", in qualsiasi momento. Se oggi non avevi ancora risposto vale come risposta.
+    /// Restituisce la ricaduta solo se fa cadere un meteorite.
     func slip(_ id: String) -> Relapse? {
         guard let h = habit(id), h.kind == .quit else { return nil }
         let today = Clock.today
         var relapse: Relapse?
         update(id) { h in
-            if !h.bornToday, !h.answers.contains(where: { $0.day == today }) {
+            if !h.answers.contains(where: { $0.day == today }) {
                 h.answers.append(Answer(day: today, good: false, at: Clock.now))
             }
-            let center = Sim.impactPoint(Sim.run(h))
-            let r = Relapse(id: UUID().uuidString, at: Clock.now, x: center.x, y: center.y)
-            h.relapses.append(r)
-            relapse = r
+            relapse = self.relapse(&h)
         }
         Notifier.reschedule(self)
         return relapse
+    }
+
+    /// Il meteorite cade solo in modalità dura, e mai il primo giorno; altrimenti la ricaduta
+    /// resta scritta (azzera i giorni di fila) ma non tocca l'isola.
+    private func relapse(_ h: inout Habit) -> Relapse? {
+        guard h.isHard, !h.bornToday else {
+            h.relapses.append(Relapse(id: UUID().uuidString, at: Clock.now, x: 0, y: 0, soft: true))
+            return nil
+        }
+        let center = Sim.impactPoint(Sim.run(h))
+        let r = Relapse(id: UUID().uuidString, at: Clock.now, x: center.x, y: center.y)
+        h.relapses.append(r)
+        return r
+    }
+
+    func setHard(_ id: String, _ on: Bool) {
+        update(id) { $0.hard = on ? true : nil }
     }
 
     func rareChance(_ h: Habit, _ species: Species) -> Double {
@@ -148,13 +230,16 @@ final class Store {
     }
 
     func markVisit(_ id: String) {
-        update(id) { $0.lastVisit = Clock.now }
+        let r = revision
+        update(id, stamp: false) { $0.lastVisit = Clock.now }
+        // L'ultima visita non cambia l'isola: i mondi già calcolati restano buoni.
+        revision = r
     }
 
     /// Se un seme resta in tasca più di un giorno, lo pianta il mondo per te.
     func autoPlant() {
         for h in habits {
-            let earned = (Array(repeating: h.created, count: Habit.startSeeds) + h.goodAnswers.map(\.at)).sorted()
+            let earned = h.seedLog.map(\.at).sorted()
             var planted = h.placements.count
             while planted < earned.count {
                 let due = earned[planted].addingTimeInterval(24 * 3600)
@@ -174,19 +259,19 @@ final class Store {
 
 enum Progression {
     static func isUnlocked(_ sp: Species, _ h: Habit, _ w: World) -> Bool {
-        let day = Int(w.progress.rounded(.down))
+        let day = w.pathDay
         switch sp.unlock {
         case .day(let d): return day >= d
         case .challenge(let d, _, let test): return day >= d && test(w.stats)
         }
     }
 
-    static func unlocked(_ h: Habit, _ w: World) -> [Species] { speciesList.filter { isUnlocked($0, h, w) } }
+    static func unlocked(_ h: Habit, _ w: World) -> [Species] { h.land.species.filter { isUnlocked($0, h, w) } }
 
     /// La prossima specie che si sbloccherà, con quanto manca.
     static func next(_ h: Habit, _ w: World) -> (Species, String)? {
-        let day = Int(w.progress.rounded(.down))
-        for sp in speciesList where !isUnlocked(sp, h, w) {
+        let day = w.pathDay
+        for sp in h.land.species where !isUnlocked(sp, h, w) {
             switch sp.unlock {
             case .day(let d):
                 let left = d - day
@@ -228,15 +313,15 @@ enum Demo {
             guard let base = cal.date(byAdding: .day, value: d, to: start) else { continue }
             let at = cal.date(bySettingHour: 20, minute: r.int(50), second: 0, of: base) ?? base
             h.answers.append(Answer(day: Clock.day(at), good: true, at: at))
+            let pathDay = Clock.day(at) - Clock.day(h.created) + 1
+            let tilesNow = Island.tiles(days: h.progress(at: at))
             while h.placements.count < h.seedsEarned {
-                let progress = Double(h.goodAnswers.count) * h.rhythm.weight
-                let pool = speciesList.filter {
-                    if case .day(let need) = $0.unlock { return Double(need) <= progress }
-                    return Double($0.unlock.day + 6) <= progress
+                let pool = h.land.species.filter {
+                    if case .day(let need) = $0.unlock { return need <= pathDay }
+                    return $0.unlock.day + 6 <= pathDay
                 }
                 let fresh = pool.filter { sp in !h.placements.contains { $0.species == sp.id } }
-                let sp: Species = fresh.first ?? r.weighted(pool.map { ($0, $0.kind == .tree ? 3 : 1.3) }) ?? speciesList[0]
-                let tilesNow = Island.tiles(days: progress)
+                let sp: Species = fresh.first ?? r.weighted(pool.map { ($0, $0.kind == .tree ? 3 : 1.3) }) ?? h.land.species[0]
                 let candidates = order.prefix(tilesNow).filter { !used.contains($0) }
                 guard !candidates.isEmpty else { break }
                 let tile = candidates[min(candidates.count - 1, r.int(min(candidates.count, 14)))]

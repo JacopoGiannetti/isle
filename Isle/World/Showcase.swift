@@ -18,6 +18,7 @@ struct Showcase {
     }
     let plan: [Spot]
     var fill = Fill(back: [], side: [], front: [])
+    var land = Habitat.forest
 
     struct Spot {
         let species: String
@@ -71,6 +72,7 @@ struct Showcase {
         let start = Clock.now.addingTimeInterval(-Double(days) * 86400 - 3600)
         var h = Habit(id: "showcase-\(id)", title: title, question: "", kind: .build, rhythm: .daily, created: start)
         h.curated = true
+        h.habitat = land.rawValue
         for d in 0..<days {
             let at = start.addingTimeInterval(Double(d) * 86400 + 3600)
             h.answers.append(Answer(day: Clock.day(at), good: true, at: at))
@@ -93,6 +95,47 @@ struct Showcase {
     private static func k(_ species: String, rare: Bool = false) -> Kind { Kind(species: species, rare: rare) }
 
     static let all: [Showcase] = [aurora, sunny, magic, rainbow, blaze, starfall]
+
+    /// Tramonto sul vulcano: la felce millenaria al centro, l'acqua a sinistra, la lava a destra,
+    /// i giganti dietro e i nidi davanti.
+    static let prehistoric = Showcase(id: "prehistoric", sky: .blaze, hour: 18.6, title: "Tramonto di fuoco", plan: [
+        s("ancientfern", 0, 0, rare: true),
+        s("treefern", -2, -1), s("treefern", 2, -1, rare: true), s("cycad", -2.5, 1.5), s("cycad", 2.5, 1.5, rare: true),
+        s("lagoon", -4.5, 0.5), s("swamp", -3.5, -2.5, rare: true), s("hotspring", -1.5, -3.5, rare: true), s("river", -3, 3),
+        s("lavapool", 4, 0), s("amber", 3, -2), s("cave", 5.5, 0.5, rare: true), s("stonearch", 0.5, -4.5),
+        s("sequoia", -2, -5), s("sequoia", 2.5, -4.5, rare: true), s("araucaria", -4.5, -3.5), s("araucaria", 4.5, -2.5, rare: true),
+        s("magnolia", -4.5, 2.5, rare: true), s("ginkgo", 4.5, 2.5, rare: true),
+        s("goldegg", 1.5, 3.5), s("sandnest", -1.5, 3.5, rare: true), s("petrified", 3, 4, rare: true),
+        s("horsetail", 0, 3), s("horsetail", -0.5, 4.5, rare: true), s("horsetail", 0.5, 5.5),
+    ], fill: Fill(back: [k("sequoia"), k("araucaria"), k("treefern"), k("ginkgo"), k("magnolia")],
+                  side: [k("treefern"), k("cycad"), k("horsetail"), k("ginkgo", rare: true), k("treefern", rare: true)],
+                  front: [k("horsetail"), k("horsetail", rare: true), k("sandnest"), k("cycad")]), land: .prehistoric)
+    /// La savana a mezzogiorno: l'albero della vita al centro, l'acqua a sinistra, le rocce a destra.
+    static let savanna = Showcase(id: "savanna", sky: .clear, hour: 11, title: "Giornata di sole", plan: [
+        s("lifetree", 0, 0),
+        s("baobab", -2, -1), s("baobab", 2, -1, rare: true), s("acacia", -2.5, 1.5, rare: true), s("marula", 2.5, 1.5, rare: true),
+        s("waterhole", -4.5, 0.5, rare: true), s("saltlake", -3.5, -2.5, rare: true), s("silveroasis", -1.5, -3.5), s("savriver", -3, 3, rare: true),
+        s("kopje", 4, 0), s("storystones", 3, -2), s("lionrock", 5.5, 0.5), s("mudpool", 0.5, -4.5, rare: true),
+        s("umbrella", -2, -5), s("umbrella", 2.5, -4.5, rare: true), s("palm", -4.5, -3.5), s("palm", 4.5, -2.5, rare: true),
+        s("palm", -4.5, 2.5, rare: true), s("acacia", 4.5, 2.5),
+        s("aloe", 1.5, 3.5, rare: true), s("termite", -1.5, 3.5, rare: true), s("termite", 3, 4),
+        s("goldgrass", 0, 3), s("goldgrass", -0.5, 4.5, rare: true), s("greengrass", 0.5, 5.5, rare: true),
+    ], fill: Fill(back: [k("umbrella"), k("acacia"), k("baobab"), k("palm"), k("marula")],
+                  side: [k("acacia"), k("goldgrass"), k("marula"), k("aloe"), k("palm", rare: true)],
+                  front: [k("goldgrass"), k("goldgrass", rare: true), k("greengrass"), k("aloe")]), land: .savanna)
+    /// La notte polare sotto l'aurora: l'abete millenario al centro, il ghiaccio a sinistra, l'igloo e il castello a destra.
+    static let arctic = Showcase(id: "arctic", sky: .aurora, hour: 23.5, title: "Aurora", plan: [
+        s("frostfir", 0, 0),
+        s("crystalfir", -2, -1), s("crystalfir", 2, -1, rare: true), s("snowfir", -2.5, 1.5, rare: true), s("larch", 2.5, 1.5, rare: true),
+        s("icehole", -4.5, 0.5, rare: true), s("floe", -3.5, -2.5, rare: true), s("polarlake", -1.5, -3.5), s("fjord", -3, 3, rare: true),
+        s("igloo", 4, 0), s("icecastle", 3, -2), s("inukshuk", 5.5, 0.5), s("geyser", 0.5, -4.5, rare: true),
+        s("snowfir", -2, -5), s("snowfir", 2.5, -4.5, rare: true), s("iceberg", -4.5, -3.5, rare: true), s("cliff", 4.5, -2.5, rare: true),
+        s("larch", -4.5, 2.5), s("snowfir", 4.5, 2.5),
+        s("auroraflower", 1.5, 3.5, rare: true), s("cloudberry", -1.5, 3.5, rare: true), s("snowdrift", 3, 4, rare: true),
+        s("auroraflower", 0, 3), s("tundra", -0.5, 4.5, rare: true), s("arcticwillow", 0.5, 5.5, rare: true),
+    ], fill: Fill(back: [k("snowfir"), k("snowfir", rare: true), k("larch"), k("larch", rare: true)],
+                  side: [k("snowfir"), k("arcticwillow"), k("cloudberry"), k("lichen"), k("snowdrift")],
+                  front: [k("auroraflower"), k("tundra"), k("cloudberry", rare: true), k("lichen", rare: true)]), land: .arctic)
 
     /// Il giardino del giorno 100: la quercia al centro, i ciliegi intorno,
     /// l'acqua a sinistra, il bosco a destra e il prato davanti.

@@ -93,6 +93,26 @@ enum Sky: String, CaseIterable {
     }
 
     var isRainy: Bool { [.drizzle, .rain, .thunder].contains(self) }
+
+    /// Sulle terre dei ghiacci la pioggia scende come neve.
+    func name(on land: Habitat) -> String {
+        guard land.snowy else { return name }
+        switch self {
+        case .drizzle: return L("Nevischio")
+        case .rain: return L("Nevicata")
+        case .thunder: return L("Bufera di neve")
+        default: return name
+        }
+    }
+
+    func icon(on land: Habitat) -> String {
+        guard land.snowy else { return icon }
+        switch self {
+        case .drizzle, .rain: return "cloud.snow.fill"
+        case .thunder: return "wind.snow"
+        default: return icon
+        }
+    }
 }
 
 /// Il meteo cambia ogni tre ore (0-3, 3-6, ...). È deciso dal caso ma sempre uguale
@@ -110,10 +130,13 @@ struct Forecast: Equatable {
         let start = cal.date(bySettingHour: k * hours, minute: 0, second: 0, of: t) ?? t
         let end = start.addingTimeInterval(Double(hours) * 3600)
         #if DEBUG
-        if let forced = UserDefaults.standard.string(forKey: "sky").flatMap(Sky.init(rawValue:)) {
+        let canForce = true
+        #else
+        let canForce = UserDefaults.standard.bool(forKey: "perf")
+        #endif
+        if canForce, let forced = UserDefaults.standard.string(forKey: "sky").flatMap(Sky.init(rawValue:)) {
             return Forecast(sky: forced, start: start, end: end)
         }
-        #endif
         return Forecast(sky: sky(day: Clock.day(t), block: k, island: island), start: start, end: end)
     }
 
@@ -143,9 +166,10 @@ struct Forecast: Equatable {
         return roll(day: day, block: k, island: island)
     }
 
+    /// Piove circa in una fascia su otto.
     private static func roll(day: Int, block k: Int, island: String) -> Sky {
         var r = RNG("sky|\(island)|\(day)|\(k)")
-        var w: [(Sky, Double)] = [(.clear, 40), (.cloudy, 25), (.drizzle, 12), (.rain, 7), (.thunder, 4)]
+        var w: [(Sky, Double)] = [(.clear, 45), (.cloudy, 25), (.drizzle, 6), (.rain, 3), (.thunder, 1.5)]
         switch k {
         case 2: w.append((.mist, 8))
         case 3, 4, 5: w.append((.petals, 4))

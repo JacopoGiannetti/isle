@@ -94,6 +94,9 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     private(set) var portal = false
     /// Introduzione: l'isola intera nella metà alta dello schermo, col testo sotto.
     private(set) var showcase = false
+    /// Dove sta l'isola nella finestrella, in frazioni della vista contate dal basso.
+    /// Sotto lo zero la punta della roccia esce dal bordo e l'isola si vede più da vicino.
+    var framing = CGRect(x: 0, y: 0, width: 1, height: 1) { didSet { fitCamera(animated: false) } }
     /// Un cielo scelto a mano, al posto delle previsioni.
     var forcedSky: Sky?
     var placing = false { didSet { updateHighlights() } }
@@ -175,6 +178,17 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         return UIImage(cgImage: t.cgImage(), scale: v.contentScaleFactor, orientation: .up)
     }
 
+    /// L'isola d'esempio di un mondo, intera in una finestrella, col suo cielo e la sua ora.
+    static func makePreview(sky: Sky, hour: Double) -> WorldScene {
+        let s = makePortal()
+        s.forcedSky = sky
+        s.viewHour = hour
+        (s.farClouds + s.nearClouds + s.fog).forEach { $0.removeFromParent() }
+        s.farClouds = []
+        s.nearClouds = []
+        return s
+    }
+
     static func makeShowcase(size: CGSize, sky: Sky, hour: Double) -> WorldScene {
         let s = makePortal()
         s.showcase = true
@@ -219,8 +233,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         tint.size = CGSize(width: size.width + 4, height: size.height + 4)
         flash.size = tint.size
         if portal { fitCamera(animated: false) }
-        rain?.position = CGPoint(x: 0, y: size.height / 2 + 20)
-        rain?.particlePositionRange = CGVector(dx: size.width * 1.4, dy: 0)
+        for e in [rain, skyRain].compactMap({ $0 }) { spread(e) }
     }
 
     override func didMove(to view: SKView) {
@@ -247,10 +260,10 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     func apply(_ w: World, animated: Bool) {
         let since = animated ? lastSync : nil
         world = w
-        if packTextures(for: w) {
+        if Perf.measure("pack", { packTextures(for: w) }) {
             for n in elementNodes.values { n.retexture() }
             for (k, n) in tileNodes {
-                let (key, make) = Self.tileKey(k)
+                let (key, make) = tileKey(k)
                 n.texture = Textures.tex(key, make).texture
                 Textures.setRect(n)
             }
@@ -272,7 +285,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
                 newTiles += 1
             }
         }
-        updateUnderside(animated: newTiles > 0 && lastSync != nil)
+        Perf.measure("underside") { updateUnderside(animated: newTiles > 0 && lastSync != nil) }
         if newTiles > 0 && lastSync != nil {
             run(.sequence([.wait(forDuration: 0.4 + Double(newTiles) * 0.07), .run { [weak self] in self?.fitCamera(animated: true) }]))
         }
@@ -291,7 +304,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
                 n.refresh()
                 continue
             }
-            let n = ElementNode(el, sway: sway)
+            let n = Perf.measure("newElement") { ElementNode(el, sway: sway) }
             castChanged = true
             addChild(n)
             if let l = n.light { addChild(l) }
@@ -315,7 +328,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
                 continue
             }
             guard let sp = animalByID[a.species] else { continue }
-            let n = AnimalNode(sp, a)
+            let n = Perf.measure("newAnimal") { AnimalNode(sp, a, sway: sway) }
             n.onRipple = { [weak self] p in self?.ripple(at: p, big: false) }
             addChild(n)
             animalNodes[a.id] = n
@@ -337,8 +350,11 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     }
 
     private func updateNightFlies() {
-        guard let sp = animalByID["firefly"], !world.tiles.isEmpty else { return }
-        let real = world.residents.filter { $0.species == "firefly" }.count
+        guard let sp = world.habitat.nightFly.flatMap({ animalByID[$0] }), !world.tiles.isEmpty else {
+            while let f = nightFlies.popLast() { f.removeFromParent() }
+            return
+        }
+        let real = world.residents.filter { $0.species == sp.id }.count
         let trees = world.elements.filter { $0.isTree && $0.mature }.count
         let want = max(0, min(12, 4 + trees / 3) - real) + (sky == .fireflies ? 24 : 0)
         while nightFlies.count > want { nightFlies.removeLast().removeFromParent() }
@@ -348,19 +364,23 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
             let k = tiles[Int(fnv(id) % UInt64(tiles.count))]
             let info = Resident(id: id, species: sp.id, name: sp.name, trait: .dreamy, arrived: .distantPast,
                                 homeX: Double(k.x), homeY: Double(k.y))
-            let n = AnimalNode(sp, info)
+            let n = AnimalNode(sp, info, sway: sway)
             addChild(n)
             nightFlies.append(n)
         }
     }
 
-    private static func tileKey(_ k: TileKey) -> (String, () -> ArtImage) {
-        Textures.tileKey(Int(fnv("\(k.x):\(k.y)") % 4))
+    private func tileKey(_ k: TileKey) -> (String, () -> ArtImage) {
+        Textures.tileKey(Int(fnv("\(k.x):\(k.y)") % 4), world.habitat)
     }
 
     /// Le immagini che servono a quest'isola, nei fogli condivisi prima di creare i nodi.
     private func packTextures(for w: World) -> Bool {
-        var wanted = (0..<4).map { Textures.tileKey($0) }
+        Textures.pack(Self.wantedTextures(for: w))
+    }
+
+    static func wantedTextures(for w: World) -> [(String, () -> ArtImage)] {
+        var wanted = (0..<4).map { Textures.tileKey($0, w.habitat) }
         wanted.append(("shadow", { Paint.groundShadow() }))
         wanted.append(("sprout", { Art.sprout() }))
         for el in w.elements {
@@ -370,11 +390,25 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
                 wanted.append(Textures.elementKey(el))
             }
         }
-        return Textures.pack(wanted)
+        var species = Set(w.residents.map(\.species))
+        if let fly = w.habitat.nightFly { species.insert(fly) }
+        for id in species.sorted() {
+            if let sp = animalByID[id] { wanted += AnimalNode.arts(sp) }
+        }
+        return wanted
+    }
+
+    /// La terra sotto l'isola, che dipende solo dalla forma e dal mondo.
+    static func undersideArt(for w: World) -> (String, () -> ArtImage) {
+        let tiles = Array(w.tiles.keys)
+        let r = Island.radius(tiles: tiles.count)
+        let shape = fnv(tiles.map { "\($0.x),\($0.y)" }.sorted().joined(separator: ";"))
+        let terrain = w.habitat.terrain
+        return ("under/\(w.habitat.rawValue)/\(shape)", { Art.underside(tiles, r, terrain) })
     }
 
     private func makeTile(_ k: TileKey) -> SKSpriteNode {
-        let (key, make) = Self.tileKey(k)
+        let (key, make) = tileKey(k)
         let s = Textures.sprite(key, make)
         s.position = Iso.point(Double(k.x), Double(k.y))
         s.zPosition = 10 + Iso.depth(Double(k.x), Double(k.y)) * 0.02
@@ -393,8 +427,8 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         undersideCount = tiles.count
         undersideFalls = falls
         let old = underside
-        let shape = fnv(tiles.map { "\($0.x),\($0.y)" }.sorted().joined(separator: ";"))
-        let tex = Textures.tex("under\(shape)") { Art.underside(tiles, r) }
+        let (key, make) = Self.undersideArt(for: world)
+        let tex = Textures.tex(key, make)
         let u = SKSpriteNode(texture: tex.texture, size: tex.size)
         u.anchorPoint = tex.anchor
         u.position = Iso.point(0, 0)
@@ -417,7 +451,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         var rng = RNG("rocks\(Int(r * 4))")
         let spots: [(CGFloat, CGFloat, Int)] = [(-0.72, 0.55, 1), (0.8, 0.42, 0), (-0.35, 1.05, 0), (0.55, 0.95, 2)]
         for (i, (fx, fy, v)) in spots.enumerated() where i < 2 + Int(r / 4) {
-            let rock = Textures.sprite("frock\(v)") { Art.floatRock(v) }
+            let rock = Textures.sprite("frock/\(world.habitat.rawValue)/\(v)") { Art.floatRock(v, world.habitat.terrain) }
             rock.position = CGPoint(x: a * fx + CGFloat(rng.range(-10, 10)), y: -b - depth * fy)
             rock.zPosition = -1
             rock.setScale(CGFloat(min(1.6, 0.8 + r * 0.06)))
@@ -559,21 +593,16 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         sway.wither.floatValue = Float(w)
         sway.wind.floatValue = Float([1, 1.1, 1.3, 1.7, 2.1, 2.4][s])
         applyFog()
-        // Con la nebbia e la pioggia, gli animali si nascondono.
-        let hideShare = max(w * 0.75, s >= 2 ? 0.6 : 0)
-        for (i, n) in animalNodes.values.sorted(by: { $0.info.id < $1.info.id }).enumerated() {
-            n.veiled = Double(i % 10) / 10 < hideShare
-        }
+        // Con la pioggia gli animali si riparano, ma restano sull'isola e si vedono.
+        for n in animalNodes.values { n.sheltering = s >= 2 }
         for n in elementNodes.values { n.sheltered = s >= 2 }
         if weather == .rain {
+            let fresh = rain == nil
             let e = rain ?? makeRain()
             rain = e
             // Più è forte la tempesta, più pioggia e più storta dal vento.
-            let lean = 0.1 + 0.07 * CGFloat(s)
-            e.particleBirthRate = [140, 140, 55, 120, 200, 270][s]
-            e.particleSpeed = 520 + 50 * CGFloat(s)
-            e.emissionAngle = -.pi / 2 - lean
-            e.particleRotation = -lean
+            fall(e, rate: [140, 140, 55, 120, 200, 270][s], speed: 520 + 50 * CGFloat(s), lean: 0.1 + 0.07 * CGFloat(s))
+            if fresh { settle(e) }
         } else if let r = rain {
             r.particleBirthRate = 0
             r.run(.sequence([.wait(forDuration: 2), .removeFromParent()]))
@@ -606,18 +635,70 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
 
     private func makeRain() -> SKEmitterNode {
         let e = SKEmitterNode()
-        e.particleTexture = Textures.tex("drop") { Art.drop() }.texture
-        e.particleLifetime = 1.6
-        e.particleSpeedRange = 80
-        e.particleAlpha = 0.55
-        e.particleAlphaRange = 0.2
-        e.particleScale = 1
-        e.particleScaleRange = 0.4
+        if world.habitat.snowy {
+            e.particleTexture = Textures.tex("snowfall") { Art.snowfall() }.texture
+            e.particleLifetime = 12
+            e.particleSpeedRange = 25
+            e.emissionAngleRange = 0.5
+            e.particleAlpha = 0.9
+            e.particleAlphaRange = 0.1
+            e.particleScale = 0.75
+            e.particleScaleRange = 0.5
+        } else {
+            e.particleTexture = Textures.tex("drop") { Art.drop() }.texture
+            e.particleLifetime = 1.6
+            e.particleSpeedRange = 80
+            e.particleAlpha = 0.55
+            e.particleAlphaRange = 0.2
+            e.particleScale = 1
+            e.particleScaleRange = 0.4
+        }
         e.zPosition = 960
         e.position = CGPoint(x: 0, y: size.height / 2 + 20)
         e.particlePositionRange = CGVector(dx: size.width * 1.4, dy: 0)
         cam.addChild(e)
         return e
+    }
+
+    /// Se pioveva già quando arrivi, la pioggia riempie subito la vista invece di cominciare a cadere dall'alto.
+    /// Se comincia mentre guardi, scende dall'alto come deve.
+    private func settle(_ e: SKEmitterNode) {
+        guard !hasDrawn else { return }
+        e.advanceSimulationTime(Double(e.particleLifetime))
+    }
+
+    /// La neve scende piano e il vento la sposta tanto: il getto parte sopravvento di quanto la sposta
+    /// e i fiocchi vivono finché non arrivano in fondo, così la vista è coperta fino agli angoli.
+    private func spread(_ e: SKEmitterNode) {
+        guard world.habitat.snowy else {
+            e.position = CGPoint(x: 0, y: size.height / 2 + 20)
+            e.particlePositionRange = CGVector(dx: size.width * 1.4, dy: 0)
+            return
+        }
+        let tilt = -.pi / 2 - e.emissionAngle
+        let slowest = max(10, (e.particleSpeed - e.particleSpeedRange / 2) * cos(tilt))
+        let time = (size.height + 60) / slowest
+        let drift = min(size.width, time * e.particleSpeed * sin(tilt))
+        e.particleLifetime = min(30, time)
+        e.position = CGPoint(x: drift / 2, y: size.height / 2 + 20)
+        e.particlePositionRange = CGVector(dx: size.width * 1.3 + abs(drift), dy: 0)
+    }
+
+    /// Dove nevica i fiocchi scendono lenti e radi, e il vento li piega di più.
+    private func fall(_ e: SKEmitterNode, rate: CGFloat, speed: CGFloat, lean: CGFloat, alpha: CGFloat? = nil) {
+        if world.habitat.snowy {
+            e.particleBirthRate = rate * 0.6
+            e.particleSpeed = speed * 0.15
+            e.emissionAngle = -.pi / 2 - lean * 1.2
+            if let alpha { e.particleAlpha = min(1, alpha + 0.4) }
+            spread(e)
+        } else {
+            e.particleBirthRate = rate
+            e.particleSpeed = speed
+            e.emissionAngle = -.pi / 2 - lean
+            e.particleRotation = -lean
+            if let alpha { e.particleAlpha = alpha }
+        }
     }
 
     private func applyFog() {
@@ -686,14 +767,11 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         sky = s
         let rate: CGFloat = s == .drizzle ? 45 : (s == .rain ? 155 : (s == .thunder ? 225 : 0))
         if rate > 0 {
+            let fresh = skyRain == nil
             let e = skyRain ?? makeRain()
             skyRain = e
-            let lean: CGFloat = s == .drizzle ? 0.05 : 0.14
-            e.particleBirthRate = rate
-            e.particleSpeed = s == .drizzle ? 420 : 580
-            e.particleAlpha = s == .drizzle ? 0.32 : 0.5
-            e.emissionAngle = -.pi / 2 - lean
-            e.particleRotation = -lean
+            fall(e, rate: rate, speed: s == .drizzle ? 420 : 580, lean: s == .drizzle ? 0.05 : 0.14, alpha: s == .drizzle ? 0.32 : 0.5)
+            if fresh { settle(e) }
         } else if let r = skyRain {
             r.particleBirthRate = 0
             r.run(.sequence([.wait(forDuration: 2), .removeFromParent()]))
@@ -796,7 +874,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
             let k = tiles[Int(fnv(key) % UInt64(tiles.count))]
             let info = Resident(id: "visitor-\(id)", species: id, name: sp.name, trait: .curious, arrived: .distantPast,
                                 homeX: Double(k.x), homeY: Double(k.y))
-            let n = AnimalNode(sp, info)
+            let n = AnimalNode(sp, info, sway: sway)
             n.onRipple = { [weak self] p in self?.ripple(at: p, big: false) }
             addChild(n)
             n.arrive(from: edgePoint(seed: info.id))
@@ -819,15 +897,31 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         halo.zPosition = -1
         w.addChild(halo)
         let y = isleRect.maxY - 10
-        let from = CGPoint(x: isleRect.minX - 200, y: y), to = CGPoint(x: isleRect.maxX + 200, y: y + 40)
-        // La prima volta parte già un po' dentro, così si vede subito.
-        w.position = CGPoint(x: isleRect.minX + isleRect.width * 0.15, y: y + 8)
-        let first = SKAction.sequence([.fadeAlpha(to: 0.95, duration: 3), .move(to: to, duration: 55), .fadeOut(withDuration: 0.1), .wait(forDuration: 10)])
-        let lap = SKAction.sequence([.move(to: from, duration: 0), .fadeAlpha(to: 0.95, duration: 3), .move(to: to, duration: 70),
-                                     .fadeOut(withDuration: 0.1), .wait(forDuration: 12)])
-        w.run(.sequence([first, .repeatForever(lap)]))
+        var bobTime = 3.2
+        #if DEBUG
+        let loop = Launch.open == "art"
+        #else
+        let loop = false
+        #endif
+        if loop {
+            // Per il video del paywall: resta dietro l'isola e ogni moto torna uguale ogni 8 secondi.
+            w.position = CGPoint(x: isleRect.minX + isleRect.width * 0.15, y: y + 8)
+            w.alpha = 0.95
+            let drift = SKAction.moveBy(x: 34, y: 5, duration: 4)
+            drift.timingMode = .easeInEaseOut
+            w.run(.repeatForever(.sequence([drift, drift.reversed()])))
+            bobTime = 2
+        } else {
+            let from = CGPoint(x: isleRect.minX - 200, y: y), to = CGPoint(x: isleRect.maxX + 200, y: y + 40)
+            // La prima volta parte già un po' dentro, così si vede subito.
+            w.position = CGPoint(x: isleRect.minX + isleRect.width * 0.15, y: y + 8)
+            let first = SKAction.sequence([.fadeAlpha(to: 0.95, duration: 3), .move(to: to, duration: 55), .fadeOut(withDuration: 0.1), .wait(forDuration: 10)])
+            let lap = SKAction.sequence([.move(to: from, duration: 0), .fadeAlpha(to: 0.95, duration: 3), .move(to: to, duration: 70),
+                                         .fadeOut(withDuration: 0.1), .wait(forDuration: 12)])
+            w.run(.sequence([first, .repeatForever(lap)]))
+        }
         w.run(.repeatForever(.animate(with: frames.map(\.texture), timePerFrame: 0.5)))
-        let bob = SKAction.moveBy(x: 0, y: 10, duration: 3.2)
+        let bob = SKAction.moveBy(x: 0, y: 10, duration: bobTime)
         bob.timingMode = .easeInEaseOut
         let holder = SKNode()
         holder.zPosition = 0
@@ -919,18 +1013,26 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     }
 
     override func update(_ currentTime: TimeInterval) {
+        guard Perf.on else { return tick(currentTime) }
+        Perf.measure(portal ? "portal" : "frame") { tick(currentTime) }
+        if !portal { Perf.batches(self) }
+    }
+
+    private func tick(_ currentTime: TimeInterval) {
         let dt = lastTime == 0 ? 1.0 / 60 : min(0.05, currentTime - lastTime)
         lastTime = currentTime
         lightTimer -= dt
-        if lightTimer <= 0 { lightTimer = 0.5; updateLight() }
+        if lightTimer <= 0 { lightTimer = 0.5; Perf.measure("light") { updateLight() } }
         if dramatic { syncLight() }
 
-        var positions: [String: (Double, Double)] = [:]
-        for (id, n) in animalNodes where n.info.babyOf == nil { positions[id] = (n.wx, n.wy) }
-        env.positions = positions
-        for n in animalNodes.values { n.step(dt, env) }
-        for n in nightFlies { n.step(dt, env) }
-        for n in visitors { n.step(dt, env) }
+        Perf.measure("animals") {
+            var positions: [String: (Double, Double)] = [:]
+            for (id, n) in animalNodes where n.info.babyOf == nil { positions[id] = (n.wx, n.wy) }
+            env.positions = positions
+            for n in animalNodes.values { n.step(dt, env) }
+            for n in nightFlies { n.step(dt, env) }
+            for n in visitors { n.step(dt, env) }
+        }
 
         // Nuvole lontane (ferme rispetto allo schermo, con un filo di parallasse) e vicine sotto l'isola.
         let w = Double(size.width), hgt = Double(size.height)
@@ -994,8 +1096,10 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
                 fitScale = max(crop.width / (size.width * 0.94), crop.height / (size.height * 0.44))
                 cam.position = CGPoint(x: crop.midX, y: crop.midY - size.height * fitScale * 0.05)
             } else {
-                fitScale = max(crop.width / size.width, crop.height / size.height)
-                cam.position = CGPoint(x: crop.midX, y: crop.midY)
+                let f = framing
+                fitScale = max(crop.width / (size.width * f.width), crop.height / (size.height * f.height))
+                cam.position = CGPoint(x: crop.midX - (f.midX - 0.5) * size.width * fitScale,
+                                       y: crop.midY - (f.midY - 0.5) * size.height * fitScale)
             }
             cam.setScale(fitScale)
             return

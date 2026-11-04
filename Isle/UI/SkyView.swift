@@ -8,12 +8,94 @@ struct LitScene: View {
     var paused = false
     var fps = 60
     var debug: SpriteView.DebugOptions = []
+    /// La vista SpriteKit sopravvive a questa: riaprendo la schermata torna la stessa, già pronta.
+    var keep = false
 
     var body: some View {
-        SpriteView(scene: scene, isPaused: paused, preferredFramesPerSecond: fps,
-                   options: [.ignoresSiblingOrder, .shouldCullNonVisibleNodes, .allowsTransparency],
-                   debugOptions: debug)
+        let _ = Perf.count("lit")
+        SceneView(scene: scene, paused: paused, fps: fps, debug: debug, keep: keep)
             .colorMultiply(Color(uiColor: scene.light.color))
+    }
+
+    /// Prepara fuori dallo schermo la vista che `keep` riuserà: la prima volta che si vede non c'è niente da creare.
+    static func prewarm(_ scene: WorldScene, fps: Int) {
+        SceneView.prewarm(scene, fps: fps)
+    }
+}
+
+/// La vista SpriteKit. Non è `SpriteView` perché la sua pausa ferma solo le azioni della scena:
+/// la vista continua a chiamare `update` e a disegnare ogni fotogramma, anche nascosta sotto un'isola aperta.
+/// Qui la pausa è quella della vista, e da ferma la GPU non lavora.
+private struct SceneView: UIViewRepresentable {
+    let scene: SKScene
+    let paused: Bool
+    let fps: Int
+    let debug: SpriteView.DebugOptions
+    let keep: Bool
+
+    private static var kept: [ObjectIdentifier: SKView] = [:]
+    /// Chi sta mostrando ciascuna vista conservata: solo lui, quando sparisce, la può fermare.
+    private static var owners: [ObjectIdentifier: Coordinator] = [:]
+
+    final class Coordinator {}
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeUIView(context: Context) -> SKView {
+        if keep, let v = Self.kept[ObjectIdentifier(scene)] {
+            Self.owners[ObjectIdentifier(v)] = context.coordinator
+            v.isPaused = paused
+            return v
+        }
+        Perf.count("makeSKView")
+        let v = Self.make(scene, fps: fps)
+        v.isPaused = paused
+        if keep {
+            Self.kept[ObjectIdentifier(scene)] = v
+            Self.owners[ObjectIdentifier(v)] = context.coordinator
+        }
+        return v
+    }
+
+    /// Fuori dallo schermo una vista conservata continuerebbe a disegnare.
+    static func dismantleUIView(_ v: SKView, coordinator: Coordinator) {
+        guard owners[ObjectIdentifier(v)] === coordinator else { return }
+        owners[ObjectIdentifier(v)] = nil
+        v.isPaused = true
+    }
+
+    private static func make(_ scene: SKScene, fps: Int) -> SKView {
+        // Nasce già della misura della scena: da vuota la scena passerebbe per una misura zero e perderebbe l'inquadratura.
+        let v = SKView(frame: CGRect(origin: .zero, size: scene.size))
+        v.ignoresSiblingOrder = true
+        v.shouldCullNonVisibleNodes = true
+        v.allowsTransparency = true
+        v.isOpaque = false
+        v.backgroundColor = .clear
+        v.preferredFramesPerSecond = fps
+        v.presentScene(scene)
+        return v
+    }
+
+    static func prewarm(_ scene: SKScene, fps: Int) {
+        let id = ObjectIdentifier(scene)
+        guard kept[id] == nil else { return }
+        Perf.measure("prewarm") {
+            let v = make(scene, fps: fps)
+            kept[id] = v
+            // Un disegno a vuoto: SpriteKit prepara qui gli shader, non alla prima apparizione.
+            _ = v.texture(from: scene)
+            v.isPaused = true
+        }
+    }
+
+    func updateUIView(_ v: SKView, context: Context) {
+        if v.scene !== scene { v.presentScene(scene) }
+        if v.preferredFramesPerSecond != fps { v.preferredFramesPerSecond = fps }
+        if v.isPaused != paused { v.isPaused = paused }
+        v.showsFPS = debug.contains(.showsFPS)
+        v.showsNodeCount = debug.contains(.showsNodeCount)
+        v.showsDrawCount = debug.contains(.showsDrawCount)
     }
 }
 
@@ -23,6 +105,12 @@ struct SkyView: View {
     let scene: WorldScene
     /// Sole e luna più piccoli quando il cielo sta in una finestrella.
     var bodyScale: CGFloat = 1
+    /// Il sole resta in cielo per tutto il giorno, non solo all'alba e al tramonto.
+    var daySun = false
+    /// Fermo quando non si vede: una finestrella sotto un'isola aperta non deve ridisegnarsi.
+    var paused = false
+    /// Un istante preciso invece dell'orologio, per disegnare un fotogramma alla volta.
+    var time: Double?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private struct Star {
@@ -76,7 +164,9 @@ struct SkyView: View {
     /// Veli dell'aurora: bande ondulate che sfumano verso il basso.
     private static func aurora(_ ctx: GraphicsContext, _ size: CGSize, t: Double, alpha: Double) {
         var ctx = ctx
-        ctx.addFilter(.blur(radius: 14))
+        let small = min(1, size.height / 600)
+        ctx.addFilter(.blur(radius: 14 * small))
+        let alpha = min(1.6, alpha * (2.2 - 1.2 * small))
         let colors: [UInt32] = [0x6BF2B0, 0x5FD8E8, 0xB48CFF]
         for (i, hex) in colors.enumerated() {
             let base = size.height * (0.1 + 0.07 * Double(i))
@@ -107,15 +197,16 @@ struct SkyView: View {
 
     var body: some View {
         // Di giorno, col cielo fermo, basta ridisegnarlo quando cambia la luce.
-        TimelineView(.animation(minimumInterval: scene.light.live ? 1.0 / 30 : 1)) { tl in
+        TimelineView(.animation(minimumInterval: scene.light.live ? 1.0 / 30 : 1, paused: paused)) { tl in
             let _ = scene.light.color
+            let _ = Perf.count("sky")
             let hour = scene.hour
             let sky = scene.sky
             let (top0, bottom0, sunUp) = WorldScene.skyColors(at: hour)
             let top = sky == .blaze ? top0.mix(UIColor(hex: 0x7A4AA8), 0.45) : (sky == .magic ? top0.mix(UIColor(hex: 0x3A2E7A), 0.4) : top0)
             let bottom = sky == .blaze ? bottom0.mix(UIColor(hex: 0xFF8A5C), 0.55) : (sky == .magic ? bottom0.mix(UIColor(hex: 0x8A6AD8), 0.35) : bottom0)
             let night = WorldScene.light(at: hour).1
-            let t = tl.date.timeIntervalSinceReferenceDate
+            let t = time ?? tl.date.timeIntervalSinceReferenceDate
             let storm = scene.overcast
             // L'ombra del meteo entra direttamente nei colori: un velo in moltiplica
             // costerebbe un passaggio in più su tutto lo schermo a ogni fotogramma.
@@ -177,7 +268,7 @@ struct SkyView: View {
                         .scaleEffect(bodyScale)
                         .colorMultiply(tint)
                         .position(x: w / 2, y: h / 2 - h * 0.08)
-                        .opacity(sunUp * (1 - storm))
+                        .opacity(max(sunUp, daySun ? 1 - night : 0) * (1 - storm))
                     Image(uiImage: Self.moonImage)
                         .scaleEffect(bodyScale)
                         .colorMultiply(tint)

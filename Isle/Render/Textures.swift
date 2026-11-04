@@ -33,7 +33,7 @@ enum Textures {
 
     static func tex(_ key: String, _ make: () -> ArtImage) -> Tex {
         if let t = cache[key] { return t }
-        let art = make()
+        let art = ready.removeValue(forKey: key) ?? make()
         let tex = SKTexture(image: art.image)
         tex.filteringMode = .linear
         let t = Tex(texture: tex, anchor: art.anchor, size: art.size)
@@ -64,17 +64,55 @@ enum Textures {
     /// restituisce `true` se ne è nato uno nuovo, e allora conviene riassegnare le texture già in uso.
     @discardableResult
     static func pack(_ wanted: [(String, () -> ArtImage)]) -> Bool {
-        var seen = Set<String>()
-        let fresh = wanted.filter { !packed.contains($0.0) && seen.insert($0.0).inserted }
+        let fresh = missing(wanted)
         guard !fresh.isEmpty else { return false }
-        let side = 2048, pad = 2
-        var pages: [[(String, ArtImage, CGRect)]] = [[]]
+        register(sheets(fresh.map { ($0.0, ready.removeValue(forKey: $0.0) ?? $0.1()) }))
+        return true
+    }
+
+    /// Come `pack`, ma disegna immagini e fogli in sottofondo: sul filo principale resta solo da
+    /// registrarli, e lo schermo non si ferma.
+    static func packInBackground(_ wanted: [(String, () -> ArtImage)]) async {
+        let fresh = missing(wanted)
+        guard !fresh.isEmpty else { return }
+        let made = await Task.detached(priority: .utility) { sheets(fresh.map { ($0.0, $0.1()) }) }.value
+        register(made)
+    }
+
+    /// Immagini già disegnate in sottofondo, in attesa che `tex` o `pack` le chiedano.
+    private static var ready: [String: ArtImage] = [:]
+
+    /// Disegna in sottofondo le immagini sciolte che serviranno, così `tex` le trova pronte.
+    static func prerender(_ wanted: [(String, () -> ArtImage)]) async {
+        var seen = Set<String>()
+        let todo = wanted.filter { cache[$0.0] == nil && ready[$0.0] == nil && seen.insert($0.0).inserted }
+        guard !todo.isEmpty else { return }
+        let made = await Task.detached(priority: .utility) { todo.map { ($0.0, $0.1()) } }.value
+        for (key, art) in made where cache[key] == nil { ready[key] = art }
+    }
+
+    private static func missing(_ wanted: [(String, () -> ArtImage)]) -> [(String, () -> ArtImage)] {
+        var seen = Set<String>()
+        return wanted.filter { !packed.contains($0.0) && seen.insert($0.0).inserted }
+    }
+
+    private struct Sheet {
+        /// `nil` per le immagini troppo grandi per un foglio: restano sciolte.
+        let image: UIImage?
+        let items: [(key: String, art: ArtImage, rect: CGRect)]
+    }
+
+    nonisolated private static func sheets(_ arts: [(String, ArtImage)]) -> [Sheet] {
+        // Un'isola intera sta in un foglio solo: con due, piante e animali passano dall'uno all'altro
+        // in ordine di profondità e ogni passaggio è una chiamata in più.
+        let side = 4096, pad = 2
+        var pages: [[(key: String, art: ArtImage, rect: CGRect)]] = [[]]
+        var loose: [(key: String, art: ArtImage, rect: CGRect)] = []
         var x = pad, y = pad, shelf = 0
-        let arts = fresh.map { ($0.0, $0.1()) }
-            .sorted { ($0.1.image.cgImage?.height ?? 0) > ($1.1.image.cgImage?.height ?? 0) }
-        for (key, art) in arts {
+        let sorted = arts.sorted { ($0.1.image.cgImage?.height ?? 0) > ($1.1.image.cgImage?.height ?? 0) }
+        for (key, art) in sorted {
             guard let cg = art.image.cgImage, cg.width + 2 * pad <= side, cg.height + 2 * pad <= side else {
-                packed.insert(key)
+                loose.append((key, art, .zero))
                 continue
             }
             if x + cg.width + pad > side { x = pad; y += shelf + pad; shelf = 0 }
@@ -86,25 +124,37 @@ enum Textures {
             x += cg.width + pad
             shelf = max(shelf, cg.height)
         }
-        for page in pages where !page.isEmpty {
-            let w = page.map { Int($0.2.maxX) }.max()! + pad
-            let h = page.map { Int($0.2.maxY) }.max()! + pad
+        var out = pages.filter { !$0.isEmpty }.map { page in
+            let w = page.map { Int($0.rect.maxX) }.max()! + pad
+            let h = page.map { Int($0.rect.maxY) }.max()! + pad
             let format = UIGraphicsImageRendererFormat()
             format.scale = 1
             let sheet = UIGraphicsImageRenderer(size: CGSize(width: w, height: h), format: format).image { _ in
-                for (_, art, r) in page { UIImage(cgImage: art.image.cgImage!).draw(in: r) }
+                for item in page { UIImage(cgImage: item.art.image.cgImage!).draw(in: item.rect) }
             }
-            let tex = SKTexture(image: sheet)
+            return Sheet(image: sheet, items: page)
+        }
+        if !loose.isEmpty { out.append(Sheet(image: nil, items: loose)) }
+        return out
+    }
+
+    private static func register(_ sheets: [Sheet]) {
+        for s in sheets {
+            guard let image = s.image else {
+                for item in s.items { packed.insert(item.key) }
+                continue
+            }
+            let tex = SKTexture(image: image)
             tex.filteringMode = .linear
-            let W = CGFloat(w), H = CGFloat(h)
-            for (key, art, r) in page {
+            let W = image.size.width, H = image.size.height
+            for (key, art, r) in s.items where !packed.contains(key) {
                 // Le coordinate delle texture partono dal basso.
                 let sub = SKTexture(rect: CGRect(x: r.minX / W, y: (H - r.maxY) / H, width: r.width / W, height: r.height / H), in: tex)
+                if Perf.on { Perf.sheetOf[ObjectIdentifier(sub)] = ObjectIdentifier(tex).hashValue % 1000 }
                 cache[key] = Tex(texture: sub, anchor: art.anchor, size: art.size)
                 packed.insert(key)
             }
         }
-        return true
     }
 
     static func elementKey(_ el: Element, stage: Int = 0) -> (String, () -> ArtImage) {
@@ -116,11 +166,11 @@ enum Textures {
             let v = Int(fnv(el.id) % 3)
             return ("flora/\(f)/\(v)", { Art.flora(f, variant: v) })
         case .crater:
-            return ("crater/\(stage)", { Art.crater(stage) })
+            return ("crater/\(el.land.rawValue)/\(stage)", { Art.crater(stage, land: el.land) })
         }
     }
 
-    static func tileKey(_ v: Int) -> (String, () -> ArtImage) { ("tile\(v)", { Art.tile(v) }) }
+    static func tileKey(_ v: Int, _ land: Habitat) -> (String, () -> ArtImage) { ("tile/\(land.rawValue)/\(v)", { Art.tile(v, land.terrain) }) }
 
     /// La parte di foglio che occupa la texture, per lo shader del vento.
     static func setRect(_ s: SKSpriteNode) {
@@ -144,7 +194,8 @@ enum Textures {
             vec4 c = texture2D(u_texture, a_rect.xy + clamp(uv, 0.0, 1.0) * a_rect.zw);
             float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
             vec3 dry = vec3(lum * 1.02, lum * 0.9, lum * 0.72);
-            c.rgb = mix(c.rgb, dry, u_wither * 0.75) * (1.0 - u_wither * 0.22);
+            float w = u_wither * a_wither;
+            c.rgb = mix(c.rgb, dry, w * 0.75) * (1.0 - w * 0.22);
             vec3 dead = vec3(lum * 0.98, lum * 0.86, lum * 0.72);
             c.rgb = mix(c.rgb, dead, a_dry * 0.92) * (1.0 - a_dry * 0.18);
             c.rgb = mix(c.rgb, vec3(1.0, 0.32, 0.32) * c.a, a_hl * 0.5);
@@ -152,8 +203,10 @@ enum Textures {
         }
         """
 
-    static func applySway(_ s: SKSpriteNode, _ sway: Sway, amp: Float, speed: Float = 1.4, phase: Float, base: Float) {
+    /// `wither` a zero per gli animali: quando l'isola appassisce loro restano a colori.
+    static func applySway(_ s: SKSpriteNode, _ sway: Sway, amp: Float, speed: Float = 1.4, phase: Float, base: Float, wither: Float = 1) {
         s.shader = sway.shader
+        s.setValue(SKAttributeValue(float: wither), forAttribute: "a_wither")
         s.setValue(SKAttributeValue(float: base), forAttribute: "a_base")
         s.setValue(SKAttributeValue(float: amp), forAttribute: "a_amp")
         s.setValue(SKAttributeValue(float: speed), forAttribute: "a_speed")
@@ -183,6 +236,7 @@ final class Sway {
             SKAttribute(name: "a_phase", type: .float),
             SKAttribute(name: "a_hl", type: .float),
             SKAttribute(name: "a_dry", type: .float),
+            SKAttribute(name: "a_wither", type: .float),
             SKAttribute(name: "a_rect", type: .vectorFloat4),
         ]
     }

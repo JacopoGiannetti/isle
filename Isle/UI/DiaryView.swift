@@ -30,20 +30,38 @@ struct DiaryView: View {
     }
 
     @ViewBuilder private func residents(_ w: World) -> some View {
-        let list = w.residents.sorted { a, b in
+        let named = w.residents.filter { animalByID[$0.species]?.named ?? false }.sorted { a, b in
             let ra = animalByID[a.species]?.rare ?? false, rb = animalByID[b.species]?.rare ?? false
             return ra != rb ? ra : a.arrived < b.arrived
         }
-        if list.isEmpty {
+        let ambient = Dictionary(grouping: w.residents.filter { !(animalByID[$0.species]?.named ?? true) }, by: \.species)
+            .sorted { $0.value.count > $1.value.count }
+        if w.residents.isEmpty {
             empty(L("Ancora nessuno. Pianta fiori e alberi: i primi visitatori arrivano presto."))
         }
-        ForEach(list) { r in
+        ForEach(named) { r in
             if let sp = animalByID[r.species] {
                 Row(image: Thumbs.animal(sp, known: true), title: controller.name(of: r),
                     subtitle: residentLine(r, sp, w),
-                    badge: sp.evolvesFrom != nil ? L("Speciale") : sp.rare ? L("Raro") : (r.isBaby(at: w.now) ? L("Cucciolo") : nil),
-                    badgeColor: sp.evolvesFrom != nil ? Theme.rarity(.special) : sp.rare ? Theme.gold : Theme.peach)
+                    badge: badge(sp) ?? (r.isBaby(at: w.now) ? L("Cucciolo") : nil),
+                    badgeColor: sp.vip ? Theme.rarity(animalRarity(sp)) : Theme.peach)
                     .onTapGesture { onFocus(.animal(r.id)) }
+            }
+        }
+        if !ambient.isEmpty {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(L("Atmosfera")).font(.cozy(14, .bold)).foregroundStyle(Theme.muted)
+                Text(L("Rendono l'isola viva, ma non contano tra i suoi animali."))
+                    .font(.cozy(12)).foregroundStyle(Theme.muted)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 10)
+            ForEach(ambient, id: \.key) { id, list in
+                if let sp = animalByID[id], let first = list.first {
+                    Row(image: Thumbs.animal(sp, known: true), title: sp.plural,
+                        subtitle: Lf("%d sull'isola", list.count), badge: badge(sp),
+                        badgeColor: Theme.rarity(animalRarity(sp)))
+                        .onTapGesture { onFocus(.animal(first.id)) }
+                }
             }
         }
         if !w.departed.isEmpty {
@@ -61,6 +79,10 @@ struct DiaryView: View {
                 }
             }
         }
+    }
+
+    private func badge(_ sp: AnimalSpecies) -> String? {
+        sp.vip ? animalRarity(sp).label : nil
     }
 
     private func residentLine(_ r: Resident, _ sp: AnimalSpecies, _ w: World) -> String {

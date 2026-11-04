@@ -70,15 +70,13 @@ struct Phase {
     }
 }
 
-let phases: [Phase] = [
-    Phase(index: 1, name: "Radura", from: 0, blurb: "Un prato, i primi alberi, le prime visite."),
+let forestPhases: [Phase] = [
+    Phase(index: 1, name: "Radura", from: 1, blurb: "Un prato, i primi alberi, le prime visite."),
     Phase(index: 2, name: "Bosco", from: 7, blurb: "Arriva l'acqua, e con lei i cervi."),
     Phase(index: 3, name: "Bosco antico", from: 21, blurb: "Salici, cascate e creature della notte."),
     Phase(index: 4, name: "Foresta incantata", from: 60, blurb: "Il bosco comincia a brillare."),
     Phase(index: 5, name: "Leggende", from: 100, blurb: "Quello che pochi hanno visto."),
 ]
-
-func phase(for day: Int) -> Phase { phases.last { day >= $0.from } ?? phases[0] }
 
 // MARK: - Specie che pianti tu
 
@@ -118,13 +116,13 @@ struct Species: Identifiable {
     }
 }
 
-let speciesList: [Species] = [
+let forestSpecies: [Species] = [
     // Radura
     Species(id: "oak", name: "Quercia", rareName: "Quercia d'autunno", kind: .tree, rarity: .common, phase: 1,
-            unlock: .day(0), emits: Conds(shade: 2, food: 1, shelter: 1), slots: 9,
+            unlock: .day(1), emits: Conds(shade: 2, food: 1, shelter: 1), slots: 9,
             blurb: "Ombra e ghiande: il cuore di ogni bosco."),
     Species(id: "flowers", name: "Fiori di campo", rareName: "Fiori azzurri", kind: .flower, rarity: .common, phase: 1,
-            unlock: .day(0), emits: Conds(food: 0.5, bloom: 3), slots: 9,
+            unlock: .day(1), emits: Conds(food: 0.5, bloom: 3), slots: 9,
             blurb: "Colore e nettare. Le farfalle non resistono."),
     Species(id: "fir", name: "Abete", rareName: "Abete innevato", kind: .tree, rarity: .common, phase: 1,
             unlock: .day(2), emits: Conds(shade: 2, shelter: 2), slots: 9,
@@ -141,7 +139,7 @@ let speciesList: [Species] = [
             blurb: "Petali rosa che cadono piano. Uno su dieci nasce bianco."),
     Species(id: "spring", name: "Sorgente", rareName: "Sorgente cristallina", kind: .water, rarity: .uncommon, phase: 2,
             unlock: .day(8), emits: Conds(water: 3, magic: 0.5), slots: 11,
-            blurb: "Acqua fresca. Senza, i cervi non vengono."),
+            blurb: "Acqua fresca. Il castoro ci costruisce la sua diga."),
     Species(id: "maple", name: "Acero", rareName: "Acero cremisi", kind: .tree, rarity: .uncommon, phase: 2,
             unlock: .day(10), emits: Conds(shade: 2, food: 1, shelter: 1, bloom: 1), slots: 11,
             blurb: "Foglie color fuoco, anche d'estate."),
@@ -189,7 +187,7 @@ let speciesList: [Species] = [
             blurb: "Petali d'oro. Chiama lo spirito della foresta."),
 ]
 
-let speciesByID: [String: Species] = Dictionary(uniqueKeysWithValues: speciesList.map { ($0.id, $0) })
+let speciesByID: [String: Species] = Dictionary(uniqueKeysWithValues: allSpecies.map { ($0.id, $0) })
 
 // MARK: - Evoluzioni
 
@@ -202,7 +200,9 @@ struct Evolution {
     var name: String { L(nameIT) }
     var blurb: String { L(blurbIT) }
 
-    var feminine: Bool { ["Quercia", "Betulla", "Sorgente", "Pergola", "Cascata"].contains { nameIT.hasPrefix($0) } }
+    var feminine: Bool { ["Quercia", "Betulla", "Sorgente", "Pergola", "Cascata", "Felce", "Cicadea", "Palude", "Magnolia", "Araucaria",
+                                     "Sequoia", "Grotta", "Laguna", "Fontana", "Pozza", "Acacia", "Prateria", "Palma", "Rupe",
+                                     "Aloe", "Marula", "Tundra", "Scogliera", "Banchisa"].contains { nameIT.hasPrefix($0) } }
 
     init(name: String, blurb: String, animal: String) {
         self.nameIT = name
@@ -211,7 +211,7 @@ struct Evolution {
     }
 }
 
-let evolutions: [String: Evolution] = [
+let forestEvolutions: [String: Evolution] = [
     "oak": Evolution(name: "Quercia carica di ghiande", blurb: "I rami si piegano sotto le ghiande.", animal: "flyingsquirrel"),
     "flowers": Evolution(name: "Prato in piena fioritura", blurb: "Un mare di petali che ronza tutto il giorno.", animal: "hawkmoth"),
     "fir": Evolution(name: "Abete delle stelle", blurb: "Di notte le sue pigne brillano.", animal: "starowl"),
@@ -233,13 +233,14 @@ let evolutions: [String: Evolution] = [
 
 extension Species {
     var evolution: Evolution? { evolutions[id] }
-    var isFeminine: Bool { ["oak", "birch", "spring", "waterfall", "lantern", "ancientoak"].contains(id) }
-    var isPlural: Bool { ["flowers", "glowshroom"].contains(id) }
+    var land: Habitat { Habitat.allCases.first { h in h.species.contains { $0.id == id } } ?? .forest }
+    var isFeminine: Bool { feminineSpecies.contains(id) }
+    var isPlural: Bool { pluralSpecies.contains(id) }
     /// "la quercia", "the oak".
     var withArticle: String { L("the.\(id)") }
     /// "È la prima quercia", "It's the first oak".
     var firstLine: String { L("first.\(id)") }
-    var firstWho: String { L(isPlural ? "I primi" : isFeminine ? "La prima" : "Il primo") }
+    var firstWho: String { L(isPlural ? (isFeminine ? "Le prime" : "I primi") : isFeminine ? "La prima" : "Il primo") }
     var evolveVerb: String { L(isPlural ? "si evolvono" : "si evolve") }
     var willEvolve: String { L(isPlural ? "si evolveranno" : "si evolverà") }
     /// Giorni da "prima" della sua specie prima di evolversi.
@@ -269,7 +270,7 @@ struct Flora: Identifiable {
     }
 }
 
-let floraList: [Flora] = [
+let forestFlora: [Flora] = [
     Flora(id: "grass", name: "Erba alta", rarity: .common, emits: Conds(), blurb: "Il primo segno che qui c'è vita.",
           weight: { c, _, _ in 2.2 + 0.2 * c.water }),
     Flora(id: "clover", name: "Trifoglio", rarity: .common, emits: Conds(food: 0.2, bloom: 0.3), blurb: "Piace ai conigli.",
@@ -300,7 +301,8 @@ let floraList: [Flora] = [
           blurb: "Nasce solo quando resisti a una voglia.", weight: { _, _, _ in 0 }),
 ]
 
-let floraByID: [String: Flora] = Dictionary(uniqueKeysWithValues: floraList.map { ($0.id, $0) })
+/// Il Fiore della tenacia è in tutti i mondi: vince il primo.
+let floraByID: [String: Flora] = Dictionary(allFlora.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
 
 // MARK: - Animali
 
@@ -309,8 +311,13 @@ enum Activity { case day, night, twilight }
 enum HomePref { case tree, water, ground, flowers }
 
 enum Ears { case round, pointed, long, tiny, antlers, bigAntlers, tufts, none }
-enum Tail { case puff, bushy, squirrel, short, none, long, fan }
-enum Pattern { case none, spots, mask, spines, crest }
+enum Tail { case puff, bushy, squirrel, short, none, long, fan, nine, dino, club, spiked, feather, tuft }
+enum Pattern { case none, spots, mask, bandit, spines, crest }
+/// Quello che sta sulla testa o intorno: collari, corna, creste, criniere, proboscidi.
+enum Crest { case none, frill, triceratops, styraco, tube, helmet, dome, spikyDome, oviCrest, croc, mane, trunk, tusks, rhino,
+    mammoth, ossicones, horns, oxHorns }
+/// Quello che sta sulla schiena o sul manto.
+enum Back { case none, plates, spikes, sail, armor, feathers, stripes, patches, shaggy }
 
 struct Look {
     var body: UInt32
@@ -328,6 +335,10 @@ struct Look {
     var snout: CGFloat = 0.5
     var neck: CGFloat = 0
     var glow = false
+    var crest: Crest = .none
+    var back: Back = .none
+    /// Cammina su due zampe, con le braccine davanti.
+    var biped = false
 }
 
 struct AnimalSpecies: Identifiable {
@@ -355,16 +366,19 @@ struct AnimalSpecies: Identifiable {
     var speed: Double = 1
     /// Gli Speciali arrivano solo per la pianta evoluta di questa specie.
     var evolvesFrom: String?
+    /// Leggendari: rari, ma arrivano con la pianta normale, senza bisogno della variante.
+    var legendary = false
 
     var feminine: Bool {
         ["fox", "frog", "duck", "dragonfly", "firefly", "butterfly", "lynx", "otter", "jay", "lunamoth", "stork",
          "hawkmoth", "hoopoe", "salamander", "marten", "turtle", "queenbee", "glowsnail", "bluebutterfly",
-         "flamefox", "snowowl", "goldfrog", "starowl", "moondeer", "skywhale", "starfox", "mandarin"].contains(id)
+         "flamefox", "snowowl", "goldfrog", "starowl", "moondeer", "skywhale", "starfox", "mandarin", "moonhare", "ninetail"].contains(id)
+            || feminineAnimals.contains(id)
     }
 
     init(id: String, name: String, plural: String, rare: Bool, move: Move, activity: Activity, home: HomePref,
          look: Look, phase: Int, blurb: String, lure: [String], riddle: Riddle? = nil, perLure: Int = 1,
-         maxCount: Int = 3, named: Bool = true, speed: Double = 1, evolvesFrom: String? = nil) {
+         maxCount: Int = 3, named: Bool = true, speed: Double = 1, evolvesFrom: String? = nil, legendary: Bool = false) {
         self.id = id
         self.nameIT = name
         self.pluralIT = plural
@@ -382,6 +396,7 @@ struct AnimalSpecies: Identifiable {
         self.named = named
         self.speed = speed
         self.evolvesFrom = evolvesFrom
+        self.legendary = legendary
     }
 
     /// Rari e Speciali: non contano nel tetto dell'isola e arrivano senza sorteggio.
@@ -406,7 +421,7 @@ struct Riddle {
 
 extension AnimalSpecies {
     /// Per i rari conta la variante rara, se la pianta ne ha una.
-    func needsRare(_ plant: String) -> Bool { rare && speciesByID[plant]?.rareName != nil }
+    func needsRare(_ plant: String) -> Bool { rare && !legendary && speciesByID[plant]?.rareName != nil }
 
     /// Quanti ne può ospitare l'isola: uno per ogni oggetto che lo attira, se l'indovinello è risolto.
     func capacity(_ st: WorldStats) -> Int {
@@ -427,15 +442,15 @@ extension AnimalSpecies {
 extension Species {
     /// Gli animali che questa pianta fa arrivare, anche quelli che chiedono qualcos'altro.
     var attracts: String {
-        let list = animalList.filter { !$0.rare && $0.lure.contains(id) }.map(\.plural)
+        let list = allAnimals.filter { (!$0.rare || $0.legendary) && $0.lure.contains(id) }.map(\.plural)
         guard !list.isEmpty else { return L("Nessun animale da sola, ma rende l'isola più bella") }
         return list.joined(separator: ", ")
     }
 }
 
-let animalList = baseAnimals + specialAnimals
+let forestAnimals = baseAnimals + specialAnimals
 
-private func special(_ id: String, _ name: String, _ plural: String, from: String, _ move: Move, _ activity: Activity,
+func special(_ id: String, _ name: String, _ plural: String, from: String, _ move: Move, _ activity: Activity,
                      _ home: HomePref, _ look: Look, _ blurb: String, speed: Double = 1) -> AnimalSpecies {
     var l = look
     l.glow = true
@@ -507,69 +522,11 @@ let specialAnimals: [AnimalSpecies] = [
 /// Ogni animale arriva se sull'isola c'è almeno una delle cose che lo attirano.
 /// Alcuni, in ogni rarità, chiedono anche qualcos'altro: quello sta nell'indovinello.
 let baseAnimals: [AnimalSpecies] = [
-    // Radura
+    // Atmosfera: non hanno nome e non contano tra gli animali dell'isola.
     AnimalSpecies(id: "butterfly", name: "Farfalla", plural: "Farfalle", rare: false, move: .flutter, activity: .day, home: .flowers,
                   look: Look(body: 0xFFB347, belly: 0xFFE08A, accent: 0x5A3D2B, dark: 0x5A3D2B, scale: 1),
                   phase: 1, blurb: "Non sta ferma un secondo.",
                   lure: ["flowers", "cherry", "wisteria"], perLure: 2, maxCount: 8, named: false),
-    AnimalSpecies(id: "rabbit", name: "Coniglio", plural: "Conigli", rare: false, move: .hop, activity: .day, home: .ground,
-                  look: Look(body: 0xC9A27E, belly: 0xF3E4D2, accent: 0xF2A7A7, dark: 0x8C6A4F, scale: 0.85, ears: .long, tail: .puff,
-                             bodyW: 18, bodyH: 13, headR: 7.5, legLen: 3, snout: 0.25),
-                  phase: 1, blurb: "Sempre di corsa, sempre affamato.",
-                  lure: ["flowers", "birch"]),
-    AnimalSpecies(id: "squirrel", name: "Scoiattolo", plural: "Scoiattoli", rare: false, move: .hop, activity: .day, home: .tree,
-                  look: Look(body: 0xC8743A, belly: 0xF5DDBE, accent: 0x8E4A22, dark: 0x7A3F1C, scale: 0.75, ears: .tufts, tail: .squirrel,
-                             bodyW: 16, bodyH: 12, headR: 7, legLen: 3, snout: 0.35),
-                  phase: 1, blurb: "Nasconde ghiande e poi dimentica dove.",
-                  lure: ["oak", "maple"]),
-    AnimalSpecies(id: "sparrow", name: "Passero", plural: "Passeri", rare: false, move: .fly, activity: .day, home: .tree,
-                  look: Look(body: 0xA87B55, belly: 0xEBD9C1, accent: 0xE8A23A, dark: 0x6B4A33, scale: 0.6),
-                  phase: 1, blurb: "Canta all'alba, puntuale.",
-                  lure: ["oak", "fir", "berry"]),
-    AnimalSpecies(id: "hedgehog", name: "Riccio", plural: "Ricci", rare: false, move: .walk, activity: .twilight, home: .ground,
-                  look: Look(body: 0x8C6A50, belly: 0xE9D3B8, accent: 0x3A2A20, dark: 0x5A4334, scale: 0.7, ears: .tiny, tail: .none,
-                             pattern: .spines, bodyW: 20, bodyH: 13, headR: 6, legLen: 2.5, snout: 0.7),
-                  phase: 1, blurb: "Esce al tramonto, a passettini.",
-                  lure: ["berry", "log"], speed: 0.6),
-    AnimalSpecies(id: "robin", name: "Pettirosso", plural: "Pettirossi", rare: false, move: .fly, activity: .day, home: .tree,
-                  look: Look(body: 0x8C6B4F, belly: 0xEE7B3F, accent: 0x3A2A20, dark: 0x5E4632, scale: 0.55),
-                  phase: 1, blurb: "Piccolo, tondo e per niente timido.",
-                  lure: ["berry"],
-                  riddle: Riddle(text: "Canta solo vicino a un albero dalla corteccia bianca come la neve.", answer: "una Betulla",
-                                 test: { $0.count("birch") > 0 })),
-    // Bosco
-    AnimalSpecies(id: "frog", name: "Rana", plural: "Rane", rare: false, move: .hop, activity: .day, home: .water,
-                  look: Look(body: 0x7DBB5A, belly: 0xDCEFB0, accent: 0x2F5A2A, dark: 0x5E9A44, scale: 0.55, ears: .none, tail: .none,
-                             bodyW: 16, bodyH: 11, headR: 6.5, legLen: 2, snout: 0.1),
-                  phase: 2, blurb: "Canta di sera, a squarciagola.",
-                  lure: ["spring", "pond"]),
-    AnimalSpecies(id: "deer", name: "Cervo", plural: "Cervi", rare: false, move: .walk, activity: .day, home: .tree,
-                  look: Look(body: 0xB97A4A, belly: 0xF0DCC0, accent: 0x3A2A20, dark: 0x8A5634, scale: 1.25, ears: .antlers, tail: .short,
-                             pattern: .spots, bodyW: 26, bodyH: 14, headR: 7, legLen: 12, snout: 0.6, neck: 8),
-                  phase: 2, blurb: "Elegante, attento a ogni rumore.",
-                  lure: ["spring", "cherry", "maple"], speed: 0.9),
-    AnimalSpecies(id: "roe", name: "Capriolo", plural: "Caprioli", rare: false, move: .walk, activity: .twilight, home: .tree,
-                  look: Look(body: 0xB0703E, belly: 0xF3E2CB, accent: 0x3A2A20, dark: 0x7E4E2A, scale: 1, ears: .pointed, tail: .puff,
-                             bodyW: 22, bodyH: 12, headR: 6.5, legLen: 10, snout: 0.55, neck: 6),
-                  phase: 2, blurb: "Salta via con un balzo e una macchia bianca.",
-                  lure: ["birch"],
-                  riddle: Riddle(text: "Beve solo l'acqua che sgorga dalla terra.", answer: "una Sorgente",
-                                 test: { $0.count("spring") > 0 }), speed: 0.9),
-    AnimalSpecies(id: "fox", name: "Volpe", plural: "Volpi", rare: false, move: .walk, activity: .twilight, home: .ground,
-                  look: Look(body: 0xE07A35, belly: 0xFBEBDD, accent: 0x2E2420, dark: 0x3A2A22, scale: 0.95, ears: .pointed, tail: .bushy,
-                             bodyW: 24, bodyH: 12, headR: 7, legLen: 7, snout: 0.8),
-                  phase: 2, blurb: "Curiosa di tutto, si fida di pochi.",
-                  lure: ["log", "fir"],
-                  riddle: Riddle(text: "Va a caccia dove saltella la sua cena.", answer: "un coniglio sull'isola",
-                                 test: { $0.animals("rabbit") + $0.animals("blackrabbit") > 0 })),
-    AnimalSpecies(id: "woodpecker", name: "Picchio", plural: "Picchi", rare: false, move: .fly, activity: .day, home: .tree,
-                  look: Look(body: 0x3D3A3A, belly: 0xF2EFEA, accent: 0xD9403A, dark: 0x262424, scale: 0.65, pattern: .crest),
-                  phase: 2, blurb: "Toc toc toc. Tutto il giorno.",
-                  lure: ["maple", "log"]),
-    AnimalSpecies(id: "duck", name: "Anatra", plural: "Anatre", rare: false, move: .swim, activity: .day, home: .water,
-                  look: Look(body: 0x9C7A5A, belly: 0xD8C3A5, accent: 0xF2B33D, dark: 0x3E7A5A, scale: 0.8),
-                  phase: 2, blurb: "Scivola sull'acqua senza fretta.",
-                  lure: ["pond"]),
     AnimalSpecies(id: "dragonfly", name: "Libellula", plural: "Libellule", rare: false, move: .flutter, activity: .day, home: .water,
                   look: Look(body: 0x3FA7C9, belly: 0xBFEFFF, accent: 0x1F5E73, dark: 0x1F5E73),
                   phase: 2, blurb: "Un lampo blu sull'acqua.",
@@ -578,64 +535,143 @@ let baseAnimals: [AnimalSpecies] = [
                   look: Look(body: 0xFFE27A, belly: 0xFFF6C8, accent: 0xFFE27A, dark: 0x5A4A20),
                   phase: 2, blurb: "Piccole luci che si cercano.",
                   lure: ["spring", "willow"], perLure: 3, maxCount: 10, named: false),
-    // Bosco antico
-    AnimalSpecies(id: "owl", name: "Gufo", plural: "Gufi", rare: false, move: .fly, activity: .night, home: .tree,
-                  look: Look(body: 0x8F6E4E, belly: 0xE6D2B2, accent: 0xF2B33D, dark: 0x5E4632, scale: 0.9, ears: .tufts),
-                  phase: 3, blurb: "Dorme di giorno. Di notte vede tutto.",
-                  lure: ["willow", "bluefir"]),
+    // Radura: ogni elemento il suo animale di terra, e a volte un uccello.
+    AnimalSpecies(id: "squirrel", name: "Scoiattolo", plural: "Scoiattoli", rare: false, move: .hop, activity: .day, home: .tree,
+                  look: Look(body: 0xC8743A, belly: 0xF5DDBE, accent: 0x8E4A22, dark: 0x7A3F1C, scale: 0.75, ears: .tufts, tail: .squirrel,
+                             bodyW: 16, bodyH: 12, headR: 7, legLen: 3, snout: 0.35),
+                  phase: 1, blurb: "Nasconde ghiande e poi dimentica dove.",
+                  lure: ["oak"]),
+    AnimalSpecies(id: "woodpecker", name: "Picchio", plural: "Picchi", rare: false, move: .fly, activity: .day, home: .tree,
+                  look: Look(body: 0x3D3A3A, belly: 0xF2EFEA, accent: 0xD9403A, dark: 0x262424, scale: 0.65, pattern: .crest),
+                  phase: 1, blurb: "Toc toc toc. Tutto il giorno.",
+                  lure: ["oak"]),
+    AnimalSpecies(id: "rabbit", name: "Coniglio", plural: "Conigli", rare: false, move: .hop, activity: .day, home: .ground,
+                  look: Look(body: 0xC9A27E, belly: 0xF3E4D2, accent: 0xF2A7A7, dark: 0x8C6A4F, scale: 0.85, ears: .long, tail: .puff,
+                             bodyW: 18, bodyH: 13, headR: 7.5, legLen: 3, snout: 0.25),
+                  phase: 1, blurb: "Sempre di corsa, sempre affamato.",
+                  lure: ["flowers"]),
+    AnimalSpecies(id: "sparrow", name: "Passero", plural: "Passeri", rare: false, move: .fly, activity: .day, home: .tree,
+                  look: Look(body: 0xA87B55, belly: 0xEBD9C1, accent: 0xE8A23A, dark: 0x6B4A33, scale: 0.6),
+                  phase: 1, blurb: "Canta all'alba, puntuale.",
+                  lure: ["flowers"]),
+    AnimalSpecies(id: "woodmouse", name: "Topolino dei boschi", plural: "Topolini dei boschi", rare: false, move: .hop, activity: .twilight, home: .ground,
+                  look: Look(body: 0xA9784E, belly: 0xF4E6D2, accent: 0xF2A7A7, dark: 0x6E4A30, scale: 0.5, ears: .round, tail: .long,
+                             bodyW: 16, bodyH: 10, headR: 6.5, legLen: 2, snout: 0.45),
+                  phase: 1, blurb: "Orecchie grandi, coda lunga, cuore che batte forte.",
+                  lure: ["fir"], speed: 1.1),
+    AnimalSpecies(id: "hedgehog", name: "Riccio", plural: "Ricci", rare: false, move: .walk, activity: .twilight, home: .ground,
+                  look: Look(body: 0x8C6A50, belly: 0xE9D3B8, accent: 0x3A2A20, dark: 0x5A4334, scale: 0.7, ears: .tiny, tail: .none,
+                             pattern: .spines, bodyW: 20, bodyH: 13, headR: 6, legLen: 2.5, snout: 0.7),
+                  phase: 1, blurb: "Esce al tramonto, a passettini.",
+                  lure: ["berry"], speed: 0.6),
+    AnimalSpecies(id: "robin", name: "Pettirosso", plural: "Pettirossi", rare: false, move: .fly, activity: .day, home: .tree,
+                  look: Look(body: 0x8C6B4F, belly: 0xEE7B3F, accent: 0x3A2A20, dark: 0x5E4632, scale: 0.55),
+                  phase: 1, blurb: "Piccolo, tondo e per niente timido.",
+                  lure: ["berry"],
+                  riddle: Riddle(text: "Canta solo vicino a un albero dalla corteccia bianca come la neve.", answer: "una Betulla",
+                                 test: { $0.count("birch") > 0 })),
+    AnimalSpecies(id: "roe", name: "Capriolo", plural: "Caprioli", rare: false, move: .walk, activity: .twilight, home: .tree,
+                  look: Look(body: 0xB0703E, belly: 0xF3E2CB, accent: 0x3A2A20, dark: 0x7E4E2A, scale: 1, ears: .pointed, tail: .puff,
+                             bodyW: 22, bodyH: 12, headR: 6.5, legLen: 10, snout: 0.55, neck: 6),
+                  phase: 1, blurb: "Salta via con un balzo e una macchia bianca.",
+                  lure: ["birch"],
+                  riddle: Riddle(text: "Si ferma solo dove trova qualcosa di dolce da brucare.", answer: "un Cespuglio di bacche",
+                                 test: { $0.count("berry") > 0 }), speed: 0.9),
+    // Bosco
+    AnimalSpecies(id: "deer", name: "Cervo", plural: "Cervi", rare: false, move: .walk, activity: .day, home: .tree,
+                  look: Look(body: 0xB97A4A, belly: 0xF0DCC0, accent: 0x3A2A20, dark: 0x8A5634, scale: 1.25, ears: .antlers, tail: .short,
+                             pattern: .spots, bodyW: 26, bodyH: 14, headR: 7, legLen: 12, snout: 0.6, neck: 8),
+                  phase: 2, blurb: "Elegante, attento a ogni rumore.",
+                  lure: ["cherry"], speed: 0.9),
+    AnimalSpecies(id: "beaver", name: "Castoro", plural: "Castori", rare: false, move: .swim, activity: .twilight, home: .water,
+                  look: Look(body: 0x7A5236, belly: 0xA8805C, accent: 0x3A2A20, dark: 0x4E3422, scale: 0.9),
+                  phase: 2, blurb: "Un ingegnere coi denti arancioni.",
+                  lure: ["spring"],
+                  riddle: Riddle(text: "Costruisce la diga solo se trova legna già pronta.", answer: "un Tronco caduto",
+                                 test: { $0.count("log") > 0 })),
+    AnimalSpecies(id: "fox", name: "Volpe", plural: "Volpi", rare: false, move: .walk, activity: .twilight, home: .ground,
+                  look: Look(body: 0xE07A35, belly: 0xFBEBDD, accent: 0x2E2420, dark: 0x3A2A22, scale: 0.95, ears: .pointed, tail: .bushy,
+                             bodyW: 24, bodyH: 12, headR: 7, legLen: 7, snout: 0.8),
+                  phase: 2, blurb: "Curiosa di tutto, si fida di pochi.",
+                  lure: ["maple"],
+                  riddle: Riddle(text: "Va a caccia dove saltella la sua cena.", answer: "un coniglio sull'isola",
+                                 test: { $0.animals("rabbit") + $0.animals("blackrabbit") > 0 })),
     AnimalSpecies(id: "badger", name: "Tasso", plural: "Tassi", rare: false, move: .walk, activity: .night, home: .ground,
                   look: Look(body: 0x8E8C8A, belly: 0x3C3A38, accent: 0xF5F3EE, dark: 0x2E2C2B, scale: 0.95, ears: .tiny, tail: .short,
                              pattern: .mask, bodyW: 24, bodyH: 13, headR: 7, legLen: 4, snout: 0.7),
-                  phase: 3, blurb: "Scava gallerie lunghissime.",
-                  lure: ["bluefir", "willow"], speed: 0.7),
+                  phase: 2, blurb: "Scava gallerie lunghissime.",
+                  lure: ["log"], speed: 0.7),
+    AnimalSpecies(id: "frog", name: "Rana", plural: "Rane", rare: false, move: .hop, activity: .day, home: .water,
+                  look: Look(body: 0x7DBB5A, belly: 0xDCEFB0, accent: 0x2F5A2A, dark: 0x5E9A44, scale: 0.55, ears: .none, tail: .none,
+                             bodyW: 16, bodyH: 11, headR: 6.5, legLen: 2, snout: 0.1),
+                  phase: 2, blurb: "Canta di sera, a squarciagola.",
+                  lure: ["pond"]),
+    AnimalSpecies(id: "duck", name: "Anatra", plural: "Anatre", rare: false, move: .swim, activity: .day, home: .water,
+                  look: Look(body: 0x9C7A5A, belly: 0xD8C3A5, accent: 0xF2B33D, dark: 0x3E7A5A, scale: 0.8),
+                  phase: 2, blurb: "Scivola sull'acqua senza fretta.",
+                  lure: ["pond"]),
+    // Bosco antico
+    AnimalSpecies(id: "lynx", name: "Lince", plural: "Linci", rare: false, move: .walk, activity: .twilight, home: .tree,
+                  look: Look(body: 0xC9A27A, belly: 0xF1E3CF, accent: 0x2E2420, dark: 0x8C6A4A, scale: 1.05, ears: .tufts, tail: .short,
+                             pattern: .spots, bodyW: 24, bodyH: 13, headR: 7.5, legLen: 8, snout: 0.45),
+                  phase: 3, blurb: "La vedi solo se lei vuole.",
+                  lure: ["willow"],
+                  riddle: Riddle(text: "Si mostra solo dove qualcuno vede al buio.", answer: "un gufo sull'isola",
+                                 test: { $0.animals("owl") + $0.animals("snowowl") > 0 })),
+    AnimalSpecies(id: "owl", name: "Gufo", plural: "Gufi", rare: false, move: .fly, activity: .night, home: .tree,
+                  look: Look(body: 0x8F6E4E, belly: 0xE6D2B2, accent: 0xF2B33D, dark: 0x5E4632, scale: 0.9, ears: .tufts),
+                  phase: 3, blurb: "Dorme di giorno. Di notte vede tutto.",
+                  lure: ["willow"]),
+    AnimalSpecies(id: "tanuki", name: "Tanuki", plural: "Tanuki", rare: false, move: .walk, activity: .twilight, home: .flowers,
+                  look: Look(body: 0x8A6E52, belly: 0xE6D6BC, accent: 0x2E2420, dark: 0x3A2E26, scale: 0.85, ears: .round, tail: .bushy,
+                             pattern: .bandit, bodyW: 22, bodyH: 14, headR: 7.5, legLen: 4, snout: 0.5),
+                  phase: 3, blurb: "Sembra un procione, ma è un cane che sogna.",
+                  lure: ["wisteria"], speed: 0.7),
+    AnimalSpecies(id: "swan", name: "Cigno", plural: "Cigni", rare: false, move: .swim, activity: .day, home: .water,
+                  look: Look(body: 0xFAFAF7, belly: 0xFFFFFF, accent: 0xF08A3A, dark: 0xD8D8D2, scale: 1.1, neck: 1),
+                  phase: 3, blurb: "Si muove come se il tempo fosse lento.",
+                  lure: ["wisteria"],
+                  riddle: Riddle(text: "Si fa bello solo davanti a quattro piante in fiore.", answer: "quattro piante fiorite",
+                                 test: { $0.bloomPlants >= 4 })),
+    AnimalSpecies(id: "wolf", name: "Lupo", plural: "Lupi", rare: false, move: .walk, activity: .night, home: .ground,
+                  look: Look(body: 0x8A8F96, belly: 0xE6E8EA, accent: 0x2E2F33, dark: 0x5B6067, scale: 1.2, ears: .pointed, tail: .bushy,
+                             bodyW: 27, bodyH: 14, headR: 7.5, legLen: 9, snout: 0.8),
+                  phase: 3, blurb: "Ulula alla luna, ma è un tenerone.",
+                  lure: ["bluefir"],
+                  riddle: Riddle(text: "Segue solo le tracce di chi porta le corna.", answer: "un cervo sull'isola",
+                                 test: { $0.animals("deer") + $0.animals("whitedeer") > 0 })),
+    AnimalSpecies(id: "bear", name: "Orso", plural: "Orsi", rare: false, move: .walk, activity: .day, home: .ground,
+                  look: Look(body: 0x7A5238, belly: 0xA67C58, accent: 0x2E2420, dark: 0x5A3A26, scale: 1.5, ears: .round, tail: .none,
+                             bodyW: 28, bodyH: 18, headR: 9, legLen: 6, snout: 0.5),
+                  phase: 3, blurb: "Lento, goloso, gentile.",
+                  lure: ["waterfall"], speed: 0.6),
     AnimalSpecies(id: "heron", name: "Airone", plural: "Aironi", rare: false, move: .walk, activity: .day, home: .water,
                   look: Look(body: 0xB9C2C8, belly: 0xEEF2F4, accent: 0xE0A93A, dark: 0x5C6870, scale: 1.1, ears: .none, tail: .short,
                              pattern: .crest, bodyW: 18, bodyH: 12, headR: 5, legLen: 14, snout: 1.2, neck: 12),
                   phase: 3, blurb: "Aspetta immobile. Poi, zac.",
-                  lure: ["waterfall", "willow"], speed: 0.6),
+                  lure: ["waterfall"], speed: 0.6),
     AnimalSpecies(id: "otter", name: "Lontra", plural: "Lontre", rare: false, move: .swim, activity: .day, home: .water,
                   look: Look(body: 0x7A5A44, belly: 0xD9C2A6, accent: 0x2E2420, dark: 0x5A4030, scale: 0.85),
                   phase: 3, blurb: "Gioca anche quando nessuno guarda.",
-                  lure: ["waterfall", "bridge"]),
-    AnimalSpecies(id: "swan", name: "Cigno", plural: "Cigni", rare: false, move: .swim, activity: .day, home: .water,
-                  look: Look(body: 0xFAFAF7, belly: 0xFFFFFF, accent: 0xF08A3A, dark: 0xD8D8D2, scale: 1.1, neck: 1),
-                  phase: 3, blurb: "Si muove come se il tempo fosse lento.",
-                  lure: ["pond"],
-                  riddle: Riddle(text: "Si fa bello solo davanti a quattro piante in fiore.", answer: "quattro piante fiorite",
-                                 test: { $0.bloomPlants >= 4 })),
+                  lure: ["bridge"]),
     AnimalSpecies(id: "stork", name: "Cicogna", plural: "Cicogne", rare: false, move: .walk, activity: .day, home: .water,
                   look: Look(body: 0xF4F2EE, belly: 0xFFFFFF, accent: 0xE0503A, dark: 0x2A2A2A, scale: 1.15, ears: .none, tail: .short,
                              bodyW: 18, bodyH: 12, headR: 5, legLen: 14, snout: 1.1, neck: 11),
                   phase: 3, blurb: "Torna sempre nello stesso nido.",
-                  lure: ["pond"],
+                  lure: ["bridge"],
                   riddle: Riddle(text: "Fa il nido dove la sera c'è un coro.", answer: "una rana sull'isola",
                                  test: { $0.animals("frog") + $0.animals("goldfrog") > 0 }), speed: 0.6),
-    AnimalSpecies(id: "beaver", name: "Castoro", plural: "Castori", rare: false, move: .swim, activity: .twilight, home: .water,
-                  look: Look(body: 0x7A5236, belly: 0xA8805C, accent: 0x3A2A20, dark: 0x4E3422, scale: 0.9),
-                  phase: 3, blurb: "Un ingegnere coi denti arancioni.",
-                  lure: ["willow"],
-                  riddle: Riddle(text: "Costruisce solo dove l'acqua cade.", answer: "una Cascata",
-                                 test: { $0.count("waterfall") > 0 })),
-    // Foresta incantata
-    AnimalSpecies(id: "wolf", name: "Lupo", plural: "Lupi", rare: false, move: .walk, activity: .night, home: .ground,
-                  look: Look(body: 0x8A8F96, belly: 0xE6E8EA, accent: 0x2E2F33, dark: 0x5B6067, scale: 1.2, ears: .pointed, tail: .bushy,
-                             bodyW: 27, bodyH: 14, headR: 7.5, legLen: 9, snout: 0.8),
-                  phase: 4, blurb: "Ulula alla luna, ma è un tenerone.",
-                  lure: ["bluefir"],
-                  riddle: Riddle(text: "Ulula solo se la notte ha una luce che non è la luna.", answer: "una Lanterna o un Albero di luce",
-                                 test: { $0.n("lantern", "lighttree") > 0 })),
-    AnimalSpecies(id: "bear", name: "Orso", plural: "Orsi", rare: false, move: .walk, activity: .day, home: .ground,
-                  look: Look(body: 0x7A5238, belly: 0xA67C58, accent: 0x2E2420, dark: 0x5A3A26, scale: 1.5, ears: .round, tail: .none,
-                             bodyW: 28, bodyH: 18, headR: 9, legLen: 6, snout: 0.5),
-                  phase: 4, blurb: "Lento, goloso, gentile.",
-                  lure: ["bluefir", "wisteria"], speed: 0.6),
-    AnimalSpecies(id: "lynx", name: "Lince", plural: "Linci", rare: false, move: .walk, activity: .twilight, home: .tree,
-                  look: Look(body: 0xC9A27A, belly: 0xF1E3CF, accent: 0x2E2420, dark: 0x8C6A4A, scale: 1.05, ears: .tufts, tail: .short,
-                             pattern: .spots, bodyW: 24, bodyH: 13, headR: 7.5, legLen: 8, snout: 0.45),
-                  phase: 4, blurb: "La vedi solo se lei vuole.",
-                  lure: ["bluefir", "willow"],
-                  riddle: Riddle(text: "Si mostra solo dove qualcuno vede al buio.", answer: "un gufo sull'isola",
-                                 test: { $0.animals("owl") + $0.animals("snowowl") > 0 })),
+    // Foresta incantata e Leggende: solo animali leggendari.
+    AnimalSpecies(id: "moonhare", name: "Lepre lunare", plural: "Lepri lunari", rare: true, move: .hop, activity: .night, home: .flowers,
+                  look: Look(body: 0xE6ECFA, belly: 0xFFFFFF, accent: 0x9FB4FF, dark: 0xB8C2DE, scale: 0.95, ears: .long, tail: .puff,
+                             bodyW: 20, bodyH: 13, headR: 7.5, legLen: 4, snout: 0.25, glow: true),
+                  phase: 4, blurb: "Corre solo quando c'è la luna, e lascia impronte che brillano.",
+                  lure: ["glowshroom"], maxCount: 1, legendary: true),
+    AnimalSpecies(id: "ninetail", name: "Volpe a nove code", plural: "Volpi a nove code", rare: true, move: .walk, activity: .twilight, home: .ground,
+                  look: Look(body: 0xF6EBDA, belly: 0xFFFFFF, accent: 0xE8603A, dark: 0xD8C2A0, scale: 1, ears: .pointed, tail: .nine,
+                             bodyW: 24, bodyH: 12, headR: 7, legLen: 7, snout: 0.8, glow: true),
+                  phase: 4, blurb: "Ogni coda, dicono, è un secolo di saggezza.",
+                  lure: ["lantern"], maxCount: 1, legendary: true),
     // Rari: legati alle varianti rare
     AnimalSpecies(id: "whitesquirrel", name: "Scoiattolo bianco", plural: "Scoiattoli bianchi", rare: true, move: .hop, activity: .day, home: .tree,
                   look: Look(body: 0xF4EFE8, belly: 0xFFFFFF, accent: 0xF2A7A7, dark: 0xCFC6BC, scale: 0.75, ears: .tufts, tail: .squirrel,
@@ -713,7 +749,7 @@ let baseAnimals: [AnimalSpecies] = [
                   look: Look(body: 0xF2F2F0, belly: 0xFFFFFF, accent: 0x6A7A8A, dark: 0xCDD3D8, scale: 1.25, ears: .pointed, tail: .bushy,
                              bodyW: 27, bodyH: 14, headR: 7.5, legLen: 9, snout: 0.8, glow: true),
                   phase: 4, blurb: "Lo vedi di notte, quando c'è la luna.",
-                  lure: ["lighttree"]),
+                  lure: ["lighttree"], maxCount: 1, legendary: true),
     AnimalSpecies(id: "royaldeer", name: "Cervo reale", plural: "Cervi reali", rare: true, move: .walk, activity: .day, home: .tree,
                   look: Look(body: 0xD9A35A, belly: 0xFFF0D2, accent: 0x6B4A20, dark: 0xB07A30, scale: 1.55, ears: .bigAntlers, tail: .short,
                              bodyW: 28, bodyH: 15, headR: 7.5, legLen: 13, snout: 0.6, neck: 9, glow: true),
@@ -721,7 +757,7 @@ let baseAnimals: [AnimalSpecies] = [
                   lure: ["ancientoak"],
                   riddle: Riddle(text: "Si inchina solo a un albero che fa luce, viola come il cielo prima dell'alba.",
                                  answer: "un Albero di luce viola", test: { $0.has("lighttree", rare: true) }),
-                  maxCount: 1, speed: 0.8),
+                  maxCount: 1, speed: 0.8, legendary: true),
     AnimalSpecies(id: "spirit", name: "Spirito della foresta", plural: "Spiriti", rare: true, move: .walk, activity: .night, home: .tree,
                   look: Look(body: 0xD8F6FF, belly: 0xFFFFFF, accent: 0x7AD9FF, dark: 0xA8E6FF, scale: 1.35, ears: .bigAntlers, tail: .short,
                              bodyW: 26, bodyH: 14, headR: 7, legLen: 12, snout: 0.6, neck: 8, glow: true),
@@ -729,13 +765,13 @@ let baseAnimals: [AnimalSpecies] = [
                   lure: ["goldcherry"],
                   riddle: Riddle(text: "Appare dove la notte ha un albero che brilla.", answer: "un Albero di luce",
                                  test: { $0.count("lighttree") > 0 }),
-                  maxCount: 1, speed: 0.5),
+                  maxCount: 1, speed: 0.5, legendary: true),
 ]
 
-let animalByID: [String: AnimalSpecies] = Dictionary(uniqueKeysWithValues: (animalList + skyVisitors).map { ($0.id, $0) })
+let animalByID: [String: AnimalSpecies] = Dictionary(uniqueKeysWithValues: (allAnimals + skyVisitors).map { ($0.id, $0) })
 
 /// Due righe sulle abitudini di ogni specie, per la sua scheda.
-let animalHabits: [String: String] = [
+let forestHabits: [String: String] = [
     "butterfly": "Si posa su un fiore solo per pochi secondi, poi cambia idea. Al mattino apre le ali al sole per scaldarsi.",
     "rabbit": "Esce all'alba e al tramonto a sgranocchiare trifoglio. Se si spaventa batte le zampe a terra per avvisare gli altri.",
     "squirrel": "Corre su e giù per i tronchi tutto il giorno. Nasconde ghiande ovunque e ne ritrova solo la metà.",
@@ -744,7 +780,7 @@ let animalHabits: [String: String] = [
     "robin": "Segue chi lavora la terra, sperando in un vermetto. Canta anche d'inverno, quando gli altri tacciono.",
     "roe": "Esce dal bosco all'alba e al tramonto a brucare i germogli. Se lo sorprendi, abbaia e scappa a balzi.",
     "stork": "Costruisce un nido enorme e lo sistema un po' ogni anno. Non canta: per salutare batte il becco.",
-    "beaver": "Rosicchia i rami di salice per costruire la sua diga. Lavora di notte e fa un baccano incredibile.",
+    "beaver": "Trascina i rami del tronco caduto fino alla sorgente per costruire la sua diga. Lavora di notte e fa un baccano incredibile.",
     "frog": "Passa il giorno immobile sul bordo dell'acqua. Quando scende la sera canta insieme a tutte le altre.",
     "deer": "Bruca all'ombra degli alberi e beve solo acqua fresca. Al minimo rumore alza la testa e resta immobile.",
     "fox": "Esce al crepuscolo per il suo giro di ronda. Si scava una tana sotto un tronco e la tiene pulitissima.",
@@ -758,7 +794,11 @@ let animalHabits: [String: String] = [
     "otter": "Nuota sul dorso e gioca con i sassi. Scivola giù dalla riva solo per il gusto di farlo.",
     "swan": "Scivola sull'acqua senza fretta, sempre in coppia. Difende il suo stagno con grande dignità.",
     "wolf": "Vive in branco e si muove soprattutto di notte. Ulula per ritrovare gli altri, non per spaventare.",
-    "bear": "Gira per il bosco in cerca di bacche e miele. Quando fa freddo dorme per settimane intere.",
+    "bear": "Aspetta i pesci sotto la cascata con una pazienza infinita. Poi si asciuga al sole e si addormenta.",
+    "woodmouse": "Corre tra le radici dell'abete e fa scorta di semi per l'inverno. Se lo guardi, si ferma e muove i baffi.",
+    "tanuki": "Si nasconde sotto il glicine e osserva tutto con aria furba. Di notte esce a cercare frutti caduti.",
+    "moonhare": "Esce solo quando i funghi luminosi si accendono. Salta così in alto che sembra voler toccare la luna.",
+    "ninetail": "Dorme acciambellata vicino alla lanterna, avvolta nelle sue code. Quando si sveglia, la fiamma si fa più calda.",
     "lynx": "Si muove nell'ombra più fitta, senza un rumore. Ti osserva a lungo prima di farsi vedere.",
     "whitesquirrel": "Fa tutto quello che fa uno scoiattolo, ma più piano, come se sapesse di essere guardato. Adora le foglie rosse della Quercia d'autunno.",
     "bluebutterfly": "Vola solo nelle giornate di sole, tra i Fiori azzurri. Dove si posa, dicono, la giornata va bene.",
@@ -775,8 +815,8 @@ let animalHabits: [String: String] = [
     "kingfisher": "Aspetta su un ramo sopra la cascata, immobile. Poi si tuffa come un lampo turchese.",
     "blackswan": "Scivola sotto il Glicine bianco, sempre a testa alta. Quando apre le ali si vedono le piume bianche.",
     "lunamoth": "Danza sopra i Funghi viola quando sorge la luna. Vive poche notti, e le passa tutte a volare.",
-    "whitewolf": "Veglia sull'Albero di luce viola per tutta la notte. Non ulula quasi mai: gli basta guardare la luna.",
-    "royaldeer": "Riposa all'ombra della Quercia millenaria d'oro. Quando cammina, gli altri animali si fermano a guardarlo.",
+    "whitewolf": "Veglia sull'Albero di luce per tutta la notte. Non ulula quasi mai: gli basta guardare la luna.",
+    "royaldeer": "Riposa all'ombra della Quercia millenaria. Quando cammina, gli altri animali si fermano a guardarlo.",
     "spirit": "Nessuno sa dove vada di giorno. Di notte cammina tra il Ciliegio d'oro e l'Albero di luce, senza lasciare impronte.",
     "flyingsquirrel": "Di giorno dorme in un buco della quercia. Al tramonto apre la sua mantellina e plana da un ramo all'altro.",
     "hawkmoth": "Resta sospesa davanti ai fiori battendo le ali velocissime. Beve il nettare con una proboscide lunga quanto lei.",

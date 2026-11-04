@@ -24,6 +24,15 @@ final class Lang {
             case .de: "Deutsch"
             }
         }
+        var flag: String {
+            switch self {
+            case .it: "🇮🇹"
+            case .en: "🇬🇧"
+            case .es: "🇪🇸"
+            case .fr: "🇫🇷"
+            case .de: "🇩🇪"
+            }
+        }
     }
 
     var id: ID {

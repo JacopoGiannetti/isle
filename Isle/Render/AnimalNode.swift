@@ -50,7 +50,10 @@ final class AnimalNode: SKNode {
     private var drankAt = -999.0
     private var exitTarget: (Double, Double)?
     private var r: RNG
-    var veiled = false
+    /// Con la pioggia della tempesta resta sull'isola, ma torna alla sua tana e si accoccola.
+    var sheltering = false {
+        didSet { if sheltering != oldValue { stateEnd = clock } }
+    }
     var onRipple: ((CGPoint) -> Void)?
 
     var isBaby: Bool { info.isBaby(at: Clock.now) }
@@ -71,12 +74,16 @@ final class AnimalNode: SKNode {
         }
     }
 
-    init(_ sp: AnimalSpecies, _ info: Resident) {
+    private let sway: Sway
+
+    init(_ sp: AnimalSpecies, _ info: Resident, sway: Sway) {
         self.sp = sp
         self.info = info
+        self.sway = sway
         r = RNG(info.id)
         shadow = SKSpriteNode(texture: Textures.shadow.texture, size: Textures.shadow.size)
         super.init()
+        skin(shadow)
         shadow.zPosition = -1
         shadow.alpha = 0.7
         addChild(shadow)
@@ -96,7 +103,60 @@ final class AnimalNode: SKNode {
     // MARK: costruzione
 
     private func part(_ key: String, _ make: () -> ArtImage) -> SKSpriteNode {
-        Textures.sprite("\(sp.id)/\(key)", make)
+        let s = Textures.sprite("\(sp.id)/\(key)", make)
+        skin(s)
+        return s
+    }
+
+    /// Lo stesso shader delle piante, fermo: così gli animali stanno nei fogli condivisi e si
+    /// disegnano insieme a loro, invece di una chiamata per ogni zampa, testa e coda.
+    private func skin(_ s: SKSpriteNode) {
+        Textures.applySway(s, sway, amp: 0, phase: 0, base: 0, wither: 0)
+    }
+
+    private func swap(_ s: SKSpriteNode?, to t: SKTexture) {
+        guard let s, s.texture != t else { return }
+        s.texture = t
+        Textures.setRect(s)
+    }
+
+    /// Tutte le immagini di una specie, anche quelle da addormentato, da mettere nei fogli condivisi.
+    static func arts(_ sp: AnimalSpecies) -> [(String, () -> ArtImage)] {
+        let l = sp.look, id = sp.id
+        var out: [(String, () -> ArtImage)] = []
+        func add(_ key: String, _ make: @escaping () -> ArtImage) { out.append(("\(id)/\(key)", make)) }
+        switch sp.move {
+        case .walk, .hop:
+            if AnimalArt.hasLegs(id) {
+                add("legF") { AnimalArt.leg(l, far: true) }
+                add("legN") { AnimalArt.leg(l, far: false) }
+            }
+            add("tail") { AnimalArt.tail(l) }
+            add("body") { AnimalArt.body(l, id: id) }
+            add("head") { AnimalArt.head(l, id: id) }
+            add("headZ") { AnimalArt.head(l, id: id, sleeping: true) }
+            add("eye") { AnimalArt.eye() }
+        case .fly:
+            add("bird") { AnimalArt.birdBody(l, id: id) }
+            add("birdZ") { AnimalArt.birdBody(l, id: id, sleeping: true) }
+            add("wing") { AnimalArt.wing(l, id: id) }
+            if !AnimalArt.isOwl(id) { add("eye") { AnimalArt.eye() } }
+        case .swim:
+            add("swim") { AnimalArt.swimmer(l, id: id, dip: false) }
+            add("swimD") { AnimalArt.swimmer(l, id: id, dip: true) }
+        case .flutter, .glow:
+            if AnimalArt.dragonflies.contains(id) {
+                add("dragon") { AnimalArt.dragonfly(l) }
+            } else if AnimalArt.fireflies.contains(id) {
+                add("ff") { AnimalArt.firefly(l) }
+            } else if id == "mistsprite" {
+                add("wisp") { AnimalArt.wisp(l) }
+            } else {
+                add("bwing") { AnimalArt.insectWing(l, id: id) }
+                if AnimalArt.hasInsectBody(id) { add("ibody") { AnimalArt.insectBody(l, id: id)! } }
+            }
+        }
+        return out
     }
 
     private func build() {
@@ -106,7 +166,9 @@ final class AnimalNode: SKNode {
         case .walk, .hop:
             let n = AnimalArt.neckTop(l)
             let legY = -l.bodyH * 0.22
-            let positions: [(CGFloat, Bool)] = [(-l.bodyW * 0.28 + 2, true), (l.bodyW * 0.26 + 2, true), (-l.bodyW * 0.28, false), (l.bodyW * 0.26, false)]
+            let positions: [(CGFloat, Bool)] = l.biped
+                ? [(l.bodyW * 0.06 + 1, true), (-l.bodyW * 0.12, false)]
+                : [(-l.bodyW * 0.28 + 2, true), (l.bodyW * 0.26 + 2, true), (-l.bodyW * 0.28, false), (l.bodyW * 0.26, false)]
             for (x, far) in positions where AnimalArt.hasLegs(id) {
                 let leg = part(far ? "legF" : "legN") { AnimalArt.leg(l, far: far) }
                 leg.position = CGPoint(x: x, y: legY + (far ? 1 : 0))
@@ -159,11 +221,11 @@ final class AnimalNode: SKNode {
             body = b
             shadow.alpha = 0
         case .flutter, .glow:
-            if id == "dragonfly" {
+            if AnimalArt.dragonflies.contains(id) {
                 let b = part("dragon") { AnimalArt.dragonfly(l) }
                 rig.addChild(b)
                 body = b
-            } else if id == "firefly" {
+            } else if AnimalArt.fireflies.contains(id) {
                 let b = part("ff") { AnimalArt.firefly(l) }
                 rig.addChild(b)
                 body = b
@@ -230,7 +292,7 @@ final class AnimalNode: SKNode {
 
     func step(_ dt: Double, _ env: Env) {
         clock += dt
-        let visible = !veiled && !(sp.move == .glow && sp.activity == .night && env.night < 0.25)
+        let visible = !(sp.move == .glow && sp.activity == .night && env.night < 0.25)
         let targetAlpha: CGFloat = visible ? 1 : 0
         if abs(alpha - targetAlpha) > 0.01 { alpha += (targetAlpha - alpha) * CGFloat(min(1, dt * 2)) }
 
@@ -269,7 +331,7 @@ final class AnimalNode: SKNode {
     }
 
     private func think(_ env: Env) {
-        let awake = isAwake(env.hour)
+        let awake = isAwake(env.hour) && !sheltering
         // I piccoli seguono la mamma.
         if let mom = info.babyOf, let m = env.positions[mom], [.walk, .hop, .swim].contains(sp.move) {
             let off = (Double(fnv(info.id) % 5) * 0.12 - 0.25, 0.25)
@@ -423,13 +485,18 @@ final class AnimalNode: SKNode {
                 head.position.y = AnimalArt.neckTop(l).y + (sleeping ? -2 : 0)
             }
         }
-        tail?.zRotation = CGFloat(sin(clock * (state == .walk ? 7 : 2.5))) * (l.tail == .squirrel ? 0.08 : 0.22)
+        tail?.zRotation = CGFloat(sin(clock * (state == .walk ? 7 : 2.5))) * (l.tail == .squirrel ? 0.08 : AnimalArt.longTail(l.tail) ? 0.07 : 0.22)
         if sleeping { emitZ(dt) }
     }
 
     private func animateLegs(moving: Bool, _ dt: Double) {
-        guard legs.count == 4 else { return }
         let a = moving ? CGFloat(sin(walkPhase)) * 0.55 : 0
+        if legs.count == 2 {
+            legs[0].zRotation = a
+            legs[1].zRotation = -a
+            return
+        }
+        guard legs.count == 4 else { return }
         legs[0].zRotation = a
         legs[3].zRotation = a
         legs[1].zRotation = -a
@@ -448,7 +515,7 @@ final class AnimalNode: SKNode {
         let id = sp.id
         let t = s ? Textures.tex("\(id)/headZ") { AnimalArt.head(l, id: id, sleeping: true) }
                   : Textures.tex("\(id)/head") { AnimalArt.head(l, id: id) }
-        head.texture = t.texture
+        swap(head, to: t.texture)
         eye?.isHidden = s
     }
 
@@ -486,8 +553,8 @@ final class AnimalNode: SKNode {
         if sleeping != sleepingHead {
             sleepingHead = sleeping
             let l = sp.look, id = sp.id
-            body?.texture = (sleeping ? Textures.tex("\(id)/birdZ") { AnimalArt.birdBody(l, id: id, sleeping: true) }
-                                      : Textures.tex("\(id)/bird") { AnimalArt.birdBody(l, id: id) }).texture
+            swap(body, to: (sleeping ? Textures.tex("\(id)/birdZ") { AnimalArt.birdBody(l, id: id, sleeping: true) }
+                                     : Textures.tex("\(id)/bird") { AnimalArt.birdBody(l, id: id) }).texture)
             eye?.isHidden = sleeping
             if sleeping { wings.first?.zRotation = 0 }
         }
@@ -512,7 +579,7 @@ final class AnimalNode: SKNode {
         let dip = clock < dipUntil
         let l = sp.look, id = sp.id
         let tex = dip ? Textures.tex("\(id)/swimD") { AnimalArt.swimmer(l, id: id, dip: true) } : Textures.tex("\(id)/swim") { AnimalArt.swimmer(l, id: id, dip: false) }
-        if body?.texture != tex.texture { body?.texture = tex.texture }
+        swap(body, to: tex.texture)
         rig.position = CGPoint(x: 0, y: 0.8 * CGFloat(sin(clock * 2)))
         rig.zRotation = 0.03 * CGFloat(sin(clock * 1.3))
         rig.xScale = facing * baseScale
@@ -524,7 +591,7 @@ final class AnimalNode: SKNode {
 
     private func stepFlutter(_ dt: Double, _ env: Env) {
         if let t = target {
-            let speed = sp.id == "dragonfly" ? (Int(clock * 1.5) % 3 == 0 ? 1.4 : 0.15) : 0.45
+            let speed = AnimalArt.dragonflies.contains(sp.id) ? (Int(clock * 1.5) % 3 == 0 ? 1.4 : 0.15) : 0.45
             moveToward(t, speed: speed, dt, turn: sp.move != .glow)
         }
         alt += (targetAlt - alt) * CGFloat(min(1, dt * 1.4))
@@ -536,7 +603,7 @@ final class AnimalNode: SKNode {
             wings[0].xScale = CGFloat(f)
             wings[1].xScale = -CGFloat(f)
         }
-        if sp.id == "dragonfly" { body?.alpha = 0.92 + 0.08 * CGFloat(sin(clock * 40)) }
+        if AnimalArt.dragonflies.contains(sp.id) { body?.alpha = 0.92 + 0.08 * CGFloat(sin(clock * 40)) }
         if let glow {
             let pulse = 0.55 + 0.45 * CGFloat(sin(clock * 2.2 + Double(fnv(info.id) % 9)))
             let lit = sp.activity == .night ? env.night : max(env.night, 0.5)

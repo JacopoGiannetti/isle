@@ -14,9 +14,10 @@ struct PathView: View {
 
     /// La zona che stai guardando, continua: a metà strada tra due zone lo sfondo è metà e metà.
     private func zone(day: Int) -> Double {
-        guard tab == 0 else { return lastZone ?? Double(phase(for: day).index - 1) }
+        let land = controller.world.habitat
+        guard tab == 0 else { return lastZone ?? Double(land.phase(for: day).index - 1) }
         let y = scroll[0], h = scroll[1]
-        return phases.dropFirst().reduce(0.0) { z, ph in
+        return land.phases.dropFirst().reduce(0.0) { z, ph in
             guard let b = bannerY[ph.index] else { return z }
             return z + smoothstep(Double(h * 0.95), Double(h * 0.3), Double(b - y))
         }
@@ -24,7 +25,7 @@ struct PathView: View {
 
     var body: some View {
         let w = controller.world
-        let day = Int(w.progress)
+        let day = w.pathDay
         let h = store.habit(controller.habitID)
         let open: (AnimalSpecies) -> Void = { animal = $0 }
         let z = zone(day: day)
@@ -90,8 +91,9 @@ struct PathView: View {
 
     /// Dove sei, in una riga: giorno, zona e quanto manca alla prossima, con una barra sottile.
     private func header(day: Int, dark: Bool) -> some View {
-        let current = phase(for: day)
-        let next = phases.first { $0.from > day }
+        let land = controller.world.habitat
+        let current = land.phase(for: day)
+        let next = land.phases.first { $0.from > day }
         let main = dark ? Color.white : Theme.ink
         let soft = dark ? Color.white.opacity(0.75) : Theme.muted
         return VStack(alignment: .leading, spacing: 6) {
@@ -138,7 +140,7 @@ private struct PlantTrail: View {
     let onBanner: (Int, CGFloat) -> Void
 
     private var ordered: [Species] {
-        speciesList.sorted { a, b in a.unlock.day != b.unlock.day ? a.unlock.day < b.unlock.day : a.rarity < b.rarity }
+        world.habitat.species.sorted { a, b in a.unlock.day != b.unlock.day ? a.unlock.day < b.unlock.day : a.rarity < b.rarity }
     }
 
     var body: some View {
@@ -147,8 +149,8 @@ private struct PlantTrail: View {
         let met = world.metSpecies
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(list.enumerated()), id: \.element.id) { i, sp in
-                let ph = phase(for: sp.unlock.day)
-                if i == 0 || phase(for: list[i - 1].unlock.day).index != ph.index {
+                let ph = world.habitat.phase(for: sp.unlock.day)
+                if i == 0 || world.habitat.phase(for: list[i - 1].unlock.day).index != ph.index {
                     PhaseBanner(phase: ph, reached: day >= ph.from)
                         .onGeometryChange(for: CGFloat.self) { $0.frame(in: .named("trail")).minY } action: { onBanner(ph.index, $0) }
                         .padding(.top, i == 0 ? 4 : 18)
@@ -213,7 +215,7 @@ private struct PhaseBanner: View {
             .frame(width: 38, height: 38)
             VStack(alignment: .leading, spacing: 2) {
                 Text(phase.name).font(.cozy(21, .bold)).foregroundStyle(.white)
-                Text(phase.from == 0 ? phase.blurb : Lf("Dal giorno %d · %@", phase.from, phase.blurb))
+                Text(phase.from <= 1 ? phase.blurb : Lf("Dal giorno %d · %@", phase.from, phase.blurb))
                     .font(.cozy(13, .medium)).foregroundStyle(.white.opacity(0.88))
             }
             Spacer(minLength: 0)
@@ -248,14 +250,6 @@ private struct TrailStop: View {
     let last: Bool
     let met: Set<String>
     let onAnimal: (AnimalSpecies) -> Void
-
-    private var attracted: [AnimalSpecies] {
-        animalList.filter { !$0.rare && $0.lure.contains(sp.id) }
-    }
-
-    private var rareGuest: AnimalSpecies? {
-        animalList.first { $0.rare && $0.lure.first == sp.id }
-    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -332,10 +326,10 @@ private struct TrailStop: View {
                 .background(purple.opacity(0.1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(purple.opacity(0.35), lineWidth: 1))
             }
-            if !attracted.isEmpty || rareGuest != nil {
+            if !sp.guests.isEmpty {
                 HStack(spacing: 6) {
                     Text(L("Attira")).font(.cozy(12, .semibold)).foregroundStyle(Theme.muted)
-                    ForEach(attracted + (rareGuest.map { [$0] } ?? [])) { a in
+                    ForEach(sp.guests) { a in
                         AnimalDot(sp: a, met: met.contains(a.id)) { onAnimal(a) }
                     }
                     Spacer(minLength: 0)
@@ -343,14 +337,22 @@ private struct TrailStop: View {
             }
         }
         .padding(12)
-        .glass(20, accent: zoneColors(phase(for: sp.unlock.day).index).main)
+        .glass(20, accent: zoneColors(sp.land.phase(for: sp.unlock.day).index).main)
+    }
+}
+
+extension Species {
+    /// Chi arriva per questa pianta: gli animali comuni che attira e l'ospite raro che la sceglie per prima.
+    var guests: [AnimalSpecies] {
+        allAnimals.filter { !$0.rare && $0.lure.contains(id) } + allAnimals.filter { $0.rare && $0.lure.first == id }.prefix(1)
     }
 }
 
 /// Iconcina di un animale nella riga "Attira": si tocca per aprirne la scheda.
-private struct AnimalDot: View {
+struct AnimalDot: View {
     let sp: AnimalSpecies
     let met: Bool
+    var size: CGFloat = 30
     let action: () -> Void
 
     var body: some View {
@@ -366,7 +368,7 @@ private struct AnimalDot: View {
                         .opacity(animalRevealed(sp, met: met) ? 1 : 0.55)
                 }
             }
-            .frame(width: 30, height: 30)
+            .frame(width: size, height: size)
             .background(special ? Theme.rarity(rarity).opacity(0.16) : Color.white.opacity(0.5), in: Circle())
             .overlay(Circle().stroke(special ? Theme.rarity(rarity).opacity(0.6) : .clear, lineWidth: 1))
             .overlay(alignment: .topTrailing) {
@@ -404,23 +406,30 @@ private struct AnimalAlbum: View {
     var body: some View {
         let known = world.metSpecies
         let here = Dictionary(grouping: world.residents, by: \.species).mapValues(\.count)
+        let animals = world.habitat.animals
+        let named = animals.filter(\.named)
         let groups: [(String, [AnimalSpecies])] = [
-            (L("Comuni"), animalList.filter { animalRarity($0) == .common }),
-            (L("Non comuni"), animalList.filter { animalRarity($0) == .uncommon }),
-            (L("Speciali"), animalList.filter { animalRarity($0) == .special }),
-            (L("Rari"), animalList.filter { animalRarity($0) == .rare }),
-            (L("Leggendari"), animalList.filter { animalRarity($0) == .legendary }),
+            (L("Comuni"), named.filter { animalRarity($0) == .common }),
+            (L("Non comuni"), named.filter { animalRarity($0) == .uncommon }),
+            (L("Speciali"), named.filter { animalRarity($0) == .special }),
+            (L("Rari"), named.filter { animalRarity($0) == .rare }),
+            (L("Leggendari"), named.filter { animalRarity($0) == .legendary }),
+            (L("Atmosfera"), animals.filter { !$0.named }),
         ]
         VStack(alignment: .leading, spacing: 18) {
-            Text(Lf("%d di %d trovati", known.count, animalList.count))
+            Text(Lf("%d di %d trovati", known.count, animals.count))
                 .font(.cozy(14, .semibold)).foregroundStyle(dark ? .white.opacity(0.85) : Theme.muted)
-            ForEach(groups, id: \.0) { title, list in
+            ForEach(groups.filter { !$0.1.isEmpty }, id: \.0) { title, list in
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 8) {
                         Text(title).font(.cozy(18, .bold)).foregroundStyle(dark ? .white : Theme.ink)
-                        RarityBadge(rarity: animalRarity(list[0]), compact: true)
+                        if list[0].named { RarityBadge(rarity: animalRarity(list[0]), compact: true) }
                     }
                     .id(title)
+                    if !list[0].named {
+                        Text(L("Rendono l'isola viva, ma non contano tra i suoi animali."))
+                            .font(.cozy(13)).foregroundStyle(dark ? .white.opacity(0.8) : Theme.muted)
+                    }
                     CardGrid(items: list) { sp in
                         Button { onAnimal(sp) } label: {
                             AnimalCard(sp: sp, seen: known.contains(sp.id), here: here[sp.id] ?? 0)

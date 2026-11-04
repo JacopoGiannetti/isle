@@ -3,6 +3,33 @@ import Foundation
 enum Brand {
     static let name = "Isle"
     static var tagline: String { L("Fai crescere il tuo mondo") }
+
+    /// Lo stesso indirizzo va su App Store Connect: se la pagina non esiste, la review rifiuta.
+    static let privacyURL = URL(string: "https://helloisle.app/privacy")!
+    static let termsURL = URL(string: "https://helloisle.app/terms")!
+    /// Finché sono vuoti le righe "Contatta il supporto" e "Lascia una recensione" non compaiono.
+    static let supportEmail: String? = "support@helloisle.app"
+    static let appStoreID: String? = "6828420944"
+
+    static var version: String {
+        let info = Bundle.main.infoDictionary
+        let v = info?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let b = info?["CFBundleVersion"] as? String ?? "1"
+        return "\(name) \(v) (\(b))"
+    }
+
+    static var supportURL: URL? {
+        guard let supportEmail else { return nil }
+        var c = URLComponents()
+        c.scheme = "mailto"
+        c.path = supportEmail
+        c.queryItems = [URLQueryItem(name: "subject", value: "\(name) – \(version)")]
+        return c.url
+    }
+
+    static var reviewURL: URL? {
+        appStoreID.flatMap { URL(string: "https://apps.apple.com/app/id\($0)?action=write-review") }
+    }
 }
 
 /// Generatore deterministico: lo stesso seme produce sempre lo stesso mondo,
@@ -69,9 +96,19 @@ enum Clock {
 
     static let calendar = Calendar.current
 
+    /// Numero del giorno, che cambia a mezzanotte locale. `ordinality(in: .era)` da solo sbaglia
+    /// vicino alla mezzanotte (usa il fuso storico dell'anno 1), quindi conta i giorni da
+    /// un mezzogiorno fisso, dove dà lo stesso numero di sempre.
     static func day(_ date: Date) -> Int {
-        calendar.ordinality(of: .day, in: .era, for: date) ?? 0
+        let start = calendar.startOfDay(for: date)
+        let days = calendar.dateComponents([.day], from: anchor.start, to: start).day ?? 0
+        return anchor.number + days
     }
+
+    private static let anchor: (start: Date, number: Int) = {
+        let noon = calendar.date(from: DateComponents(year: 2025, month: 1, day: 1, hour: 12)) ?? Date(timeIntervalSince1970: 0)
+        return (calendar.startOfDay(for: noon), calendar.ordinality(of: .day, in: .era, for: noon) ?? 0)
+    }()
 
     static var today: Int { day(now) }
 

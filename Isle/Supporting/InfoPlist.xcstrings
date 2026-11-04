@@ -1,0 +1,42 @@
+{
+  "sourceLanguage" : "it",
+  "strings" : {
+    "NSUserTrackingUsageDescription" : {
+      "comment" : "Privacy - Tracking Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle zeigt keine Werbung. Wir möchten nur wissen, ob dich eine unserer Anzeigen hergebracht hat, nie etwas über deine Inseln."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle shows no ads. We only use this to learn whether one of our ads brought you here, never anything about your islands."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle no tiene publicidad. Solo sirve para saber si uno de nuestros anuncios te trajo aquí, nunca nada de tus islas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle n'a pas de publicité. Cela sert uniquement à savoir si l'une de nos annonces t'a amené ici, jamais rien de tes îles."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isle non ha pubblicità. Serve solo a sapere se una nostra inserzione ti ha portato qui, mai niente delle tue isole."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -48,7 +48,7 @@ extension Art {
     /// La roccia sotto l'isola: parte dal bordo a gradini delle caselle, scende bassa
     /// a ciotola e finisce in punte irregolari.
     /// L'ancora è il centro dell'isola; il bordo alto resta nascosto dietro i fianchi delle caselle.
-    static func underside(_ tiles: [TileKey], _ r: Double) -> ArtImage {
+    static func underside(_ tiles: [TileKey], _ r: Double, _ terrain: Terrain) -> ArtImage {
         let (minX, ys) = frontEdge(tiles)
         let n = ys.count
         guard n > 1 else { return Paint.image(4, 4) { _ in } }
@@ -107,7 +107,7 @@ extension Art {
         }
 
         return Paint.image(w, h, base: h - cy, scale: detail) { g in
-            Paint.linear(g, body, [UIColor(hex: 0x7E5A52), UIColor(hex: 0x644452), UIColor(hex: 0x4A3244)],
+            Paint.linear(g, body, terrain.rock.map { UIColor(hex: $0) },
                          CGPoint(x: 0, y: (smoothY.min() ?? cy)), CGPoint(x: 0, y: h - pad))
             Paint.clipped(g, body) {
                 // Facce delle punte: una in ombra e una più chiara, come roccia spaccata.
@@ -116,11 +116,11 @@ extension Art {
                     let dark = CGMutablePath()
                     dark.addLines(between: [ridge(index(t.u), 4), ridge(index(min(1, t.u + t.half * 1.1)), 4), tip])
                     dark.closeSubpath()
-                    Paint.fill(g, dark, UIColor(hex: 0x2A1C30, alpha: 0.22))
+                    Paint.fill(g, dark, UIColor(hex: terrain.rockDark, alpha: 0.22))
                     let lit = CGMutablePath()
                     lit.addLines(between: [ridge(index(max(0, t.u - t.half * 0.7)), 4), ridge(index(t.u), 4), tip])
                     lit.closeSubpath()
-                    Paint.fill(g, lit, UIColor(hex: 0xF2C9B0, alpha: 0.07))
+                    Paint.fill(g, lit, UIColor(hex: terrain.rockLit, alpha: terrain.surface == .fern ? 0.12 : 0.07))
                 }
                 // Venature orizzontali nella roccia.
                 for (k, f) in [0.32, 0.64].enumerated() {
@@ -131,7 +131,7 @@ extension Art {
                         let p = CGPoint(x: x(i), y: smoothY[i] + 5 + bowl(u) * CGFloat(f) + 2 * sin(u * 23 + CGFloat(k) * 2))
                         if j == 0 { band.move(to: p) } else { band.addLine(to: p) }
                     }
-                    Paint.stroke(g, band, UIColor(hex: 0x2A1C30, alpha: 0.18), 1.6)
+                    Paint.stroke(g, band, UIColor(hex: terrain.rockDark, alpha: 0.18), 1.6)
                 }
                 // Luce da sinistra, ombra fredda a destra.
                 let all = CGPath(rect: CGRect(x: 0, y: 0, width: w, height: h), transform: nil)
@@ -150,12 +150,25 @@ extension Art {
                     let py = max(topY[i] + 7, smoothY[i] + 6 + bowl(u) * rng.range(0.1, 0.7))
                     let rx = rng.range(1.8, 3.6), ry = rx * rng.range(0.55, 0.8)
                     Paint.fill(g, Paint.ellipse(px, py + 1, rx, ry), UIColor(hex: 0x2A1C24, alpha: 0.35))
-                    Paint.fill(g, Paint.ellipse(px, py, rx, ry), UIColor(hex: rng.chance(0.5) ? 0x8C7A80 : 0x9A8A8A))
+                    Paint.fill(g, Paint.ellipse(px, py, rx, ry), UIColor(hex: terrain.rock[0]).light(rng.chance(0.5) ? 0.18 : 0.28))
                     Paint.fill(g, Paint.ellipse(px - rx * 0.3, py - ry * 0.35, rx * 0.45, ry * 0.35), UIColor.white.alpha(0.22))
                 }
             }
+            if terrain.surface == .snow {
+                // Ghiaccioli che pendono dal bordo.
+                for _ in 0..<Int(8 + r * 1.5) {
+                    let i = index(rng.range(0.05, 0.95))
+                    let p0 = CGPoint(x: x(i), y: topY[i] - 1)
+                    let len = rng.range(5, 13), half = rng.range(1.2, 2.2)
+                    let ice = CGMutablePath()
+                    ice.addLines(between: [CGPoint(x: p0.x - half, y: p0.y), CGPoint(x: p0.x + half, y: p0.y), CGPoint(x: p0.x + 0.2, y: p0.y + len)])
+                    ice.closeSubpath()
+                    Paint.fill(g, ice, UIColor(hex: 0xDDF0FF, alpha: 0.9))
+                    Paint.stroke(g, ice, UIColor(hex: 0x9CC4E4, alpha: 0.8), 0.5)
+                }
+            }
             // Radici che escono da sotto le caselle e pendono sulla roccia e nel vuoto.
-            for _ in 0..<Int(5 + r) {
+            for _ in 0..<(terrain.surface == .snow ? 0 : Int(5 + r)) {
                 let u = rng.chance(0.5) ? rng.range(0.04, 0.3) : rng.range(0.7, 0.96)
                 let i = index(u)
                 let p0 = CGPoint(x: x(i), y: topY[i])
@@ -180,7 +193,7 @@ extension Art {
     }
 
     /// Sassolino che fluttua sotto l'isola.
-    static func floatRock(_ v: Int) -> ArtImage {
+    static func floatRock(_ v: Int, _ t: Terrain) -> ArtImage {
         var r = RNG("rock\(v)")
         let w = CGFloat(18 + v * 5)
         return Paint.image(w + 6, w + 6, base: (w + 6) / 2) { g in
@@ -191,10 +204,10 @@ extension Art {
             p.addQuadCurve(to: CGPoint(x: cx + r.range(-3, 3), y: top + w * 0.75), control: CGPoint(x: cx + w * 0.45, y: top + w * 0.45))
             p.addQuadCurve(to: CGPoint(x: cx - w / 2, y: top), control: CGPoint(x: cx - w * 0.45, y: top + w * 0.45))
             p.closeSubpath()
-            Paint.linear(g, p, [UIColor(hex: 0x9A6848), UIColor(hex: 0x5E3A2C)], CGPoint(x: cx, y: top), CGPoint(x: cx, y: top + w * 0.75))
+            Paint.linear(g, p, [UIColor(hex: t.left[1]), UIColor(hex: t.rock[2])], CGPoint(x: cx, y: top), CGPoint(x: cx, y: top + w * 0.75))
             let grass = Paint.ellipse(cx, top, w / 2 + 0.5, w * 0.16)
-            Paint.fill(g, Paint.ellipse(cx, top + 1.6, w / 2 + 0.5, w * 0.16), UIColor(hex: 0x5E9A4A))
-            Paint.fill(g, grass, UIColor(hex: 0x8DC56A))
+            Paint.fill(g, Paint.ellipse(cx, top + 1.6, w / 2 + 0.5, w * 0.16), t.surface == .snow ? UIColor(hex: 0xC6DAEA) : UIColor(hex: t.top[0]).shade(0.28))
+            Paint.fill(g, grass, UIColor(hex: t.top[0]))
             Paint.fill(g, Paint.ellipse(cx - w * 0.15, top - w * 0.04, w * 0.2, w * 0.06), UIColor.white.alpha(0.3))
         }
     }

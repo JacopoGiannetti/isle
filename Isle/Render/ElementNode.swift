@@ -9,8 +9,21 @@ final class ElementNode: SKNode {
     /// Le ombre stanno tutte su uno strato sotto le piante: così si disegnano insieme, in una sola
     /// chiamata, invece di alternarsi con ogni pianta.
     static let shadowLayer: CGFloat = 205
+    /// Petali, scintille e lucciole sopra tutte le piante e sotto le luci: ogni sistema di particelle
+    /// è una chiamata a sé, e in mezzo agli alberi spezzerebbe in due il loro disegno comune.
+    static let ambientLayer: CGFloat = 880
     override var zPosition: CGFloat {
-        didSet { shadow?.zPosition = Self.shadowLayer - zPosition }
+        didSet {
+            shadow?.zPosition = Self.shadowLayer - zPosition
+            for e in particles { e.zPosition = Self.ambientLayer - zPosition }
+        }
+    }
+    private var particles: [SKEmitterNode] = []
+
+    private func addParticles(_ e: SKEmitterNode) {
+        e.zPosition = Self.ambientLayer - zPosition
+        particles.append(e)
+        addChild(e)
     }
     private(set) var light: SKSpriteNode?
     private var stream: SKSpriteNode?
@@ -27,7 +40,7 @@ final class ElementNode: SKNode {
 
     var isFlat: Bool {
         if case .crater = el.kind { return true }
-        if let s = el.speciesID { return s == "spring" || s == "pond" || s == "source" }
+        if let s = el.speciesID { return el.isSource || s == "spring" || s == "pond" }
         return false
     }
 
@@ -229,9 +242,8 @@ final class ElementNode: SKNode {
         e.particleColor = UIColor(hex: hex)
         e.particleColorBlendFactor = 1
         e.particleBlendMode = bees ? .alpha : .add
-        e.zPosition = 3
         e.advanceSimulationTime(3)
-        addChild(e)
+        addParticles(e)
     }
 
     private func addSteam() {
@@ -326,9 +338,8 @@ final class ElementNode: SKNode {
         e.particleRotationSpeed = 1.6
         e.particleScale = 0.9
         e.particleScaleRange = 0.4
-        e.zPosition = 2
         e.advanceSimulationTime(4)
-        addChild(e)
+        addParticles(e)
     }
 
     private func addSparkles() {
@@ -345,9 +356,8 @@ final class ElementNode: SKNode {
         e.particleColor = UIColor(hex: 0xFFF3C0)
         e.particleColorBlendFactor = 1
         e.particleBlendMode = .add
-        e.zPosition = 3
         e.advanceSimulationTime(2)
-        addChild(e)
+        addParticles(e)
     }
 
     private func addSmoke() {
