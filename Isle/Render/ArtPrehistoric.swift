@@ -4,16 +4,19 @@ import UIKit
 extension Art {
     static func wildPlant(_ id: String, rare: Bool) -> ArtImage? {
         prehistoricPlant(id, rare: rare) ?? savannaPlant(id, rare: rare) ?? arcticPlant(id, rare: rare)
+            ?? zenPlant(id, rare: rare) ?? farmPlant(id, rare: rare)
     }
 
     static func wildFlora(_ id: String, _ r: inout RNG) -> ArtImage? {
-        prehistoricFlora(id, &r) ?? savannaFlora(id, &r) ?? arcticFlora(id, &r)
+        prehistoricFlora(id, &r) ?? savannaFlora(id, &r) ?? arcticFlora(id, &r) ?? zenFlora(id, &r) ?? farmFlora(id, &r)
     }
 
     static func wildEvolved(_ id: String, rare: Bool, front: Bool, _ g: CGContext, _ r: inout RNG) {
         prehistoricEvolved(id, rare: rare, front: front, g, &r)
         savannaEvolved(id, rare: rare, front: front, g, &r)
         arcticEvolved(id, rare: rare, front: front, g, &r)
+        zenEvolved(id, rare: rare, front: front, g, &r)
+        farmEvolved(id, rare: rare, front: front, g, &r)
     }
 
     // MARK: pezzi comuni

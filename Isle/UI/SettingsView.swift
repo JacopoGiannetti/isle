@@ -1,3 +1,4 @@
+import StoreKit
 import SwiftUI
 import UserNotifications
 
@@ -9,11 +10,50 @@ struct SettingsView: View {
     @Environment(\.scenePhase) private var phase
     @State private var notifications: UNAuthorizationStatus?
     @State private var confirmDelete = false
+    @State private var testBuild = false
+    @State private var plan: Premium.Plan?
+    @State private var managing = false
+    @State private var restoring = false
+    @State private var restored = false
     private let cloud = Cloud.status
+    private let premium = Premium.shared
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    row(L("Abbonamento"), "crown.fill") {
+                        Text(L(premium.active ? "Attivo" : "Non attivo"))
+                            .font(.cozy(15, .medium))
+                            .foregroundStyle(premium.active ? Theme.green : Theme.muted)
+                    }
+                    if premium.active {
+                        Button { managing = true } label: { row(L("Gestisci abbonamento"), "creditcard", external: true) }
+                    } else {
+                        Button { Premium.showPaywall() } label: { row(L("Abbonati"), "lock.open") }
+                    }
+                    Button {
+                        restoring = true
+                        Task {
+                            restored = await Premium.restore()
+                            restoring = false
+                        }
+                    } label: {
+                        row(L("Ripristina acquisti"), "arrow.clockwise") {
+                            if restoring { ProgressView() }
+                        }
+                    }
+                    .disabled(restoring)
+                } footer: {
+                    footer(planFooter)
+                }
+                .listRowBackground(Theme.paper)
+                .manageSubscriptionsSheet(isPresented: $managing)
+                .task(id: premium.active) { plan = await Premium.plan() }
+                .onChange(of: managing) { _, open in
+                    if !open { Task { plan = await Premium.plan() } }
+                }
+
                 Section {
                     Picker(selection: Binding(get: { lang.id }, set: { lang.id = $0 })) {
                         ForEach(Lang.ID.allCases) { id in
@@ -109,6 +149,28 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Theme.paper)
 
+                if testBuild {
+                    Section {
+                        Button {
+                            dismiss()
+                            Task {
+                                try? await Task.sleep(for: .milliseconds(350))
+                                UserDefaults.standard.set(true, forKey: TestTools.replayKey)
+                                Profile.reset()
+                                Premium.forgetFirstGuest()
+                                withAnimation(.easeInOut(duration: 0.6)) { store.seenIntro = false }
+                            }
+                        } label: {
+                            row("Rifai l'onboarding", "arrow.counterclockwise")
+                        }
+                    } header: {
+                        footer("Test")
+                    } footer: {
+                        footer("Solo in Xcode e TestFlight. Riparte dall'introduzione con tutte le domande, poi apre la creazione di un'isola; il primo animale chiederà di nuovo recensione e paywall.")
+                    }
+                    .listRowBackground(Theme.paper)
+                }
+
                 Section {
                     Button(role: .destructive) {
                         confirmDelete = true
@@ -149,11 +211,24 @@ struct SettingsView: View {
             }
         }
         .presentationDetents([.large])
+        .task { testBuild = await TestTools.available.value }
         .task(id: phase) {
             guard phase == .active else { return }
             notifications = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
             await Cloud.sync()
         }
+    }
+
+    private var planFooter: String {
+        guard premium.active else { return L("Non hai un abbonamento attivo. Se l'avevi già fatto, tocca Ripristina acquisti.") }
+        var text = restored ? L("Abbonamento ripristinato.") + " " : ""
+        if let plan, let date = plan.date {
+            let when = date.formatted(.dateTime.day().month(.wide).year().locale(Locale(identifier: Lang.code)))
+            text += Lf(plan.renews ? "%@: si rinnova il %@." : "%@: scade il %@ e non si rinnova.", plan.name, when)
+        } else {
+            text += L("Hai accesso a tutta Isle.")
+        }
+        return text + " " + L("Lo gestisci o lo disdici dalle impostazioni del tuo account Apple.")
     }
 
     private var cloudFooter: String {

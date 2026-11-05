@@ -354,7 +354,7 @@ struct WelcomeCard: View {
     }
 
     private func subtitle(_ r: Resident, _ sp: AnimalSpecies) -> String {
-        if let lure = r.lure { return Lf(sp.feminine ? "Una %@, attirata %@." : "Un %@, attirato %@.", sp.name, lure) }
+        if let lure = r.lure { return Lf(sp.feminine ? "Una %@, attirata %@." : "Un %@, attirato %@.", sp.name, lure.text) }
         return Lf(sp.feminine ? "Una %@ è venuta a trovarti." : "Un %@ è venuto a trovarti.", sp.name)
     }
 

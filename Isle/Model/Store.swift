@@ -126,6 +126,7 @@ final class Store {
         Clock.hourOverride = nil
         seenIntro = false
         Profile.reset()
+        Premium.forgetFirstGuest()
         Notifier.reschedule(self)
         Superwall.shared.reset()
     }

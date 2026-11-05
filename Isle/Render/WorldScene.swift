@@ -79,6 +79,8 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     private(set) var forecast: Forecast?
     private(set) var sky = Sky.clear
     var onVisitorSeen: ((String) -> Void)?
+    /// Il nome da mostrare sopra un animale: tradotto, o quello scelto dall'utente.
+    var nameOf: ((Resident) -> String)?
     var onSkyChange: (() -> Void)?
     private var skyRain: SKEmitterNode?
     private var skyPetals: SKEmitterNode?
@@ -872,7 +874,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         } else {
             let tiles = world.tiles.keys.sorted { ($0.x, $0.y) < ($1.x, $1.y) }
             let k = tiles[Int(fnv(key) % UInt64(tiles.count))]
-            let info = Resident(id: "visitor-\(id)", species: id, name: sp.name, trait: .curious, arrived: .distantPast,
+            let info = Resident(id: Self.visitorID(id), species: id, name: sp.name, trait: .curious, arrived: .distantPast,
                                 homeX: Double(k.x), homeY: Double(k.y))
             let n = AnimalNode(sp, info, sway: sway)
             n.onRipple = { [weak self] p in self?.ripple(at: p, big: false) }
@@ -932,7 +934,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     }
 
     /// Un lampo: doppio bagliore, come quelli veri.
-    private func strike() {
+    func strike() {
         flash.removeAllActions()
         flash.run(.sequence([
             .fadeAlpha(to: 0.45, duration: 0.04), .fadeAlpha(to: 0.05, duration: 0.09),
@@ -1057,7 +1059,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         bob = newBob
 
 
-        if let f = following, let n = animalNodes[f] {
+        if let f = following, let n = animalNode(f) {
             let p = n.focusPoint
             cam.position.x += (p.x - cam.position.x) * CGFloat(min(1, dt * 3))
             cam.position.y += (p.y - followLift - cam.position.y) * CGFloat(min(1, dt * 3))
@@ -1145,16 +1147,28 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     }
 
     func select(_ sel: Selection?) {
-        if case .animal(let old) = selected { animalNodes[old]?.showTag(nil) }
+        if case .animal(let old) = selected { animalNode(old)?.showTag(nil) }
         selected = sel
-        if case .animal(let id) = sel, let n = animalNodes[id] {
-            let name = world.resident(id).map { r in n.sp.named ? r.name : n.sp.name } ?? n.sp.name
+        if case .animal(let id) = sel, let n = animalNode(id) {
+            let name = world.resident(id).map { r in n.sp.named ? nameOf?(r) ?? L(r.name) : n.sp.name } ?? n.sp.name
             n.showTag(name)
         }
         if sel == nil { following = nil }
     }
 
-    func activity(of id: String) -> String? { animalNodes[id]?.activityText }
+    func activity(of id: String) -> String? { animalNode(id)?.activityText }
+
+    /// Gli abitanti e i visitatori del cielo: si toccano, si seguono e si descrivono allo stesso modo.
+    private func animalNode(_ id: String) -> AnimalNode? {
+        animalNodes[id] ?? visitors.first { $0.info.id == id }
+    }
+
+    static func visitorID(_ species: String) -> String { "visitor-\(species)" }
+
+    /// La specie di un visitatore del cielo, dal suo id di selezione.
+    static func visitorSpecies(_ id: String) -> String? {
+        id.hasPrefix("visitor-") ? String(id.dropFirst("visitor-".count)) : nil
+    }
 
     // MARK: gesti
 
@@ -1204,7 +1218,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
             return
         }
         var bestAnimal: (AnimalNode, CGFloat)?
-        for n in animalNodes.values where n.alpha > 0.3 {
+        for n in Array(animalNodes.values) + visitors where n.alpha > 0.3 {
             let d = hypot(n.focusPoint.x - p.x, n.focusPoint.y - p.y)
             let reach = max(18, 16 * n.sp.look.scale)
             if d < reach && d < (bestAnimal?.1 ?? .infinity) { bestAnimal = (n, d) }
@@ -1229,6 +1243,11 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
             n.wiggle()
             select(.element(n.el.id))
             onSelect?(.element(n.el.id))
+        } else if let w = whale, (w.children.first?.alpha ?? 0) > 0.3, w.calculateAccumulatedFrame().contains(p) {
+            // La balena nuota dietro l'isola: si tocca solo dove l'isola non la copre.
+            following = nil
+            select(.animal(Self.visitorID("skywhale")))
+            onSelect?(.animal(Self.visitorID("skywhale")))
         } else {
             select(nil)
             onSelect?(nil)
@@ -1346,12 +1365,12 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     }
 
     /// Il seme dorato cade dal cielo; quando tocca terra parte la crescita.
-    func playSeedDrop(at k: TileKey, completion: @escaping () -> Void) {
+    func playSeedDrop(at k: TileKey, scale: CGFloat = 1.4, height: CGFloat = 260, completion: @escaping () -> Void) {
         let p = Iso.point(Double(k.x), Double(k.y))
         let seed = Textures.sprite("seed") { Art.seed() }
-        seed.position = CGPoint(x: p.x, y: p.y + 260)
+        seed.position = CGPoint(x: p.x, y: p.y + height)
         seed.zPosition = 1000
-        seed.setScale(1.4)
+        seed.setScale(scale)
         addChild(seed)
         let trail = SKEmitterNode()
         trail.particleTexture = Textures.sparkle.texture

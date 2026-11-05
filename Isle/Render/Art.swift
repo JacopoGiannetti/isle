@@ -100,6 +100,21 @@ enum Art {
                     for _ in 0..<6 {
                         Paint.fill(g, Paint.circle(r.range(6, 60), r.range(5, 30), 0.5), UIColor(hex: 0xF2DC9E, alpha: 0.7))
                     }
+                case .moss:
+                    // Muschio: cuscinetti scuri e qualche sassolino chiaro.
+                    for _ in 0..<5 {
+                        Paint.fill(g, Paint.ellipse(r.range(10, 56), r.range(7, 28), r.range(3, 6), r.range(1.4, 2.4)), grass.shade(0.12).alpha(0.5))
+                    }
+                    for _ in 0..<3 {
+                        Paint.fill(g, Paint.ellipse(r.range(10, 56), r.range(7, 28), 0.9, 0.55), UIColor(hex: 0xD8D4CC, alpha: 0.8))
+                    }
+                    return
+                case .meadow:
+                    // Prato da fattoria: fiorellini di campo tra l'erba.
+                    for _ in 0..<5 {
+                        let col: UInt32 = r.chance(0.5) ? 0xFFFFFF : r.chance(0.5) ? 0xFFE066 : 0xE85A4A
+                        Paint.fill(g, Paint.circle(r.range(8, 58), r.range(6, 29), 0.6), UIColor(hex: col, alpha: 0.9))
+                    }
                 case .grass: break
                 }
                 for _ in 0..<18 {
@@ -174,6 +189,8 @@ enum Art {
         case "source-pre": return sourcePond(.prehistoric)
         case "source-sav": return sourcePond(.savanna)
         case "source-arc": return sourcePond(.arctic)
+        case "source-zen": return sourcePond(.zen)
+        case "source-farm": return sourcePond(.farm)
         case "willow": return willow(rare)
         case "wisteria": return wisteria(rare)
         case "bluefir": return fir(rare ? 0xB3C6D3 : 0x4F86A8, snow: false, tall: true)
@@ -435,6 +452,8 @@ enum Art {
         case .prehistoric: (stones, cap, lights) = ([0x4A3E44, 0x5A4C50, 0x3E3238], 0xF2A23A, 0xFFC86A)
         case .savanna: (stones, cap, lights) = ([0xB2683E, 0xC27A4A, 0x9A5634], 0xDDBE68, 0xFFE7A0)
         case .arctic: (stones, cap, lights) = ([0x8AA2C0, 0x9AB2CE, 0x7A92B2], 0xF6FAFD, 0xCFF2FF)
+        case .zen: (stones, cap, lights) = ([0x84848E, 0x96969E, 0x6E6E7A], 0x7FAE5E, 0xFFD89A)
+        case .farm: (stones, cap, lights) = ([0xB49A7E, 0xC4AA8C, 0x9C8268], 0x8CC25A, 0xFFE7A0)
         }
         return Paint.image(56, 34, base: 17) { g in
             let cx: CGFloat = 28, cy: CGFloat = 17
@@ -1056,6 +1075,41 @@ enum Art {
             }
             for k in 0..<3 {
                 Paint.radial(g, [UIColor.white.alpha(0.5), UIColor.white.alpha(0)], CGPoint(x: cx - 10 + CGFloat(k) * 10, y: cy - 6 - CGFloat(k % 2) * 4), 7)
+            }
+        case .zen:
+            // Un laghetto di loti bordato di sassi grigi.
+            Paint.fill(g, Paint.ellipse(cx, cy + 1, 34, 17), UIColor(hex: 0x7FA86A))
+            let water = Paint.ellipse(cx, cy + 1.5, 28, 13)
+            Paint.linear(g, water, [UIColor(hex: 0x3E7E86), UIColor(hex: 0x86C2B8)], CGPoint(x: cx, y: cy - 11), CGPoint(x: cx, y: cy + 14))
+            Paint.fill(g, Paint.ellipse(cx - 8, cy - 2, 8, 1.6), UIColor.white.alpha(0.35))
+            for i in 0..<14 {
+                let a = CGFloat(i) / 14 * 6.283 + r.range(-0.1, 0.1)
+                stone(g, cx + cos(a) * 29, cy + 2 + sin(a) * 14, r.range(2.6, 3.6), UIColor(hex: [0x8A8A94, 0x9C9CA4, 0x76767F][i % 3]))
+            }
+            for i in 0..<5 {
+                let a = CGFloat(i) * 1.3 + 0.3
+                lily(g, cx + cos(a) * r.range(7, 18), cy + 1 + sin(a) * r.range(3, 7), r.range(3.4, 4.4), flower: i % 2 == 0, pink: i != 2)
+            }
+        case .farm:
+            // Uno stagno con le canne e una passerella di legno.
+            Paint.fill(g, Paint.ellipse(cx, cy + 1, 34, 17), UIColor(hex: 0x86B850))
+            let water = Paint.ellipse(cx, cy + 1.5, 28, 13)
+            Paint.linear(g, water, [UIColor(hex: 0x4E92A8), UIColor(hex: 0x96D2D8)], CGPoint(x: cx, y: cy - 11), CGPoint(x: cx, y: cy + 14))
+            Paint.fill(g, Paint.ellipse(cx - 8, cy - 2, 8, 1.6), UIColor.white.alpha(0.35))
+            for k in 0..<4 {
+                let x = cx + 12 + CGFloat(k) * 3.2, y = cy + 6 - CGFloat(k) * 1.2
+                Paint.fill(g, CGPath(rect: CGRect(x: x - 1.5, y: y - 1, width: 3, height: 2.4), transform: nil), UIColor(hex: 0xB08458))
+                Paint.fill(g, CGPath(rect: CGRect(x: x - 1.5, y: y + 1.4, width: 3, height: 0.6), transform: nil), UIColor(hex: 0x6E4E34))
+            }
+            for (dx, dy) in [(-25.0, -1.0), (-22.0, 5.0), (24.0, -4.0)] as [(CGFloat, CGFloat)] {
+                for k in 0..<4 {
+                    let x = cx + dx + CGFloat(k) * 1.4
+                    let p = CGMutablePath()
+                    p.move(to: CGPoint(x: x, y: cy + dy + 3))
+                    p.addQuadCurve(to: CGPoint(x: x + r.range(-1.5, 1.5), y: cy + dy - r.range(7, 11)), control: CGPoint(x: x - 0.5, y: cy + dy - 3))
+                    Paint.stroke(g, p, UIColor(hex: 0x6E9A3E), 1)
+                    if k == 1 { Paint.fill(g, Paint.ellipse(x, cy + dy - 6, 0.9, 2.2), UIColor(hex: 0x6A4A30)) }
+                }
             }
         case .forest:
             break

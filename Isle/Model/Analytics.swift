@@ -63,6 +63,7 @@ enum Analytics {
     /// Restituisce false se lo SDK è spento: l'evento non è partito.
     @discardableResult
     static func log(_ name: String, _ params: [String: Any] = [:]) -> Bool {
+        Funnel.record(name, params)
         guard started else { return false }
         AppsFlyerLib.shared().logEvent(name, withValues: params.isEmpty ? nil : params)
         return true

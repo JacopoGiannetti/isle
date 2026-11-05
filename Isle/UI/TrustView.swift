@@ -116,6 +116,7 @@ struct TrustView: View {
     }
 
     private func reveal() {
+        Funnel.step("trust")
         guard !reduceMotion else { shown = 7; return }
         for step in 1...7 {
             withAnimation(.timingCurve(0.16, 1, 0.3, 1, duration: 0.7).delay(0.15 + Double(step) * 0.22)) { shown = step }

@@ -106,6 +106,7 @@ struct WorldView: View {
             if let s = Launch.once("select") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                     if s == Sim.sourceID { c.focus(.element(s)); return }
+                    if WorldScene.visitorSpecies(s) != nil { c.focus(.animal(s)); return }
                     let list = c.world.elements.filter { $0.speciesID == s && $0.mature }
                     if let e = list.first(where: \.evolved) ?? list.first(where: { c.world.evolveAt[$0.id] != nil }) ?? list.first {
                         c.focus(.element(e.id))

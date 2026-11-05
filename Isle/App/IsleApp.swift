@@ -15,6 +15,7 @@ struct IsleApp: App {
         Perf.start()
         Cloud.start()
         Analytics.start()
+        Funnel.start()
     }
 
     var body: some Scene {
@@ -30,6 +31,7 @@ struct IsleApp: App {
         .onChange(of: phase) { _, p in
             if p == .active {
                 Analytics.start()
+                Funnel.start()
                 Task { await Cloud.sync() }
                 Premium.gate(store)
                 store.autoPlant()
@@ -46,6 +48,7 @@ struct IsleApp: App {
 enum Launch {
     static var open: String? { UserDefaults.standard.string(forKey: "open") }
     /// Isole finte o orologio spostato: niente iCloud e niente paywall.
+    /// `-demoOpenToday 1` lascia aperta la domanda di oggi.
     static let demo = ["demoDays", "demoHome", "fresh", "resetAll", "stormDays", "open"]
         .contains { UserDefaults.standard.object(forKey: $0) != nil }
 
@@ -84,6 +87,23 @@ enum Launch {
                 try? img.pngData()?.write(to: url)
                 print("PHOTO \(img.size) scale \(img.scale) -> \(url.path)")
             }
+        }
+        // Le isole della pagina dei mondi del tour: vanno copiate in Assets.xcassets/Tour.
+        if d.bool(forKey: "dumpTourWorlds") {
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("tour-worlds")
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            for show in Tour.worldShows {
+                let h = show.habit
+                _ = Island.order(seed: h.seed)
+                guard let img = Thumbs.isle(Sim.run(h)) else { continue }
+                let width = Tour.worldWidth
+                let size = CGSize(width: width, height: (img.size.height * width / img.size.width).rounded())
+                let small = UIGraphicsImageRenderer(size: size, format: format).image { _ in img.draw(in: CGRect(origin: .zero, size: size)) }
+                try? small.pngData()?.write(to: dir.appendingPathComponent("tour-world-\(show.land.rawValue).png"))
+            }
+            print("TOUR WORLDS -> \(dir.path)")
         }
         // Salva ogni pianta accanto alla sua evoluzione, per controllarle a occhio.
         if d.bool(forKey: "dumpEvolved") {
@@ -159,8 +179,8 @@ enum Launch {
         #if DEBUG
         if d.bool(forKey: "fresh") && Store.shared.habits.isEmpty {
             let build = d.string(forKey: "freshKind") == "build"
-            Store.shared.habits = [Habit(id: UUID().uuidString, title: build ? "Andare in palestra" : "Smettere di fumare",
-                                         question: build ? "Hai fatto palestra oggi?" : "Hai fumato oggi?",
+            Store.shared.habits = [Habit(id: UUID().uuidString, title: build ? L("Andare in palestra") : L("Smettere di fumare"),
+                                         question: build ? L("Hai fatto palestra oggi?") : L("Hai fumato oggi?"),
                                          kind: build ? .build : .quit, rhythm: demoRhythm(d), created: Clock.now)]
             if d.object(forKey: "remindAt") != nil { Store.shared.habits[0].reminderHour = d.integer(forKey: "remindAt") }
             Store.shared.seenIntro = true
@@ -171,11 +191,12 @@ enum Launch {
         if days > 0 && Store.shared.habits.isEmpty {
             let kind: HabitKind = d.string(forKey: "demoKind") == "build" ? .build : .quit
             let start = Clock.now.addingTimeInterval(-Double(days) * 86400 - 3 * 3600)
-            var h = Habit(id: UUID().uuidString, title: kind == .quit ? "Smettere di fumare" : "Meditare",
-                          question: kind == .quit ? "Hai fumato oggi?" : "Hai meditato oggi?",
+            var h = Habit(id: UUID().uuidString, title: kind == .quit ? L("Smettere di fumare") : L("Meditare"),
+                          question: kind == .quit ? L("Hai fumato oggi?") : L("Hai meditato oggi?"),
                           kind: kind, rhythm: demoRhythm(d), created: start)
             if let land = d.string(forKey: "demoLand") { h.habitat = land }
-            Demo.extend(&h, days: days, from: Clock.calendar.startOfDay(for: start.addingTimeInterval(86400)))
+            let openToday = d.bool(forKey: "demoOpenToday")
+            Demo.extend(&h, days: openToday ? days - 1 : days, from: Clock.calendar.startOfDay(for: start.addingTimeInterval(86400)))
             if let last = h.answers.last, last.at > Clock.now { Clock.offset = last.at.timeIntervalSince(Date()) + 1800 }
             #if DEBUG
             if d.object(forKey: "remindAt") != nil { h.reminderHour = d.integer(forKey: "remindAt"); h.reminderMinute = 0 }
@@ -188,9 +209,9 @@ enum Launch {
         // Tre isole in tre mondi, una con la domanda di oggi ancora aperta: per la Home.
         if d.bool(forKey: "demoHome") && Store.shared.habits.isEmpty {
             let list: [(String, String, HabitKind, Habitat, Int, Bool)] = [
-                ("Smettere di fumare", "Hai fumato oggi?", .quit, .forest, 40, true),
-                ("Andare in palestra", "Hai fatto palestra oggi?", .build, .savanna, 22, false),
-                ("Meno social", "Hai aperto i social oggi?", .quit, .arctic, 14, true),
+                (L("Smettere di fumare"), L("Hai fumato oggi?"), .quit, .forest, 40, true),
+                (L("Andare in palestra"), L("Hai fatto palestra oggi?"), .build, .savanna, 22, false),
+                (L("Meno social"), L("Hai aperto i social oggi?"), .quit, .arctic, 14, true),
             ]
             var latest = Date.distantPast
             Store.shared.habits = list.map { title, question, kind, land, days, answered in
@@ -238,6 +259,8 @@ struct RootView: View {
     @State private var introFromScratch = false
     /// Le domande di benvenuto, solo per chi comincia da zero.
     @State private var quizzing = false
+    /// Prima delle domande: come funziona Isle, in movimento.
+    @State private var touring = false
 
     var body: some View {
         ZStack {
@@ -247,13 +270,19 @@ struct RootView: View {
                 if quizzing {
                     WelcomeQuiz(onDone: finishIntro)
                         .transition(.opacity)
+                } else if touring {
+                    Tour(onDone: afterTour)
+                        .transition(.opacity)
                 } else if trusting {
                     TrustView(onDone: afterTrust)
                         .transition(.opacity)
                 } else {
                     IntroView(onStart: leaveIntro)
                         .transition(.opacity)
-                        .onAppear { introFromScratch = store.habits.isEmpty }
+                        .onAppear {
+                            introFromScratch = store.habits.isEmpty
+                            if introFromScratch && !TestTools.replaying { Funnel.step("intro") }
+                        }
                 }
             } else {
                 // La Home resta sotto anche mentre si crea un'isola, ferma: smontarla e ricostruirla
@@ -274,7 +303,8 @@ struct RootView: View {
                         }
                         Premium.describe(store)
                         if store.habits.count == 1 {
-                            Superwall.shared.register(placement: "onboarding_complete")
+                            if let h = store.habits.first { Funnel.firstHabit(h) }
+                            Premium.register("onboarding_complete")
                             Analytics.log("onboarding_complete")
                         }
                     }, onCancel: store.habits.isEmpty ? nil : closeNew)
@@ -287,6 +317,8 @@ struct RootView: View {
             // `-open quiz` mostra le domande di benvenuto sopra tutto, senza toccare le isole
             // (con `-quizStep pact` da una pagina precisa).
             if Launch.open == "quiz" { WelcomeQuiz(onDone: {}).zIndex(2) }
+            // `-open tour`: le pagine animate prima delle domande.
+            if Launch.open == "tour" { Tour(onDone: {}).zIndex(2) }
             #endif
         }
         .fullScreenCover(item: Binding(get: { openWorld.map(IDBox.init) }, set: { openWorld = $0?.id })) { box in
@@ -299,6 +331,9 @@ struct RootView: View {
             #if DEBUG
             // `-trust 1` la mostra anche con AppsFlyer spento, `2` ci va subito, `3` chiede anche il permesso.
             if UserDefaults.standard.integer(forKey: "trust") >= 2, !store.seenIntro { trusting = true }
+            #endif
+            #if DEBUG
+            if Launch.open == "paywall" { DispatchQueue.main.asyncAfter(deadline: .now() + 2) { Superwall.shared.register(placement: "first_animal") } }
             #endif
             if Launch.open == "world", let h = store.habits.first { openWorld = h.id }
             if Launch.open == "new" { creating = true }
@@ -331,7 +366,10 @@ struct RootView: View {
     }
 
     private func leaveIntro() {
+        if TestTools.replaying || (introFromScratch && store.habits.isEmpty) { Tour.prepare() }
         var showTrust = Analytics.on && ATTrackingManager.trackingAuthorizationStatus == .notDetermined
+        // iOS chiede il permesso una volta sola, ma chi rifà l'onboarding per provarlo deve rivedere la schermata.
+        if TestTools.replaying { showTrust = true }
         #if DEBUG
         if UserDefaults.standard.integer(forKey: "trust") > 0 { showTrust = true }
         #endif
@@ -341,20 +379,30 @@ struct RootView: View {
 
     /// Chi ha ritrovato le isole su iCloud, o rivede l'introduzione, salta le domande.
     private func afterTrust() {
-        guard introFromScratch && store.habits.isEmpty else { return finishIntro() }
+        guard TestTools.replaying || (introFromScratch && store.habits.isEmpty) else { return finishIntro() }
         withAnimation(.easeInOut(duration: 0.6)) {
             trusting = false
+            touring = true
+        }
+    }
+
+    private func afterTour() {
+        withAnimation(.easeInOut(duration: 0.6)) {
+            touring = false
             quizzing = true
         }
     }
 
     /// Chi ha ritrovato le sue isole su iCloud le apre già oltre il primo animale: lì vale il paywall.
     private func finishIntro() {
+        let replay = TestTools.replaying
+        UserDefaults.standard.removeObject(forKey: TestTools.replayKey)
         withAnimation(.easeInOut(duration: 0.6)) {
             trusting = false
+            touring = false
             quizzing = false
             store.seenIntro = true
-            creating = store.habits.isEmpty
+            creating = store.habits.isEmpty || replay
         }
         if introFromScratch && !store.habits.isEmpty { Premium.gate(store) }
     }

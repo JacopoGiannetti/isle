@@ -33,8 +33,6 @@ struct IntroView: View {
     @State private var buttonIn = false
     @State private var art: [BubbleArt] = []
     /// "Ho già delle isole": si cercano su iCloud.
-    @State private var checking = false
-    @State private var restoreNote: String?
 
     private let shows = Showcase.all
     private static let launchSky = Color(hex: 0xA0D9E5)
@@ -173,49 +171,14 @@ struct IntroView: View {
     // MARK: arrivo
 
     private var continueButton: some View {
-        VStack(spacing: 6) {
-            if let restoreNote {
-                Text(restoreNote)
-                    .font(.cozy(14, .medium))
-                    .foregroundStyle(Theme.muted)
-                    .multilineTextAlignment(.center)
-                    .transition(.opacity)
-            }
-            Button(L("Continua"), action: onStart)
-                .buttonStyle(PrimaryButton())
-            Button(action: restore) {
-                ZStack {
-                    Text(L("Ho già delle isole")).opacity(checking ? 0 : 1)
-                    if checking { ProgressView() }
-                }
-                .font(.cozy(16, .semibold))
-                .foregroundStyle(Theme.ink.opacity(0.7))
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .contentShape(Rectangle())
-            }
-            .disabled(checking)
-        }
-        .padding(.horizontal, 24)
-        .frame(maxHeight: .infinity, alignment: .bottom)
-        .opacity(buttonIn ? 1 : 0)
-        .offset(y: buttonIn ? 0 : 16)
-        .allowsHitTesting(buttonIn)
-    }
-
-    /// Le isole trovate su iCloud le prende `Store`; poi si entra come con "Continua".
-    private func restore() {
-        checking = true
-        withAnimation { restoreNote = nil }
-        Task {
-            await Cloud.sync()
-            checking = false
-            guard Store.shared.habits.isEmpty else { return onStart() }
-            let status = Cloud.status
-            let note = status.account == false ? L("Accedi a iCloud nelle impostazioni di iPhone, poi riprova.")
-                : status.failed ? L("iCloud non risponde. Riprova tra poco.")
-                : L("Non ci sono isole salvate su questo iCloud.")
-            withAnimation { restoreNote = note }
-        }
+        Button(L("Continua"), action: onStart)
+            .buttonStyle(PrimaryButton())
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .opacity(buttonIn ? 1 : 0)
+            .offset(y: buttonIn ? 0 : 16)
+            .allowsHitTesting(buttonIn)
     }
 
     // MARK: testo
@@ -698,7 +661,7 @@ struct CloudLayer: View {
 }
 
 /// Raro o leggendario: un cartellino storto e colorato che brilla piano, come il riquadro nel titolo.
-private struct TierTag: View {
+struct TierTag: View {
     let tier: Rarity
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 

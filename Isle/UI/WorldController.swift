@@ -50,6 +50,7 @@ final class WorldController {
             withAnimation(.spring(duration: 0.4)) { self?.lift(id) }
         }
         scene.onVisitorSeen = { sp in Store.shared.sawVisitor(habitID, sp) }
+        scene.nameOf = { [weak self] r in self?.name(of: r) ?? L(r.name) }
         scene.onSkyChange = { [weak self] in
             guard let self else { return }
             withAnimation(.spring(duration: 0.4)) {

@@ -136,6 +136,32 @@ struct Showcase {
     ], fill: Fill(back: [k("snowfir"), k("snowfir", rare: true), k("larch"), k("larch", rare: true)],
                   side: [k("snowfir"), k("arcticwillow"), k("cloudberry"), k("lichen"), k("snowdrift")],
                   front: [k("auroraflower"), k("tundra"), k("cloudberry", rare: true), k("lichen", rare: true)]), land: .arctic)
+    /// Il giardino zen la sera: il bonsai millenario al centro, l'acqua a sinistra, il tempio a destra.
+    static let zen = Showcase(id: "zen", sky: .fireflies, hour: 20.5, title: "Sera di lanterne", plan: [
+        s("elderbonsai", 0, 0),
+        s("cloudpine", -2, -1), s("cloudpine", 2, -1, rare: true), s("sakura", -2.5, 1.5, rare: true), s("momiji", 2.5, 1.5, rare: true),
+        s("koipond", -4.5, 0.5, rare: true), s("moonpond", -3.5, -2.5), s("lotus", -1.5, -3.5, rare: true), s("zenstream", -3, 3, rare: true),
+        s("teahouse", 4, 0), s("pagoda", 3, -2), s("stonelantern", 5.5, 0.5), s("bamboofountain", 0.5, -4.5, rare: true),
+        s("bamboo", -2, -5), s("bamboo", 2.5, -4.5, rare: true), s("jadebamboo", -4.5, -3.5), s("sakura", 4.5, -2.5),
+        s("momiji", -4.5, 2.5), s("redbridge", 4.5, 2.5, rare: true),
+        s("hozuki", 1.5, 3.5, rare: true), s("hydrangea", -1.5, 3.5, rare: true), s("zenstones", 3, 4, rare: true),
+        s("moss", 0, 3), s("azalea", -0.5, 4.5, rare: true), s("moss", 0.5, 5.5, rare: true),
+    ], fill: Fill(back: [k("bamboo"), k("bamboo", rare: true), k("cloudpine"), k("sakura")],
+                  side: [k("momiji"), k("azalea"), k("hydrangea"), k("zenstones"), k("bamboo")],
+                  front: [k("moss"), k("moss", rare: true), k("azalea"), k("hozuki")]), land: .zen)
+    /// La fattoria nel pomeriggio: il castagno al centro, l'acqua a sinistra, la stalla e il mulino a destra.
+    static let farm = Showcase(id: "farm", sky: .clear, hour: 17.5, title: "Pomeriggio d'oro", plan: [
+        s("elderchestnut", 0, 0),
+        s("appletree", -2, -1), s("appletree", 2, -1, rare: true), s("olive", -2.5, 1.5, rare: true), s("starapple", 2.5, 1.5),
+        s("farmpond", -4.5, 0.5, rare: true), s("watermill", -3.5, -2.5), s("well", -1.5, -3.5, rare: true), s("wishfountain", -3, 3),
+        s("barn", 4, 0), s("windmill", 3, -2), s("henhouse", 5.5, 0.5), s("carousel", 0.5, -4.5),
+        s("olive", -2, -5), s("appletree", 2.5, -4.5, rare: true), s("haybale", -4.5, -3.5), s("scarecrow", 4.5, -2.5, rare: true),
+        s("vineyard", -4.5, 2.5, rare: true), s("pumpkins", 4.5, 2.5, rare: true),
+        s("sunflower", 1.5, 3.5, rare: true), s("tomatoes", -1.5, 3.5), s("carrots", 3, 4, rare: true),
+        s("wheat", 0, 3), s("sunflower", -0.5, 4.5), s("carrots", 0.5, 5.5),
+    ], fill: Fill(back: [k("appletree"), k("olive"), k("olive", rare: true), k("appletree", rare: true)],
+                  side: [k("wheat"), k("haybale"), k("sunflower"), k("vineyard"), k("appletree")],
+                  front: [k("carrots"), k("tomatoes"), k("pumpkins"), k("wheat", rare: true)]), land: .farm)
 
     /// Il giardino del giorno 100: la quercia al centro, i ciliegi intorno,
     /// l'acqua a sinistra, il bosco a destra e il prato davanti.

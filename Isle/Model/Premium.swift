@@ -1,6 +1,9 @@
 import Foundation
 import Observation
+import StoreKit
 import SuperwallKit
+import UIKit
+import UIKit.UIGestureRecognizerSubclass
 
 /// Paywall e abbonamento, gestiti da Superwall: acquisti, ripristini e stato arrivano da lì.
 /// Quale paywall mostrare, a chi e se blocca qualcosa si decide dalla dashboard, non qui.
@@ -18,10 +21,17 @@ final class Premium: SuperwallDelegate {
         shared.active = Superwall.shared.subscriptionStatus.isActive
     }
 
-    func subscriptionStatusDidChange(from oldValue: SubscriptionStatus, to newValue: SubscriptionStatus) {
+    func subscriptionStatusDidChange(from oldValue: SuperwallKit.SubscriptionStatus, to newValue: SuperwallKit.SubscriptionStatus) {
         active = newValue.isActive
         if oldValue.isActive && !newValue.isActive { Self.gate(Store.shared) }
-        if newValue.isActive { Task { await Analytics.reportPurchases() } }
+        if newValue.isActive {
+            Task { await Analytics.reportPurchases() }
+            Funnel.subscribed()
+        }
+    }
+
+    func handleSuperwallEvent(withInfo eventInfo: SuperwallEventInfo) {
+        if case .paywallOpen = eventInfo.event { Funnel.step("paywall") }
     }
 
     /// Attributi per le audience e i testi del paywall: niente testi dell'utente, solo numeri
@@ -34,7 +44,6 @@ final class Premium: SuperwallDelegate {
             "source": profile.source ?? "",
             "goals": profile.goals.joined(separator: ","),
             "goal": profile.goals.first ?? "",
-            "tried": profile.tried ?? "",
             "obstacles": profile.obstacles.joined(separator: ","),
             "islands": habits.count,
             "quit_islands": habits.filter { $0.kind == .quit }.count,
@@ -48,16 +57,66 @@ final class Premium: SuperwallDelegate {
     /// Una nuova isola oltre la prima. Se il paywall non si può mostrare (per esempio offline
     /// al primo avvio) Superwall non chiama `open`, ma l'isola si crea lo stesso.
     static func newIsland(_ store: Store, open: @escaping () -> Void) {
-        let handler = PaywallPresentationHandler()
-        handler.onError { _ in open() }
-        Superwall.shared.register(placement: "create_island", params: ["islands": store.habits.count], handler: handler, feature: open)
+        let count = store.habits.count
+        Task {
+            guard await !TestTools.skipPaywall() else { return open() }
+            let handler = PaywallPresentationHandler()
+            handler.onError { _ in open() }
+            Superwall.shared.register(placement: "create_island", params: ["islands": count], handler: handler, feature: open)
+        }
+    }
+
+    /// L'abbonamento attivo come lo vede Apple: per le Impostazioni.
+    struct Plan {
+        let name: String
+        let date: Date?
+        let renews: Bool
+    }
+
+    static func plan() async -> Plan? {
+        for await result in StoreKit.Transaction.currentEntitlements {
+            guard case .verified(let t) = result, t.productType == .autoRenewable, t.revocationDate == nil else { continue }
+            let product = try? await Product.products(for: [t.productID]).first
+            var renews = false
+            for status in (try? await product?.subscription?.status) ?? [] {
+                if case .verified(let info) = status.renewalInfo, info.currentProductID == t.productID || info.autoRenewPreference == t.productID {
+                    renews = info.willAutoRenew
+                }
+            }
+            return Plan(name: product?.displayName ?? t.productID, date: t.expirationDate, renews: renews)
+        }
+        return nil
+    }
+
+    /// Dalle Impostazioni: lo chiede l'utente, quindi niente condizioni.
+    static func showPaywall() {
+        Superwall.shared.register(placement: "first_animal")
+    }
+
+    /// Vero se dopo il ripristino l'abbonamento c'è. Se manca, Superwall lo dice già con un suo avviso.
+    static func restore() async -> Bool {
+        _ = await Superwall.shared.restorePurchases()
+        return Superwall.shared.subscriptionStatus.isActive
+    }
+
+    static func register(_ placement: String) {
+        Task {
+            guard await !TestTools.skipPaywall() else { return }
+            Superwall.shared.register(placement: placement)
+        }
     }
 
     private static let firstGuestKey = "premium.firstGuest"
 
+    /// Il primo animale torna a chiedere recensione e paywall, come dopo una nuova installazione.
+    static func forgetFirstGuest() {
+        UserDefaults.standard.removeObject(forKey: firstGuestKey)
+    }
+
     /// Chiusa la scheda del primo animale di sempre: prima la recensione, poi il paywall.
-    /// La richiesta di Apple non dice se compare né quando si chiude, e l'app resta attiva sotto:
-    /// il paywall entra subito dietro, così chiuse le stelle è già lì.
+    /// Le stelle di Apple le disegna un altro processo: l'app non sa se compaiono né quando si
+    /// chiudono, ma finché sono aperte non riceve tocchi. Il paywall parte al primo tocco
+    /// sull'app, ignorando i primi istanti in cui le stelle possono ancora arrivare.
     static func afterFirstGuest(review: () -> Void) {
         let defaults = UserDefaults.standard
         guard !defaults.bool(forKey: firstGuestKey) else { return }
@@ -65,9 +124,10 @@ final class Premium: SuperwallDelegate {
         Analytics.log("first_animal")
         review()
         Task {
-            try? await Task.sleep(for: .seconds(1))
+            try? await Task.sleep(for: .seconds(1.5))
+            await FirstTouch.wait()
             guard !shared.active else { return }
-            Superwall.shared.register(placement: "first_animal")
+            register("first_animal")
         }
     }
 
@@ -85,7 +145,61 @@ final class Premium: SuperwallDelegate {
                 try? await Task.sleep(for: .milliseconds(100))
             }
             guard case .inactive = Superwall.shared.subscriptionStatus, !Superwall.shared.isPaywallPresented else { return }
-            Superwall.shared.register(placement: "first_animal")
+            register("first_animal")
         }
     }
+}
+
+/// Strumenti per chi prova l'app da Xcode o da TestFlight: nella versione dell'App Store non ci sono.
+enum TestTools {
+    static let available = Task<Bool, Never> {
+        #if DEBUG
+        return true
+        #else
+        guard case .verified(let t)? = try? await AppTransaction.shared else { return false }
+        return t.environment != .production
+        #endif
+    }
+
+    /// `true` per provare l'app senza paywall. Vale solo da Xcode e TestFlight, mai sull'App Store.
+    static let paywallOff = false
+
+    static let replayKey = "test.replayOnboarding"
+
+    /// L'onboarding rifatto dalle Impostazioni: domande comprese, anche con le isole già fatte.
+    static var replaying: Bool { UserDefaults.standard.bool(forKey: replayKey) }
+
+    static func skipPaywall() async -> Bool {
+        paywallOff ? await available.value : false
+    }
+}
+
+/// Aspetta il prossimo tocco in qualunque punto della finestra, senza toglierlo a chi sta sotto.
+private final class FirstTouch: UIGestureRecognizer, UIGestureRecognizerDelegate {
+    private var touched: (() -> Void)?
+
+    static func wait() async {
+        let window = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first
+        guard let window else { return }
+        await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+            let g = FirstTouch(target: nil, action: nil)
+            g.cancelsTouchesInView = false
+            g.delaysTouchesEnded = false
+            g.delegate = g
+            g.touched = { [weak window, unowned g] in
+                DispatchQueue.main.async { window?.removeGestureRecognizer(g) }
+                c.resume()
+            }
+            window.addGestureRecognizer(g)
+        }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        state = .failed
+        let t = touched
+        touched = nil
+        t?()
+    }
+
+    func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
 }

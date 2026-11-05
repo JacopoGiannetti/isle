@@ -222,7 +222,7 @@ struct HomeView: View {
 }
 
 /// Il giorno del sentiero, come il timbro postale su una cartolina.
-private struct DayStamp: View {
+struct DayStamp: View {
     let day: Int
 
     var body: some View {

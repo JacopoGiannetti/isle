@@ -7,7 +7,6 @@ struct Profile: Codable, Equatable {
     var name = ""
     var source: String?
     var goals: [String] = []
-    var tried: String?
     var obstacles: [String] = []
 
     private static let key = "profile"
@@ -31,7 +30,7 @@ struct WelcomeQuiz: View {
     let onDone: () -> Void
 
     enum Step: String, CaseIterable {
-        case name, source, goals, tried, obstacles, answer, science, headStart, reminders, pact, forming
+        case name, source, goals, obstacles, answer, science, reminders, pact, forming
     }
 
     struct Option {
@@ -39,6 +38,8 @@ struct WelcomeQuiz: View {
         let label: String
         let icon: String
         let tint: Color
+        /// `icon` è un logo ufficiale del catalogo (`Brands/`), non un simbolo di sistema.
+        var brand = false
     }
 
     @State private var step: Step = .name
@@ -46,13 +47,11 @@ struct WelcomeQuiz: View {
     @State private var askReminders = true
     @State private var remindersOn = false
     @State private var hold: CGFloat = 0
-    @State private var bars = false
     @FocusState private var typing: Bool
 
     private var order: [Step] {
         Step.allCases.filter { s in
             switch s {
-            case .obstacles: return p.tried != "first"
             case .reminders: return askReminders
             default: return true
             }
@@ -93,7 +92,7 @@ struct WelcomeQuiz: View {
             Analytics.log("onboarding_step", ["step": step.rawValue])
             #if DEBUG
             if let s = Launch.once("quizStep").flatMap(Step.init(rawValue:)) {
-                p = Profile(name: "Marta", source: "tiktok", goals: ["health", "money"], tried: "many", obstacles: ["motivation", "relapse"])
+                p = Profile(name: "Marta", source: "tiktok", goals: ["health", "money"], obstacles: ["motivation", "relapse"])
                 step = s
             }
             #endif
@@ -129,11 +128,9 @@ struct WelcomeQuiz: View {
         case .name: namePage
         case .source: sourcePage
         case .goals: goalsPage
-        case .tried: triedPage
         case .obstacles: obstaclesPage
         case .answer: answerPage
         case .science: sciencePage
-        case .headStart: headStartPage
         case .reminders: remindersPage
         case .pact: pactPage
         case .forming: EmptyView()
@@ -150,7 +147,9 @@ struct WelcomeQuiz: View {
                     .opacity(p.firstName.isEmpty ? 0.5 : 1)
                 skip(L("Preferisco non dirlo")) { p.name = ""; next() }
             case .source:
-                skip(L("Salta"), action: next)
+                Button(p.source == nil ? L("Salta") : L("Avanti"), action: next)
+                    .buttonStyle(PrimaryButton())
+                    .animation(.easeOut(duration: 0.2), value: p.source == nil)
             case .goals:
                 Button(L("Avanti"), action: next)
                     .buttonStyle(PrimaryButton())
@@ -161,7 +160,8 @@ struct WelcomeQuiz: View {
                     .buttonStyle(PrimaryButton())
                     .disabled(p.obstacles.isEmpty)
                     .opacity(p.obstacles.isEmpty ? 0.5 : 1)
-            case .answer, .science, .headStart:
+                skip(L("Salta")) { p.obstacles = []; next() }
+            case .answer, .science:
                 Button(L("Avanti"), action: next).buttonStyle(PrimaryButton())
             case .reminders:
                 Button(L("Attiva i promemoria"), action: enableReminders).buttonStyle(PrimaryButton())
@@ -171,7 +171,7 @@ struct WelcomeQuiz: View {
                     Analytics.log("onboarding_pact")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { next() }
                 }
-            case .tried, .forming:
+            case .forming:
                 EmptyView()
             }
         }
@@ -207,7 +207,6 @@ struct WelcomeQuiz: View {
         Analytics.log("onboarding_quiz", [
             "source": p.source ?? "",
             "goals": p.goals.joined(separator: ","),
-            "tried": p.tried ?? "",
             "obstacles": p.obstacles.joined(separator: ","),
         ])
         Premium.describe(Store.shared)
@@ -250,15 +249,59 @@ struct WelcomeQuiz: View {
     }
 
     private var sourcePage: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            heading(L("Come hai conosciuto Isle?"), L("Ci aiuta a capire dove raccontarla."))
-            ForEach(Self.sources, id: \.id) { o in
-                option(o, on: p.source == o.id, multi: false) {
-                    p.source = o.id
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { next() }
-                }
+        VStack(spacing: 0) {
+            IsleMark(size: 92)
+                .padding(.top, 12)
+            Text(L("Come hai conosciuto Isle?"))
+                .font(.book(30, .bold))
+                .foregroundStyle(Theme.ink)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 18)
+            Text(L("Ci aiuta a capire dove raccontarla."))
+                .font(.cozy(15))
+                .foregroundStyle(Theme.muted)
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2), spacing: 10) {
+                ForEach(Self.sources, id: \.id) { sourceChip($0) }
             }
+            .padding(.top, 28)
         }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func sourceChip(_ o: Option) -> some View {
+        let on = p.source == o.id
+        return Button {
+            p.source = on ? nil : o.id
+        } label: {
+            HStack(spacing: 10) {
+                Group {
+                    if o.brand {
+                        Image(o.icon).renderingMode(.template).resizable().scaledToFit()
+                    } else {
+                        Image(systemName: o.icon).font(.system(size: 16, weight: .semibold))
+                    }
+                }
+                .frame(width: 18, height: 18)
+                .foregroundStyle(on ? .white : o.tint)
+                Text(o.label)
+                    .font(.cozy(14, .semibold))
+                    .foregroundStyle(on ? .white : Theme.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .frame(maxWidth: .infinity)
+            .contentShape(.rect(cornerRadius: 16))
+            .glassEffect(on ? .regular.tint(Theme.violet.opacity(0.9)) : .regular, in: .rect(cornerRadius: 16))
+            .animation(.easeOut(duration: 0.2), value: on)
+        }
+        .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: on)
     }
 
     private var goalsPage: some View {
@@ -268,19 +311,6 @@ struct WelcomeQuiz: View {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                 ForEach(Self.goals, id: \.id) { o in
                     tile(o, on: p.goals.contains(o.id)) { toggle(&p.goals, o.id) }
-                }
-            }
-        }
-    }
-
-    private var triedPage: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            heading(L("Ci hai già provato?"), L("Nessun giudizio: quasi tutti ci provano più di una volta prima di farcela."))
-            ForEach(Self.attempts, id: \.id) { o in
-                option(o, on: p.tried == o.id, multi: false) {
-                    p.tried = o.id
-                    if o.id == "first" { p.obstacles = [] }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { next() }
                 }
             }
         }
@@ -296,7 +326,7 @@ struct WelcomeQuiz: View {
     }
 
     private var answerPage: some View {
-        let first = p.tried == "first" || p.obstacles.isEmpty
+        let first = p.obstacles.isEmpty
         let picked = first ? Self.obstacles.map(\.id) : Self.obstacles.map(\.id).filter(p.obstacles.contains)
         return VStack(alignment: .leading, spacing: 12) {
             AnimalParade()
@@ -330,32 +360,6 @@ struct WelcomeQuiz: View {
                   text: L("Stabilire in anticipo quando agire aumenta molto le probabilità di raggiungere un obiettivo."),
                   isle: L("Su Isle la domanda arriva ogni giorno alla stessa ora."),
                   source: "Gollwitzer & Sheeran, Advances in Experimental Social Psychology, 2006")
-        }
-    }
-
-    private var headStartPage: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            heading(L("Ti diamo un vantaggio"),
-                    L("In uno studio, chi riceveva una tessera fedeltà con 2 timbri già regalati arrivava in fondo quasi il doppio delle volte."))
-            VStack(spacing: 14) {
-                HStack(alignment: .bottom, spacing: 22) {
-                    bar(value: 0.19, label: L("Senza timbri regalati"), accent: false)
-                    bar(value: 0.34, label: L("Con 2 timbri regalati"), accent: true)
-                }
-                .frame(height: 220)
-                Text("Nunes & Drèze, Journal of Consumer Research, 2006")
-                    .font(.cozy(11, .medium))
-                    .foregroundStyle(Theme.muted)
-            }
-            .padding(20)
-            .surface(24)
-            promise(icon: "gift.fill", tint: Theme.peach,
-                    title: L("I tuoi primi 2 semi sono un regalo"),
-                    text: L("Li pianti subito. Col secondo arriva il primo animale."))
-        }
-        .onAppear {
-            bars = false
-            withAnimation(.spring(duration: 1.1, bounce: 0.25).delay(0.35)) { bars = true }
         }
     }
 
@@ -531,39 +535,6 @@ struct WelcomeQuiz: View {
         .accessibilityElement(children: .combine)
     }
 
-    private func bar(value: CGFloat, label: String, accent: Bool) -> some View {
-        VStack(spacing: 8) {
-            GeometryReader { g in
-                VStack(spacing: 8) {
-                    Spacer(minLength: 0)
-                    Text("\(Int((value * 100).rounded()))%")
-                        .font(.book(26, .bold))
-                        .foregroundStyle(accent ? Theme.violet : Theme.muted)
-                        .opacity(bars ? 1 : 0)
-                    Group {
-                        if accent {
-                            AccentFill()
-                        } else {
-                            Theme.track
-                        }
-                    }
-                    .frame(width: 78, height: bars ? (g.size.height - 44) * value / 0.34 : 6)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .frame(maxWidth: .infinity)
-            }
-            Text(label)
-                .font(.cozy(13, .semibold))
-                .foregroundStyle(Theme.ink.opacity(0.75))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(height: 36, alignment: .top)
-        }
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(label): \(Int((value * 100).rounded()))%")
-    }
-
     private func bullet(_ icon: String, _ text: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
@@ -577,14 +548,14 @@ struct WelcomeQuiz: View {
     // MARK: scelte
 
     static var sources: [Option] { [
-        Option(id: "appstore", label: L("Cercando sull'App Store"), icon: "apple.logo", tint: Theme.sky),
-        Option(id: "tiktok", label: "TikTok", icon: "music.note", tint: Theme.ink),
-        Option(id: "instagram", label: "Instagram", icon: "camera.fill", tint: Color(hex: 0xE1306C)),
-        Option(id: "facebook", label: "Facebook", icon: "hand.thumbsup.fill", tint: Color(hex: 0x1877F2)),
-        Option(id: "youtube", label: "YouTube", icon: "play.rectangle.fill", tint: Theme.red),
-        Option(id: "friend", label: L("Un amico o un parente"), icon: "person.2.fill", tint: Theme.green),
-        Option(id: "web", label: L("Una ricerca sul web"), icon: "globe", tint: Theme.violet),
-        Option(id: "other", label: L("Altro"), icon: "ellipsis", tint: Theme.muted),
+        Option(id: "tiktok", label: "TikTok", icon: "brand_tiktok", tint: Theme.ink, brand: true),
+        Option(id: "instagram", label: "Instagram", icon: "brand_instagram", tint: Color(hex: 0xFF0069), brand: true),
+        Option(id: "facebook", label: "Facebook", icon: "brand_facebook", tint: Color(hex: 0x0866FF), brand: true),
+        Option(id: "youtube", label: "YouTube", icon: "brand_youtube", tint: Color(hex: 0xFF0000), brand: true),
+        Option(id: "appstore", label: "App Store", icon: "brand_appstore", tint: Color(hex: 0x0D96F6), brand: true),
+        Option(id: "web", label: L("Ricerca sul web"), icon: "magnifyingglass", tint: Theme.violet),
+        Option(id: "friend", label: L("Un amico"), icon: "person.2.fill", tint: Theme.green),
+        Option(id: "other", label: L("Altro"), icon: "ellipsis.circle.fill", tint: Theme.muted),
     ] }
 
     static var goals: [Option] { [
@@ -596,12 +567,6 @@ struct WelcomeQuiz: View {
         Option(id: "time", label: L("Più tempo per me"), icon: "clock.fill", tint: Theme.peach),
         Option(id: "proud", label: L("Essere fiero di me"), icon: "star.fill", tint: Theme.violet),
         Option(id: "loved", label: L("Per chi amo"), icon: "person.2.fill", tint: Color(hex: 0xEC7E8F)),
-    ] }
-
-    static var attempts: [Option] { [
-        Option(id: "first", label: L("È la prima volta"), icon: "sparkles", tint: Theme.gold),
-        Option(id: "few", label: L("Una o due volte"), icon: "arrow.clockwise", tint: Theme.sky),
-        Option(id: "many", label: L("Tante volte"), icon: "arrow.triangle.2.circlepath", tint: Theme.violet),
     ] }
 
     static var obstacles: [Option] { [
@@ -632,7 +597,7 @@ struct WelcomeQuiz: View {
 private struct AnimalParade: View {
     private static let faces: [UIImage] = ["squirrel", "rabbit", "fox", "owl", "deer"]
         .compactMap { animalByID[$0] }
-        .map(AnimalArt.portrait)
+        .map { AnimalArt.portrait($0) }
     @State private var up = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -750,104 +715,221 @@ private struct HoldButton: View {
     }
 }
 
-/// L'isola che si prepara: le risposte tornano indietro una alla volta, spuntate.
+/// L'isola che si prepara: mentre scorrono i passi, un'isola stilizzata si copre di prato,
+/// poi di fiori, alberi e animali. L'ultimo passo dice cosa è stato preparato per lui.
 private struct Forming: View {
     let profile: Profile
     let remindersOn: Bool
     let goals: [String]
     let onDone: () -> Void
 
-    @State private var shown = 0
-    @State private var percent = 0.0
+    @State private var stage = 0
     @State private var float = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var rows: [String] {
-        var list: [String] = []
-        if !goals.isEmpty { list.append(Lf("Pensata per: %@", goals.joined(separator: ", "))) }
-        let help: [String: String] = [
-            "motivation": L("Un motivo per tornare ogni giorno"),
-            "progress": L("Progressi che si vedono"),
-            "relapse": L("Un'isola che resta, anche dopo un passo falso"),
-            "forgot": L("Una domanda al giorno, all'ora giusta"),
-            "boring": L("Animali e mondi da scoprire"),
+    private var steps: [String] {
+        [
+            L("Preparo il terreno"),
+            goals.isEmpty ? L("Adatto Isle a te") : Lf("Adatto Isle ai tuoi obiettivi: %@", goals.joined(separator: ", ")),
+            L("Pianto i primi alberi"),
+            L("Chiamo i primi animali"),
+            remindersOn ? L("Imposto il promemoria di ogni giorno") : L("Preparo la domanda di ogni giorno"),
         ]
-        let picked = WelcomeQuiz.obstacles.map(\.id).filter(profile.obstacles.contains).prefix(2).compactMap { help[$0] }
-        list += picked.isEmpty ? [L("Un motivo per tornare ogni giorno")] : Array(picked)
-        list.append(L("2 semi in regalo per cominciare"))
-        if remindersOn { list.append(L("Promemoria attivi")) }
-        return list
+    }
+
+    private var finished: Bool { stage >= steps.count }
+
+    private var title: String {
+        if finished { return profile.firstName.isEmpty ? L("Tutto pronto!") : Lf("Tutto pronto, %@!", profile.firstName) }
+        return profile.firstName.isEmpty ? L("Prepariamo la tua isola") : Lf("Prepariamo l'isola di %@", profile.firstName)
     }
 
     var body: some View {
-        VStack(spacing: 26) {
-            Spacer()
-            ZStack {
-                AccentFill()
-                    .clipShape(Circle())
-                    .frame(width: 170, height: 170)
-                    .blur(radius: 40)
-                    .opacity(0.45)
-                IsleMark(size: 120)
-                    .offset(y: float ? -6 : 6)
-            }
-            VStack(spacing: 8) {
-                Text(profile.firstName.isEmpty ? L("Prepariamo la tua isola") : Lf("Prepariamo l'isola di %@", profile.firstName))
+        VStack(spacing: 22) {
+            Spacer(minLength: 0)
+            GrowingIsle(stage: stage)
+                .offset(y: float ? -5 : 5)
+            VStack(spacing: 10) {
+                Text(title)
                     .font(.book(28, .bold))
                     .foregroundStyle(Theme.ink)
                     .multilineTextAlignment(.center)
+                    .contentTransition(.opacity)
                 GeometryReader { g in
                     ZStack(alignment: .leading) {
                         Capsule().fill(.white.opacity(0.7))
-                        AccentFill().clipShape(Capsule()).frame(width: max(8, g.size.width * percent / 100))
+                        AccentFill().clipShape(Capsule())
+                            .frame(width: max(8, g.size.width * CGFloat(stage) / CGFloat(steps.count)))
                     }
                 }
-                .frame(width: 180, height: 8)
-                .padding(.top, 6)
-                Text("\(Int(percent))%")
-                    .font(.cozy(15, .semibold).monospacedDigit())
-                    .foregroundStyle(Theme.muted)
-                    .contentTransition(.numericText())
+                .frame(width: 200, height: 8)
             }
             VStack(alignment: .leading, spacing: 12) {
-                ForEach(rows.indices, id: \.self) { i in
+                ForEach(steps.indices, id: \.self) { i in
                     HStack(spacing: 12) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Theme.green)
-                        Text(rows[i])
-                            .font(.cozy(16, .medium))
-                            .foregroundStyle(Theme.ink)
+                        ZStack {
+                            if stage > i {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(Theme.green)
+                                    .transition(.scale.combined(with: .opacity))
+                            } else if stage == i {
+                                ProgressView().controlSize(.small).tint(Theme.violet)
+                            } else {
+                                Circle().stroke(Theme.line, lineWidth: 2).frame(width: 18, height: 18)
+                            }
+                        }
+                        .frame(width: 22, height: 22)
+                        Text(steps[i])
+                            .font(.cozy(15, stage == i ? .semibold : .medium))
+                            .foregroundStyle(stage >= i ? Theme.ink : Theme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    .opacity(shown > i ? 1 : 0)
-                    .offset(y: shown > i ? 0 : 10)
                 }
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
             .surface(24)
             .padding(.horizontal, 24)
-            Spacer()
-            Spacer()
+            Spacer(minLength: 0)
         }
-        .sensoryFeedback(.impact(weight: .light), trigger: shown)
+        .sensoryFeedback(.impact(weight: .light), trigger: stage)
+        .sensoryFeedback(.success, trigger: finished)
         .task { await run() }
     }
 
     private func run() async {
         if !reduceMotion {
-            withAnimation(.easeInOut(duration: 1.8).repeatForever()) { float = true }
+            withAnimation(.easeInOut(duration: 2).repeatForever()) { float = true }
         }
-        let steps = rows.count
-        for i in 1...steps {
-            try? await Task.sleep(for: .seconds(0.85))
-            withAnimation(.spring(duration: 0.45)) {
-                shown = i
-                percent = 100 * Double(i) / Double(steps)
+        for i in 1...steps.count {
+            try? await Task.sleep(for: .seconds(1.1))
+            withAnimation(.spring(duration: 0.5)) { stage = i }
+        }
+        try? await Task.sleep(for: .seconds(1.3))
+        onDone()
+    }
+}
+
+/// Un'isola volante disegnata, che a ogni passo si popola: prato, fiori, alberi, animali, la stella.
+private struct GrowingIsle: View {
+    let stage: Int
+
+    private struct Thing: Identifiable {
+        let id: String
+        let image: UIImage
+        let x: CGFloat
+        let y: CGFloat
+        let size: CGFloat
+        let from: Int
+        let delay: Double
+    }
+
+    private static let width: CGFloat = 300
+    private static let unit = width / 64
+    /// Il centro del prato, dove stanno in piedi piante e animali.
+    private static let ground = CGPoint(x: width / 2, y: 27 * unit)
+
+    @MainActor private static let things: [Thing] = {
+        @MainActor func plant(_ id: String, _ x: CGFloat, _ y: CGFloat, _ size: CGFloat, _ from: Int, _ delay: Double) -> Thing {
+            Thing(id: "p\(id)\(x)", image: Thumbs.plant(id, rare: false), x: x, y: y, size: size, from: from, delay: delay)
+        }
+        @MainActor func animal(_ id: String, _ x: CGFloat, _ y: CGFloat, _ size: CGFloat, _ delay: Double) -> Thing? {
+            animalByID[id].map { Thing(id: "a\(id)", image: Thumbs.animal($0, known: true), x: x, y: y, size: size, from: 4, delay: delay) }
+        }
+        let list: [Thing?] = [
+            plant("flowers", -100, 12, 44, 2, 0),
+            plant("berry", 102, 4, 54, 2, 0.12),
+            plant("flowers", 44, 18, 40, 2, 0.24),
+            plant("fir", -84, -6, 92, 3, 0),
+            plant("oak", -12, -10, 122, 3, 0.15),
+            plant("birch", 66, -6, 100, 3, 0.3),
+            animal("squirrel", -50, 20, 56, 0),
+            animal("rabbit", 14, 24, 52, 0.15),
+            animal("fox", 88, 22, 58, 0.3),
+        ]
+        return list.compactMap { $0 }.sorted { $0.y < $1.y }
+    }()
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Canvas { ctx, _ in Self.drawRock(&ctx, grass: false) }
+            Canvas { ctx, _ in Self.drawRock(&ctx, grass: true) }
+                .opacity(stage >= 1 ? 1 : 0)
+                .animation(.easeInOut(duration: 0.8), value: stage >= 1)
+            ForEach(Self.things) { t in
+                let on = stage >= t.from
+                Image(uiImage: t.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: t.size, height: t.size, alignment: .bottom)
+                    .scaleEffect(on ? 1 : 0.01, anchor: .bottom)
+                    .opacity(on ? 1 : 0)
+                    .animation(.spring(duration: 0.55, bounce: 0.45).delay(on ? t.delay : 0), value: on)
+                    .position(x: Self.ground.x + t.x, y: Self.ground.y + t.y - t.size / 2)
+            }
+            Star()
+                .frame(width: 34, height: 34)
+                .scaleEffect(stage >= 5 ? 1 : 0.01)
+                .rotationEffect(.degrees(stage >= 5 ? 0 : -90))
+                .opacity(stage >= 5 ? 1 : 0)
+                .animation(.spring(duration: 0.6, bounce: 0.5), value: stage >= 5)
+                .position(x: Self.width - 34, y: 30)
+        }
+        .frame(width: Self.width, height: 62 * Self.unit)
+        .accessibilityHidden(true)
+    }
+
+    /// La roccia e il prato del marchio, più grandi; senza erba il terreno è ancora nudo.
+    private static func drawRock(_ ctx: inout GraphicsContext, grass: Bool) {
+        ctx.scaleBy(x: unit, y: unit)
+        if !grass {
+            var rock = Path()
+            rock.move(to: CGPoint(x: 8, y: 31))
+            rock.addLine(to: CGPoint(x: 56, y: 31))
+            rock.addQuadCurve(to: CGPoint(x: 33, y: 61), control: CGPoint(x: 50, y: 45))
+            rock.addQuadCurve(to: CGPoint(x: 8, y: 31), control: CGPoint(x: 15, y: 43))
+            ctx.fill(rock, with: .linearGradient(Gradient(colors: [Color(hex: 0xC2A4BE), Color(hex: 0x6A4F6E)]),
+                                                 startPoint: CGPoint(x: 32, y: 31), endPoint: CGPoint(x: 32, y: 61)))
+            var facet = Path()
+            facet.move(to: CGPoint(x: 31, y: 31))
+            facet.addLine(to: CGPoint(x: 56, y: 31))
+            facet.addQuadCurve(to: CGPoint(x: 33, y: 61), control: CGPoint(x: 50, y: 45))
+            facet.closeSubpath()
+            ctx.fill(facet, with: .color(.black.opacity(0.13)))
+            ctx.fill(Path(ellipseIn: CGRect(x: 6, y: 25, width: 52, height: 13)), with: .color(Color(hex: 0x9C7A5C)))
+            ctx.fill(Path(ellipseIn: CGRect(x: 6, y: 20.5, width: 52, height: 13)),
+                     with: .linearGradient(Gradient(colors: [Color(hex: 0xE6CDA3), Color(hex: 0xC9A777)]),
+                                           startPoint: CGPoint(x: 20, y: 20), endPoint: CGPoint(x: 44, y: 34)))
+        } else {
+            var fall = Path(roundedRect: CGRect(x: 13, y: 32, width: 2.6, height: 19), cornerRadius: 1.3)
+            fall.addRoundedRect(in: CGRect(x: 17.5, y: 33, width: 1.6, height: 11), cornerSize: CGSize(width: 0.8, height: 0.8))
+            ctx.fill(fall, with: .linearGradient(Gradient(colors: [Color(hex: 0xD6F6FF), Color(hex: 0xD6F6FF, opacity: 0)]),
+                                                 startPoint: CGPoint(x: 0, y: 32), endPoint: CGPoint(x: 0, y: 51)))
+            ctx.fill(Path(ellipseIn: CGRect(x: 6, y: 25, width: 52, height: 13)), with: .color(Color(hex: 0x3F8A45)))
+            ctx.fill(Path(ellipseIn: CGRect(x: 6, y: 20.5, width: 52, height: 13)),
+                     with: .linearGradient(Gradient(colors: [Color(hex: 0xA6E27A), Color(hex: 0x5DAE52)]),
+                                           startPoint: CGPoint(x: 20, y: 20), endPoint: CGPoint(x: 44, y: 34)))
+        }
+    }
+
+    private struct Star: View {
+        var body: some View {
+            Canvas { ctx, s in
+                let c = CGPoint(x: s.width / 2, y: s.height / 2)
+                let r = s.width / 2
+                var star = Path()
+                for i in 0..<8 {
+                    let a = Double(i) * .pi / 4 - .pi / 2
+                    let d = i % 2 == 0 ? r : r * 0.28
+                    let p = CGPoint(x: c.x + cos(a) * d, y: c.y + sin(a) * d)
+                    if i == 0 { star.move(to: p) } else { star.addLine(to: p) }
+                }
+                star.closeSubpath()
+                ctx.fill(Path(ellipseIn: CGRect(x: c.x - r * 0.9, y: c.y - r * 0.9, width: r * 1.8, height: r * 1.8)),
+                         with: .color(Color(hex: 0xFFE27A, opacity: 0.35)))
+                ctx.fill(star, with: .color(Color(hex: 0xFFD45A)))
             }
         }
-        try? await Task.sleep(for: .seconds(0.9))
-        onDone()
     }
 }

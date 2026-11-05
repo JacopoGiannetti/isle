@@ -92,10 +92,40 @@ struct Resident: Identifiable {
     var homeID: String?
     var homeX: Double
     var homeY: Double
-    var lure: String?
+    var lure: Lure?
     var returns = 0
 
     func isBaby(at t: Date) -> Bool { babyOf != nil && t.timeIntervalSince(arrived) < 7 * 86400 }
+}
+
+/// La pianta che ha attirato un animale. Il testo si compone quando si mostra, nella lingua scelta.
+struct Lure {
+    let species: String
+    let rare: Bool
+    let evolved: Bool
+    let mature: Bool
+    let day: Int
+
+    /// "dalla tua acacia del giorno 1", "the acacia from day 1", "der Akazie von Tag 1".
+    var text: String {
+        guard let sp = speciesByID[species] else { return "" }
+        guard Lang.code == "it" else {
+            var who = sp.withArticle
+            // "angelockt von" vuole il dativo.
+            if Lang.code == "de" {
+                let article = who.prefix { $0 != " " }
+                let dative = sp.isPlural ? "den" : article == "die" ? "der" : "dem"
+                who = dative + who.dropFirst(article.count)
+            }
+            return Lf("%@ del giorno %d", who, day)
+        }
+        let name = !mature ? Lf("Germoglio di %@", sp.name)
+            : evolved ? evolutions[species]?.name ?? sp.name
+            : sp.displayName(rare: rare)
+        let fem = mature && (evolved ? evolutions[species]?.feminine == true : sp.isFeminine)
+        let from = mature && !evolved && sp.isPlural ? (fem ? "dalle tue" : "dai tuoi") : fem ? "dalla tua" : "dal tuo"
+        return "\(from) \(name.lowercased()) del giorno \(day)"
+    }
 }
 
 enum ChronicleKind {
@@ -682,7 +712,7 @@ private struct State {
             var fled: [String] = []
             while fled.count < Sim.meteorAnimals, !near.isEmpty {
                 let a = near.remove(at: r.int(near.count))
-                fled.append(h.renames[a.id] ?? a.name)
+                fled.append(h.renames[a.id] ?? L(a.name))
                 leave(a.id, at: t, why: L("Scappato col meteorite"))
             }
             var text = lost.isEmpty ? L("È caduto un meteorite, per fortuna dove non c'era niente.")
@@ -1088,12 +1118,8 @@ private struct State {
             a.homeX = e.x
             a.homeY = e.y
         }
-        if let l = preferred.first {
-            let id = l.mature ? (l.speciesID ?? "") : ""
-            let sp = speciesByID[id]
-            let fem = l.evolved ? evolutions[id]?.feminine == true : sp?.isFeminine == true
-            let from = !l.evolved && sp?.isPlural == true ? "dai tuoi" : fem ? "dalla tua" : "dal tuo"
-            a.lure = "\(from) \(l.name.lowercased()) del giorno \(max(1, l.day))"
+        if let l = preferred.first, let s = l.speciesID {
+            a.lure = Lure(species: s, rare: l.rare, evolved: l.evolved, mature: l.mature, day: max(1, l.day))
         }
     }
 

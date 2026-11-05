@@ -3,7 +3,7 @@ import Foundation
 /// I mondi tra cui scegliere: ognuno ha le sue zone, le sue piante, i suoi animali e il suo terreno.
 /// Gli id di piante e animali sono unici fra tutti i mondi, così le ricerche per id restano globali.
 enum Habitat: String, CaseIterable, Identifiable {
-    case forest, prehistoric, savanna, arctic
+    case forest, prehistoric, savanna, arctic, zen, farm
 
     var id: String { rawValue }
 
@@ -13,6 +13,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return L("Isola preistorica")
         case .savanna: return L("Savana")
         case .arctic: return L("Terre dei ghiacci")
+        case .zen: return L("Giardino zen")
+        case .farm: return L("Fattoria")
         }
     }
 
@@ -22,6 +24,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return L("Felci giganti, ambra e dinosauri cuccioli.")
         case .savanna: return L("Acacie, baobab, zebre e leoni.")
         case .arctic: return L("Neve, aurora, foche e orsi polari.")
+        case .zen: return L("Bambù, carpe koi, lanterne e panda rossi.")
+        case .farm: return L("Frutteti, mulini, mucche e galline.")
         }
     }
 
@@ -34,6 +38,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return prehistoricPhases
         case .savanna: return savannaPhases
         case .arctic: return arcticPhases
+        case .zen: return zenPhases
+        case .farm: return farmPhases
         }
     }
 
@@ -43,6 +49,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return prehistoricSpecies
         case .savanna: return savannaSpecies
         case .arctic: return arcticSpecies
+        case .zen: return zenSpecies
+        case .farm: return farmSpecies
         }
     }
 
@@ -52,6 +60,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return prehistoricFlora
         case .savanna: return savannaFlora
         case .arctic: return arcticFlora
+        case .zen: return zenFlora
+        case .farm: return farmFlora
         }
     }
 
@@ -61,6 +71,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return prehistoricAnimals
         case .savanna: return savannaAnimals
         case .arctic: return arcticAnimals
+        case .zen: return zenAnimals
+        case .farm: return farmAnimals
         }
     }
 
@@ -73,6 +85,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return "source-pre"
         case .savanna: return "source-sav"
         case .arctic: return "source-arc"
+        case .zen: return "source-zen"
+        case .farm: return "source-farm"
         }
     }
 
@@ -82,6 +96,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return L("Pozza dell'ambra")
         case .savanna: return L("Oasi sorgente")
         case .arctic: return L("Sorgente calda")
+        case .zen: return L("Vasca di pietra")
+        case .farm: return L("Fontanile")
         }
     }
 
@@ -92,6 +108,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return L("Il cratere è guarito: ora è una sorgente calda. Questa volta non si estingue nessuno.")
         case .savanna: return L("Il cratere è guarito: ora è una pozza dove gli animali vengono a bere.")
         case .arctic: return L("Il meteorite ha sciolto il ghiaccio: ora è una sorgente termale.")
+        case .zen: return L("Il cratere è guarito: ora è un laghetto di fiori di loto.")
+        case .farm: return L("Il cratere è guarito: ora è uno stagno dove le anatre fanno il bagno.")
         }
     }
 
@@ -102,13 +120,15 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return "compsognathus"
         case .savanna: return "dikdik"
         case .arctic: return "arctichare"
+        case .zen: return "pika"
+        case .farm: return "hen"
         }
     }
 
     /// Le lucciole di sola atmosfera che si accendono ogni notte.
     var nightFly: String? {
         switch self {
-        case .forest, .savanna: return "firefly"
+        case .forest, .savanna, .zen, .farm: return "firefly"
         case .prehistoric: return "glowbeetle"
         case .arctic: return nil
         }
@@ -124,6 +144,8 @@ enum Habitat: String, CaseIterable, Identifiable {
         case .prehistoric: return .prehistoric
         case .savanna: return .savanna
         case .arctic: return .arctic
+        case .zen: return .zen
+        case .farm: return .farm
         }
     }
 
@@ -145,13 +167,21 @@ enum Habitat: String, CaseIterable, Identifiable {
             return Terrain(top: [0xF3F7FB, 0xEDF3F9, 0xF6F9FC, 0xE9F0F7],
                            left: [0xCFE4F2, 0x9DBFDA, 0x6E8EB0], right: [0xB2D0E6, 0x80A6C6, 0x56769A], grit: 0x5A7A9E,
                            rock: [0x7A8CAA, 0x5C6C8E, 0x404C6C], rockDark: 0x1E2640, rockLit: 0xD8F0FF, surface: .snow)
+        case .zen:
+            return Terrain(top: [0x9CC47A, 0x96BE74, 0xA2CA80, 0x90B86E],
+                           left: [0xB89A74, 0x8A7460, 0x5E6670], right: [0x9C805E, 0x725E4C, 0x4A525C], grit: 0x5A4A3E,
+                           rock: [0x7A7A84, 0x5E5E6A, 0x44444E], rockDark: 0x22222A, rockLit: 0xF2D8C8, surface: .moss)
+        case .farm:
+            return Terrain(top: [0x9ACB5E, 0x94C558, 0xA2D266, 0x8EBF54],
+                           left: [0xC8945A, 0x9A6A44, 0x6A5444], right: [0xAA7A4A, 0x7E5636, 0x564034], grit: 0x6A4A2E,
+                           rock: [0x8A6A54, 0x6E5244, 0x523C34], rockDark: 0x2A1C18, rockLit: 0xFFD8A8, surface: .meadow)
         }
     }
 }
 
 /// I colori della terra di un mondo: la superficie delle caselle, i loro fianchi e la roccia sotto l'isola.
 struct Terrain {
-    enum Surface { case grass, fern, dry, snow }
+    enum Surface { case grass, fern, dry, snow, moss, meadow }
     let top: [UInt32]
     let left: [UInt32]
     let right: [UInt32]
@@ -166,7 +196,7 @@ let allSpecies: [Species] = Habitat.allCases.flatMap(\.species)
 let allAnimals: [AnimalSpecies] = Habitat.allCases.flatMap(\.animals)
 let allFlora: [Flora] = Habitat.allCases.flatMap(\.flora)
 
-let evolutions: [String: Evolution] = [forestEvolutions, prehistoricEvolutions, savannaEvolutions, arcticEvolutions]
+let evolutions: [String: Evolution] = [forestEvolutions, prehistoricEvolutions, savannaEvolutions, arcticEvolutions, zenEvolutions, farmEvolutions]
     .reduce(into: [:]) { all, part in all.merge(part) { a, _ in a } }
 
 /// Per articoli e accordi: "la prima Sequoia", "i primi Equiseti".
@@ -175,9 +205,13 @@ let feminineSpecies: Set<String> = ["oak", "birch", "spring", "waterfall", "lant
                                     "lavapool", "swamp", "ancientfern",
                                     "acacia", "goldgrass", "aloe", "marula", "waterhole", "palm", "greengrass", "kopje",
                                     "umbrella", "lionrock", "mudpool", "storystones", "silveroasis",
-                                    "floe", "cliff"]
+                                    "floe", "cliff",
+                                    "azalea", "stonelantern", "bamboofountain", "teahouse", "pagoda",
+                                    "haybale", "barn", "vineyard", "carousel", "wishfountain", "hydrangea", "carrots", "pumpkins"]
 let pluralSpecies: Set<String> = ["flowers", "glowshroom", "horsetail", "kopje", "moonflower", "storystones",
-                                  "lichen", "cloudberry", "tundra", "auroraflower"]
+                                  "lichen", "cloudberry", "tundra", "auroraflower",
+                                  "zenstones", "lotus", "hydrangea", "hozuki",
+                                  "carrots", "sunflower", "tomatoes", "pumpkins"]
 let feminineAnimals: Set<String> = ["meganeura", "ammonite", "giantammonite", "maiasaura",
                                     "savbutterfly", "leopardtortoise", "sunbird", "zebra", "gazelle", "fisheagle", "giraffe",
                                     "oxpecker", "blackpanther", "stargiraffe", "emeraldsunbird", "goldzebra", "silvergazelle",
@@ -185,10 +219,16 @@ let feminineAnimals: Set<String> = ["meganeura", "ammonite", "giantammonite", "m
                                     "snowbutterfly", "arctichare", "arcticfox", "ptarmigan", "seal", "puffin", "reindeer", "tern",
                                     "orca", "aurorafox", "frostlynx", "silverreindeer", "auroraorca", "silverhare", "bluefox",
                                     "goldptarmigan", "whiteseal", "goldreindeer", "goldpuffin", "siberiantiger", "leopardseal", "beardedseal",
-                                    "snowgoose", "humpback", "seaotter", "borealowl"]
+                                    "snowgoose", "humpback", "seaotter", "borealowl",
+                                    "zenbutterfly", "variedtit", "wagtail", "koi", "egret", "turtledove", "crane", "phoenix",
+                                    "yellowwagtail", "goldkoi", "silvercrane", "azuremagpie", "pondturtle",
+                                    "akatombo", "giantsalamander", "treefrog", "jadecrane",
+                                    "farmbutterfly", "hen", "whiteduck", "sheep", "goat", "cow", "magpie",
+                                    "goldenhen", "mooncow", "silkie", "cintapig", "goldduck", "blacksheep", "highlandcow",
+                                    "farmgoose", "littleowl", "swallow", "brownhare", "coypu", "stonemarten", "greattit"]
 
 /// Due righe sulle abitudini di ogni specie, per la sua scheda.
-let animalHabits: [String: String] = [forestHabits, prehistoricHabits, savannaHabits, arcticHabits]
+let animalHabits: [String: String] = [forestHabits, prehistoricHabits, savannaHabits, arcticHabits, zenHabits, farmHabits]
     .reduce(into: [:]) { all, part in all.merge(part) { a, _ in a } }
 
 extension Habit {

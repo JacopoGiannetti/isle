@@ -14,7 +14,9 @@ struct InfoCard: View {
                 case .element(let id):
                     if let e = controller.world.element(id) { element(e) } else { gone }
                 case .animal(let id):
-                    if let r = controller.world.resident(id) { animal(r) } else { gone }
+                    if let r = controller.world.resident(id) { animal(r) }
+                    else if let sp = visitor(id) { visitor(id, sp) }
+                    else { gone }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,11 +169,40 @@ struct InfoCard: View {
         }
     }
 
+    /// Il visitatore del cielo, finché c'è il suo fenomeno: quando cambia il tempo se ne va.
+    private func visitor(_ id: String) -> AnimalSpecies? {
+        guard let s = WorldScene.visitorSpecies(id), controller.shownSky.visitor == s else { return nil }
+        return animalByID[s]
+    }
+
+    @ViewBuilder private func visitor(_ id: String, _ sp: AnimalSpecies) -> some View {
+        let sky = controller.shownSky
+        HStack(spacing: 14) {
+            Image(uiImage: Thumbs.animal(sp, known: true)).resizable().scaledToFit().frame(width: 64, height: 64)
+                .background(Theme.cream, in: Circle())
+            VStack(alignment: .leading, spacing: 4) {
+                Text(sp.name).font(.cozy(22, .bold)).foregroundStyle(Theme.ink)
+                Chip(text: L("Visitatore del cielo"), color: Theme.rarity(.rare))
+            }
+        }
+        if let act = controller.activity(id) {
+            Label(act.prefix(1).uppercased() + act.dropFirst(), systemImage: "eye.fill")
+                .font(.cozy(14, .semibold)).foregroundStyle(Theme.deep)
+        }
+        Text(sp.blurb).font(.cozy(15)).foregroundStyle(Theme.ink)
+        if let f = controller.forecast, f.sky == sky {
+            Label(Lf("%@ fino alle %@", sky.name, Forecast.time(f.end)), systemImage: sky.icon)
+                .font(.cozy(14, .semibold)).foregroundStyle(Theme.rarity(.rare))
+        }
+        Text(L("Resta sull'isola solo finché dura il fenomeno: quando finisce, se ne va."))
+            .font(.cozy(13)).foregroundStyle(Theme.muted)
+    }
+
     private func story(_ r: Resident, _ sp: AnimalSpecies, _ w: World) -> String {
         let days = max(0, Int(w.now.timeIntervalSince(r.arrived) / 86400))
         var s = days == 0 ? L(sp.feminine ? "Arrivata oggi" : "Arrivato oggi")
             : (days == 1 ? L("Sull'isola da 1 giorno") : Lf("Sull'isola da %d giorni", days))
-        if let lure = r.lure { s += Lf(sp.feminine ? ", attirata %@" : ", attirato %@", lure) }
+        if let lure = r.lure { s += Lf(sp.feminine ? ", attirata %@" : ", attirato %@", lure.text) }
         if let mom = r.babyOf.flatMap({ w.resident($0) }) {
             s += ". " + Lf(sp.feminine ? "Figlia di %@" : "Figlio di %@", controller.name(of: mom))
         }

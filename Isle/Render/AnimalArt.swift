@@ -76,6 +76,8 @@ enum AnimalArt {
                         Paint.fill(g, Paint.ellipse(cx + r.range(-l.bodyW * 0.32, l.bodyW * 0.28), cy + r.range(-l.bodyH * 0.35, 0), 1.1, 0.8),
                                    (id == "salamander" || id == "starfox" || id == "moondeer" ? c(l.accent) : c(l.belly)).alpha(0.9))
                     }
+                case .panda:
+                    Paint.fill(g, Paint.ellipse(cx + l.bodyW * 0.22, cy, l.bodyW * 0.17, l.bodyH * 0.62), c(l.dark))
                 default: break
                 }
                 backOnBody(g, l, cx, cy, id: id)
@@ -190,9 +192,15 @@ enum AnimalArt {
             switch l.ears {
             case .round:
                 for dx in [-0.55, 0.25] as [CGFloat] {
-                    Paint.fill(g, Paint.circle(cx + dx * r0, cy - r0 * 0.8, r0 * 0.42), main.shade(0.2))
+                    Paint.fill(g, Paint.circle(cx + dx * r0, cy - r0 * 0.8, r0 * 0.42), l.pattern == .panda ? dark : main.shade(0.2))
                     Paint.fill(g, Paint.circle(cx + dx * r0, cy - r0 * 0.8, r0 * 0.22), acc.alpha(0.8))
                 }
+            case .lop:
+                g.saveGState()
+                g.translateBy(x: cx - r0 * 0.55, y: cy - r0 * 0.6)
+                g.rotate(by: 0.5)
+                Paint.fill(g, Paint.ellipse(0, r0 * 0.75, r0 * 0.34, r0 * 0.95), main.shade(0.22))
+                g.restoreGState()
             case .pointed, .tufts:
                 for dx in [-0.5, 0.3] as [CGFloat] {
                     let p = CGMutablePath()
@@ -260,7 +268,21 @@ enum AnimalArt {
                 } else if l.pattern == .bandit {
                     Paint.fill(g, Paint.ellipse(cx + r0 * 0.42, cy + r0 * 0.4, r0 * 0.6, r0 * 0.4), c(l.belly))
                     Paint.fill(g, Paint.ellipse(cx + r0 * 0.3, cy + r0 * 0.04, r0 * 0.5, r0 * 0.34), c(l.accent))
+                } else if l.pattern == .panda {
+                    g.saveGState()
+                    g.translateBy(x: cx + r0 * 0.36, y: cy - r0 * 0.02)
+                    g.rotate(by: -0.5)
+                    Paint.fill(g, Paint.ellipse(0, 0, r0 * 0.36, r0 * 0.26), dark)
+                    g.restoreGState()
                 }
+            }
+            if l.ears == .lop {
+                g.saveGState()
+                g.translateBy(x: cx + r0 * 0.05, y: cy - r0 * 0.7)
+                g.rotate(by: 0.25)
+                Paint.fill(g, Paint.ellipse(0, r0 * 0.8, r0 * 0.36, r0 * 1.0), main.shade(0.08))
+                Paint.fill(g, Paint.ellipse(r0 * 0.05, r0 * 0.85, r0 * 0.16, r0 * 0.7), acc.alpha(0.6))
+                g.restoreGState()
             }
             // Muso
             if l.snout > 0.15 {
@@ -323,7 +345,8 @@ enum AnimalArt {
     static func leg(_ l: Look, far: Bool) -> ArtImage {
         let w: CGFloat = l.biped ? max(3.4, l.bodyW * 0.19) : max(2.6, l.bodyW * 0.13), len = l.legLen + 3
         return Paint.image(w + 2, len + 2, base: len + 1) { g in
-            let col = far ? c(l.body).shade(0.35) : c(l.body).shade(0.08)
+            let fur = l.pattern == .panda ? c(l.dark) : c(l.body)
+            let col = far ? fur.shade(0.35) : fur.shade(0.08)
             let p = CGPath(roundedRect: CGRect(x: 1, y: 1, width: w, height: len), cornerWidth: w / 2, cornerHeight: w / 2, transform: nil)
             Paint.fill(g, p, col)
             Paint.clipped(g, p) {
@@ -405,6 +428,24 @@ enum AnimalArt {
                     Paint.stroke(g, tail, col.shade(0.22), 0.6)
                 }
             }
+        case .curl:
+            return Paint.image(10, 10, base: 5) { g in
+                let p = CGMutablePath()
+                p.move(to: CGPoint(x: 9.5, y: 5))
+                p.addCurve(to: CGPoint(x: 3, y: 3.5), control1: CGPoint(x: 7, y: 7.5), control2: CGPoint(x: 2, y: 6.5))
+                p.addCurve(to: CGPoint(x: 5.6, y: 4.2), control1: CGPoint(x: 3.6, y: 0.8), control2: CGPoint(x: 6.6, y: 1.8))
+                Paint.stroke(g, p, main.shade(0.12), 1.3)
+            }
+        case .horse:
+            let hair = c(l.accent)
+            return Paint.image(16, 22, base: 18) { g in
+                for (dx, col) in [(-1.5, hair.shade(0.2)), (0.0, hair), (1.5, hair.light(0.12))] as [(CGFloat, UIColor)] {
+                    let p = CGMutablePath()
+                    p.move(to: CGPoint(x: 14, y: 3.5))
+                    p.addCurve(to: CGPoint(x: 4 + dx, y: 20), control1: CGPoint(x: 6, y: 2), control2: CGPoint(x: 2 + dx, y: 12))
+                    Paint.stroke(g, p, col, 2.6)
+                }
+            }
         case .dino, .club, .spiked, .feather, .tuft:
             return longTailArt(l)
         case .fan, .none:
@@ -420,6 +461,7 @@ enum AnimalArt {
         case .long: return CGPoint(x: -l.bodyW * 0.62, y: -l.bodyH * 0.05)
         case .dino, .club, .spiked, .feather: return CGPoint(x: -l.bodyW * 0.4, y: l.bodyH * 0.08)
         case .tuft: return CGPoint(x: -l.bodyW * 0.46, y: l.bodyH * 0.2)
+        case .horse: return CGPoint(x: -l.bodyW * 0.5 - 4, y: l.bodyH * 0.2)
         default: return CGPoint(x: -l.bodyW * 0.48, y: l.bodyH * 0.05)
         }
     }
@@ -427,7 +469,7 @@ enum AnimalArt {
     // MARK: Uccelli
 
     static func isOwl(_ id: String) -> Bool { ["owl", "snowowl", "starowl", "lightowl", "eagleowl", "scopsowl", "africaneagleowl",
-                                                       "borealowl", "crystalowl"].contains(id) }
+                                                       "borealowl", "crystalowl", "uralowl", "littleowl", "barnowl"].contains(id) }
 
     private enum Beak { case short, long, dagger, curved, crossed, thick }
     private enum BirdTail { case wedge, long, cocked, stub, forked }
@@ -458,6 +500,19 @@ enum AnimalArt {
         case "puffin", "goldpuffin": return (.thick, .stub, true)
         case "tern": return (.long, .forked, false)
         case "gyrfalcon": return (.thick, .long, false)
+        case "variedtit", "greattit", "canary", "whitewarbler", "bushwarbler": return (.short, .wedge, true)
+        case "wagtail", "yellowwagtail", "blackbird": return (.short, .long, false)
+        case "egret", "crane", "silvercrane", "jadecrane": return (.dagger, .stub, false)
+        case "crestedibis": return (.curved, .stub, false)
+        case "greenpheasant", "goldpheasant", "peacock", "whitepeacock": return (.short, .long, false)
+        case "phoenix": return (.curved, .long, false)
+        case "turtledove": return (.short, .long, true)
+        case "azuremagpie", "magpie": return (.thick, .long, false)
+        case "whiteeye", "swallow": return (.short, .forked, false)
+        case "hen", "silkie", "goldenhen", "turkey": return (.short, .cocked, true)
+        case "chick": return (.short, .stub, true)
+        case "goldfinch": return (.thick, .forked, true)
+        case "crow": return (.thick, .wedge, false)
         default: return (.short, .wedge, false)
         }
     }
@@ -491,6 +546,12 @@ enum AnimalArt {
                     p.move(to: CGPoint(x: 9, y: y0))
                     p.addQuadCurve(to: CGPoint(x: 0.5, y: 6 + CGFloat(k) * 2.4), control: CGPoint(x: 4, y: y0 + 3))
                     Paint.stroke(g, p, UIColor(hex: UInt32(hex)), 1.3)
+                }
+            }
+            if ["peacock", "whitepeacock", "phoenix"].contains(id) {
+                for (x, y) in [(2.5, 19.6), (5.6, 17.4)] as [(CGFloat, CGFloat)] {
+                    Paint.fill(g, Paint.circle(x, y, 1.4), acc)
+                    Paint.fill(g, Paint.circle(x, y, 0.65), main)
                 }
             }
             let body = shape.round ? Paint.ellipse(13.5, 13.2, 7.6, 6.8) : Paint.ellipse(13, 13, 8, 6)
@@ -535,7 +596,8 @@ enum AnimalArt {
                 cr.closeSubpath()
                 Paint.fill(g, cr, acc)
             }
-            let beakColor = ["woodpecker", "jay", "kingfisher", "bullfinch", "crossbill", "hoopoe", "dipper"].contains(id)
+            let beakColor = ["woodpecker", "jay", "kingfisher", "bullfinch", "crossbill", "hoopoe", "dipper", "egret", "crestedibis",
+                             "azuremagpie", "magpie", "crow", "swallow", "variedtit", "greattit", "wagtail", "yellowwagtail"].contains(id)
                 ? UIColor(hex: 0x2E2A28) : UIColor(hex: 0xE8A23A)
             let beak = CGMutablePath()
             switch shape.beak {
@@ -766,7 +828,7 @@ enum AnimalArt {
                 }
             }
         }
-        if id == "turtle" || id == "archelon" {
+        if id == "turtle" || id == "archelon" || id == "pondturtle" {
             return Paint.image(36, 24, base: 7) { g in
                 let wl: CGFloat = 17
                 if !dip {
@@ -1035,11 +1097,11 @@ enum AnimalArt {
 
     // MARK: Ritratto (per Diario e Sentiero)
 
-    static func portrait(_ sp: AnimalSpecies) -> UIImage {
+    static func portrait(_ sp: AnimalSpecies, scale: CGFloat = 3) -> UIImage {
         let l = sp.look
         let size: CGFloat = 64
         let format = UIGraphicsImageRendererFormat()
-        format.scale = 3
+        format.scale = scale
         return UIGraphicsImageRenderer(size: CGSize(width: size, height: size), format: format).image { ctx in
             let g = ctx.cgContext
             func draw(_ a: ArtImage, at p: CGPoint, scale k: CGFloat, flip: Bool = false) {

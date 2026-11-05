@@ -165,12 +165,23 @@ final class ElementNode: SKNode {
             case "lighttree": lightColor = el.rare ? UIColor(hex: 0xC9A0FF) : UIColor(hex: 0xA8EEFF); lightSize = 170; lightY = 60
             case "goldcherry": lightColor = UIColor(hex: 0xFFD98A); lightSize = 130; lightY = 55
             case "spring" where el.rare: lightColor = UIColor(hex: 0x9FF2FF); lightSize = 60; lightY = 2
+            case "stonelantern": lightColor = UIColor(hex: 0xFFC46A); lightSize = 90; lightY = 24
+            case "hozuki": lightColor = el.rare ? UIColor(hex: 0xE6EEFF) : UIColor(hex: 0xFF9A4A); lightSize = 60; lightY = 12
+            case "pagoda": lightColor = UIColor(hex: 0xFFC46A); lightSize = 120; lightY = 40
+            case "teahouse": lightColor = UIColor(hex: 0xFFD08A); lightSize = 90; lightY = 18
+            case "jadebamboo": lightColor = el.rare ? UIColor(hex: 0xD8F6FF) : UIColor(hex: 0x8AF0C0); lightSize = 140; lightY = 50
+            case "moonpond": lightColor = UIColor(hex: 0xEAF2FF); lightSize = 100; lightY = 4
+            case "starapple": lightColor = el.rare ? UIColor(hex: 0xD8B0FF) : UIColor(hex: 0xFFE7A0); lightSize = 140; lightY = 55
+            case "wishfountain": lightColor = UIColor(hex: 0x9FF2FF); lightSize = 80; lightY = 10
             default: break
             }
             if ["cherry", "goldcherry", "wisteria"].contains(s), case .plant = el.kind {
                 addPetals(s == "wisteria" ? (el.rare ? 0xF2EEFA : 0xB58BE0) : (s == "goldcherry" ? 0xF7D57A : (el.rare ? 0xFFFFFF : 0xF7B5CB)))
             }
             if s == "maple", case .plant = el.kind { addPetals(el.rare ? 0xC8323F : 0xF08F3E, leaves: true) }
+            if s == "sakura", case .plant = el.kind { addPetals(el.rare ? 0xFFFFFF : 0xF7B5CB) }
+            if s == "momiji", case .plant = el.kind { addPetals(el.rare ? 0x8A3A8E : 0xD8302E, leaves: true) }
+            if s == "elderbonsai", case .plant = el.kind { addPetals(0xF7C2D4) }
             if el.isSource { lightColor = UIColor(hex: 0x9FF2FF); lightSize = 90; lightY = 2; addSparkles() }
             if el.rare, case .plant = el.kind { addSparkles() }
             if el.evolved {
@@ -211,6 +222,9 @@ final class ElementNode: SKNode {
         case "willow": return (UIColor(hex: 0xFFF2A0), 150, 40)
         case "ancientoak": return (UIColor(hex: 0xFFC46A), 120, 70)
         case "spring": return (UIColor(hex: 0xFFB37A), 60, 2)
+        case "redbridge": return (UIColor(hex: 0xFFC46A), 100, 16)
+        case "pumpkins": return (UIColor(hex: 0xFF9A3A), 80, 8)
+        case "windmill": return (UIColor(hex: 0xFFD08A), 70, 22)
         default: return nil
         }
     }
@@ -221,6 +235,8 @@ final class ElementNode: SKNode {
         case "willow", "glowshroom": addFireflies(s == "glowshroom" ? 0x9FF2E8 : 0xFFF2A0, spread: s == "glowshroom" ? 34 : 60)
         case "spring": addSteam()
         case "berry", "wisteria", "flowers": addFireflies(0xF2C14E, spread: 40, bees: true)
+        case "hozuki", "koipond", "zenstream", "jadebamboo": addFireflies(0xFFF2A0, spread: 40)
+        case "sunflower", "vineyard", "appletree", "azalea", "hydrangea": addFireflies(0xF2C14E, spread: 36, bees: true)
         default: break
         }
     }

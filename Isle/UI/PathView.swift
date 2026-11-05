@@ -36,7 +36,7 @@ struct PathView: View {
                     Text(L("Il Sentiero")).font(.cozy(24, .bold))
                         .foregroundStyle(dark ? .white : Theme.ink)
                     Spacer(minLength: 0)
-                    TabSwitch(tab: $tab).frame(width: 176)
+                    TabSwitch(tab: $tab, accent: zoneColors(Int(z.rounded()) + 1).main, dark: dark)
                 }
                 header(day: day, dark: dark)
             }
@@ -120,13 +120,47 @@ struct PathView: View {
     }
 }
 
-/// Piante / Animali.
+/// Piante / Animali: due pillole su una striscia di vetro, quella scelta col colore della zona in cui sei.
 private struct TabSwitch: View {
     @Binding var tab: Int
+    let accent: Color
+    let dark: Bool
+    @Namespace private var ns
 
     var body: some View {
-        SegmentedBar(selection: $tab, items: [(0, L("Piante")), (1, L("Animali"))])
-            .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+        HStack(spacing: 2) {
+            item(0, L("Piante"), icon: "leaf.fill")
+            item(1, L("Animali"), icon: "pawprint.fill")
+        }
+        .padding(3)
+        .background(Capsule().fill(.white.opacity(dark ? 0.12 : 0.5)))
+        .overlay(Capsule().stroke(.white.opacity(dark ? 0.25 : 0.8), lineWidth: 1))
+        .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
+        .fixedSize()
+        .sensoryFeedback(.selection, trigger: tab)
+    }
+
+    private func item(_ value: Int, _ label: String, icon: String) -> some View {
+        let on = tab == value
+        return Button { withAnimation(.spring(duration: 0.35, bounce: 0.25)) { tab = value } } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon).font(.system(size: 11, weight: .bold))
+                Text(label).font(.cozy(13, .bold))
+            }
+            .foregroundStyle(on ? Color.white : dark ? Color.white.opacity(0.75) : Theme.ink.opacity(0.55))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background {
+                if on {
+                    Capsule().fill(accent)
+                        .overlay(Capsule().stroke(.white.opacity(0.35), lineWidth: 1))
+                        .shadow(color: accent.opacity(0.4), radius: 6, y: 2)
+                        .matchedGeometryEffect(id: "on", in: ns)
+                }
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 }
 

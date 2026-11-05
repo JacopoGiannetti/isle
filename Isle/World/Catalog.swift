@@ -202,7 +202,8 @@ struct Evolution {
 
     var feminine: Bool { ["Quercia", "Betulla", "Sorgente", "Pergola", "Cascata", "Felce", "Cicadea", "Palude", "Magnolia", "Araucaria",
                                      "Sequoia", "Grotta", "Laguna", "Fontana", "Pozza", "Acacia", "Prateria", "Palma", "Rupe",
-                                     "Aloe", "Marula", "Tundra", "Scogliera", "Banchisa"].contains { nameIT.hasPrefix($0) } }
+                                     "Aloe", "Marula", "Tundra", "Scogliera", "Banchisa",
+                                     "Azalea", "Ortensie", "Carote", "Balla", "Vigna", "Zucche"].contains { nameIT.hasPrefix($0) } }
 
     init(name: String, blurb: String, animal: String) {
         self.nameIT = name
@@ -310,14 +311,14 @@ enum Move { case walk, hop, fly, swim, flutter, glow }
 enum Activity { case day, night, twilight }
 enum HomePref { case tree, water, ground, flowers }
 
-enum Ears { case round, pointed, long, tiny, antlers, bigAntlers, tufts, none }
-enum Tail { case puff, bushy, squirrel, short, none, long, fan, nine, dino, club, spiked, feather, tuft }
-enum Pattern { case none, spots, mask, bandit, spines, crest }
+enum Ears { case round, pointed, long, lop, tiny, antlers, bigAntlers, tufts, none }
+enum Tail { case puff, bushy, squirrel, short, curl, horse, none, long, fan, nine, dino, club, spiked, feather, tuft }
+enum Pattern { case none, spots, mask, bandit, spines, crest, panda }
 /// Quello che sta sulla testa o intorno: collari, corna, creste, criniere, proboscidi.
 enum Crest { case none, frill, triceratops, styraco, tube, helmet, dome, spikyDome, oviCrest, croc, mane, trunk, tusks, rhino,
-    mammoth, ossicones, horns, oxHorns }
+    mammoth, ossicones, horns, oxHorns, horseMane, unicorn, crown }
 /// Quello che sta sulla schiena o sul manto.
-enum Back { case none, plates, spikes, sail, armor, feathers, stripes, patches, shaggy }
+enum Back { case none, plates, spikes, sail, armor, feathers, stripes, patches, shaggy, wool, blotches, belt }
 
 struct Look {
     var body: UInt32

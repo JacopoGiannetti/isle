@@ -41,7 +41,8 @@ struct ArtImage {
 
 /// Primitive di disegno in Core Graphics (asse y verso il basso).
 enum Paint {
-    static let scale: CGFloat = 3.5
+    /// Le immagini dello store la alzano per un attimo, per disegnare grande senza sgranare.
+    nonisolated(unsafe) static var scale: CGFloat = 3.5
 
     static func image(_ w: CGFloat, _ h: CGFloat, base: CGFloat = 4, scale: CGFloat = Paint.scale, _ draw: (CGContext) -> Void) -> ArtImage {
         let format = UIGraphicsImageRendererFormat()

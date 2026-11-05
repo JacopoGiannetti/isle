@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// Isle scrive solo la scheda anonima del proprio onboarding, installs/{uid}, e non la rilegge.
+// La dashboard la legge con l'Admin SDK, che non passa da queste regole.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /installs/{uid} {
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly([
+          'createdAt', 'updatedAt', 'app', 'build', 'os', 'language', 'region', 'debug',
+          'steps', 'last', 'answers', 'firstHabit', 'subscribedAt'
+        ])
+        && (!('answers' in request.resource.data)
+            || request.resource.data.answers.keys().hasOnly([
+              'source', 'goals', 'obstacles', 'att', 'notifications'
+            ]))
+        && (!('firstHabit' in request.resource.data)
+            || request.resource.data.firstHabit.keys().hasOnly(['kind', 'rhythm', 'world']))
+        && (!('steps' in request.resource.data) || request.resource.data.steps.size() <= 40);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

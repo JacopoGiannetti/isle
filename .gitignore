@@ -6,3 +6,6 @@ DerivedData/
 
 # Chiavi (AppsFlyer): restano solo in locale
 Isle/App/Secrets.swift
+
+# Chiavi Firebase: restano solo in locale
+Isle/GoogleService-Info.plist

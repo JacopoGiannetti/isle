@@ -41,6 +41,9 @@ packages:
   AppsFlyerFramework:
     url: https://github.com/AppsFlyerSDK/AppsFlyerFramework
     from: 6.14.0
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.0.0
 
 targets:
   Isle:
@@ -53,6 +56,11 @@ targets:
       - package: AppsFlyerFramework
         products:
           - AppsFlyerLib
+      - package: Firebase
+        products:
+          - FirebaseCore
+          - FirebaseAuth
+          - FirebaseFirestore
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jacopogiannetti.isle

@@ -3,7 +3,7 @@ import UIKit
 /// Le parti degli animali degli altri mondi: creste, collari, placche, vele, code lunghe,
 /// pterosauri e rettili marini. Tutto nello stesso stile chibi della Foresta.
 extension AnimalArt {
-    static let dragonflies: Set<String> = ["dragonfly", "meganeura"]
+    static let dragonflies: Set<String> = ["dragonfly", "meganeura", "akatombo"]
     static let fireflies: Set<String> = ["firefly", "glowbeetle"]
 
     static func isPtero(_ id: String) -> Bool {
@@ -22,6 +22,9 @@ extension AnimalArt {
         case .mane: return (r0 * 0.8, r0 * 0.6, r0 * 0.6)
         case .trunk, .mammoth: return (r0 * 0.4, 0, r0 * 1.4)
         case .horns, .oxHorns: return (r0 * 0.6, r0 * 0.6, 0)
+        case .horseMane: return (r0 * 0.6, r0 * 0.3, r0 * 0.3)
+        case .unicorn: return (r0 * 0.6, r0 * 1.3, r0 * 0.3)
+        case .crown: return (0, r0 * 0.9, 0)
         default: return (0, r0 * 0.4, 0)
         }
     }
@@ -33,6 +36,7 @@ extension AnimalArt {
         case .spikes: return l.bodyH * 0.7
         case .sail: return l.bodyH * 1.3
         case .armor, .feathers, .shaggy: return l.bodyH * 0.25
+        case .wool: return l.bodyH * 0.35
         default: return 0
         }
     }
@@ -104,6 +108,13 @@ extension AnimalArt {
                 Paint.stroke(g, p, col, r0 * 0.3)
             }
             Paint.fill(g, Paint.ellipse(cx - r0 * 0.15, cy - r0 * 0.85, r0 * 0.6, r0 * 0.25), acc)
+        case .horseMane, .unicorn:
+            for i in 0..<7 {
+                let t = CGFloat(i) / 6
+                let a = -1.75 - t * 1.75
+                let col = i % 2 == 0 ? acc : acc.shade(0.15)
+                Paint.fill(g, Paint.circle(cx - r0 * 0.15 + cos(a) * r0 * 1.0, cy + sin(a) * r0 * 0.95, r0 * (0.42 - t * 0.08)), col)
+            }
         default: break
         }
     }
@@ -187,6 +198,29 @@ extension AnimalArt {
             tusk.move(to: CGPoint(x: cx + r0 * 1.0, y: cy + r0 * 0.45))
             tusk.addQuadCurve(to: CGPoint(x: cx + r0 * 1.25, y: cy - r0 * 0.15), control: CGPoint(x: cx + r0 * 1.5, y: cy + r0 * 0.4))
             Paint.stroke(g, tusk, UIColor(hex: 0xF6EEDC), r0 * 0.16)
+        case .horseMane, .unicorn:
+            Paint.fill(g, Paint.ellipse(cx + r0 * 0.05, cy - r0 * 0.78, r0 * 0.36, r0 * 0.24), acc)
+            if l.crest == .unicorn {
+                let base = CGPoint(x: cx + r0 * 0.3, y: cy - r0 * 0.8), tip = CGPoint(x: cx + r0 * 0.85, y: cy - r0 * 2.05)
+                horn(base, tip, r0 * 0.16, UIColor(hex: 0xF6E2A8))
+                for k in 1..<4 {
+                    let t = CGFloat(k) / 4
+                    let x = base.x + (tip.x - base.x) * t, y = base.y + (tip.y - base.y) * t
+                    Paint.stroke(g, CGPath(rect: CGRect(x: x - r0 * 0.12 * (1 - t), y: y, width: r0 * 0.24 * (1 - t), height: 0.01), transform: nil),
+                                 UIColor(hex: 0xC8A860), 0.5)
+                }
+            }
+        case .crown:
+            let gold = UIColor(hex: 0xF2C84A)
+            let x0 = cx - r0 * 0.15, w = r0 * 0.75, y0 = cy - r0 * 1.15, ht = r0 * 0.5
+            let p = CGMutablePath()
+            p.addLines(between: [CGPoint(x: x0, y: y0), CGPoint(x: x0, y: y0 - ht), CGPoint(x: x0 + w * 0.25, y: y0 - ht * 0.55),
+                                 CGPoint(x: x0 + w * 0.5, y: y0 - ht * 1.05), CGPoint(x: x0 + w * 0.75, y: y0 - ht * 0.55),
+                                 CGPoint(x: x0 + w, y: y0 - ht), CGPoint(x: x0 + w, y: y0)])
+            p.closeSubpath()
+            Paint.fill(g, p, gold)
+            Paint.stroke(g, p, gold.shade(0.35), 0.5)
+            Paint.fill(g, Paint.circle(x0 + w * 0.5, y0 - ht * 0.35, r0 * 0.07), UIColor(hex: 0xE84A6A))
         default: break
         }
     }
@@ -266,6 +300,14 @@ extension AnimalArt {
                 let x = cx - a * 0.6 + t * a * 1.0
                 Paint.fill(g, Paint.circle(x, topY(x) + 1, b * 0.35), main.shade(0.1))
             }
+        case .wool:
+            // Una nuvola intorno al corpo: bolle sul dorso, sul sedere e sotto la pancia.
+            for i in 0..<12 {
+                let ang = .pi * 0.62 + CGFloat(i) / 11 * .pi * 1.62
+                let x = cx + cos(ang) * a * 0.92, y = cy + sin(ang) * b * 0.9
+                Paint.fill(g, Paint.circle(x + 0.4, y + 0.5, b * 0.38), main.shade(0.22))
+                Paint.fill(g, Paint.circle(x, y, b * 0.36), main)
+            }
         default: break
         }
     }
@@ -309,6 +351,29 @@ extension AnimalArt {
                     Paint.fill(g, p, acc)
                 }
             }
+        case .wool:
+            var r = RNG("wool\(id)")
+            let curl = c(l.body).shade(0.14).alpha(0.7)
+            for _ in 0..<14 {
+                let x = cx + r.range(-a * 0.8, a * 0.75), y = cy + r.range(-b * 0.75, b * 0.5)
+                let p = CGMutablePath()
+                p.addArc(center: CGPoint(x: x, y: y), radius: r.range(1, 1.6), startAngle: 0.4, endAngle: 3.6, clockwise: false)
+                Paint.stroke(g, p, curl, 0.6)
+            }
+        case .blotches:
+            var r = RNG("blotches\(id)")
+            for (fx, fy, s) in [(-0.55, -0.35, 0.34), (0.05, 0.25, 0.3), (0.45, -0.5, 0.24), (-0.15, -0.85, 0.2)] as [(CGFloat, CGFloat, CGFloat)] {
+                let x = cx + fx * a, y = cy + fy * b, rr = s * a
+                var circles: [(CGFloat, CGFloat, CGFloat)] = []
+                for _ in 0..<4 {
+                    circles.append((x + r.range(-rr * 0.5, rr * 0.5), y + r.range(-rr * 0.35, rr * 0.35), rr * r.range(0.55, 0.8)))
+                }
+                Paint.fill(g, Paint.union(circles), acc)
+            }
+        case .belt:
+            let band = CGMutablePath()
+            band.addRect(CGRect(x: cx - a * 0.12, y: cy - b - 1, width: a * 0.42, height: l.bodyH + 2))
+            Paint.fill(g, band, acc.alpha(0.95))
         default: break
         }
     }
@@ -544,6 +609,46 @@ extension AnimalArt {
                     Paint.radial(g, [acc.alpha(0.9), acc.alpha(0)], CGPoint(x: 35, y: wl - 15), 6)
                     Paint.fill(g, Paint.circle(35, wl - 15, 1.6), acc.light(0.5))
                 }
+            }
+        case "koi", "goldkoi":
+            // Una carpa appena sotto il pelo dell'acqua: si vedono il dorso a macchie, la pinna e la coda.
+            return Paint.image(36, 22, base: 7) { g in
+                let wl: CGFloat = 15
+                Paint.fill(g, Paint.ellipse(18, wl + 0.6, 15, 3.4), UIColor(hex: 0x2A6A8A, alpha: 0.25))
+                let tail = CGMutablePath()
+                tail.move(to: CGPoint(x: 8, y: wl - 1))
+                tail.addQuadCurve(to: CGPoint(x: 1, y: wl - 5), control: CGPoint(x: 4, y: wl - 1.5))
+                tail.addQuadCurve(to: CGPoint(x: 3, y: wl + 1), control: CGPoint(x: 3.4, y: wl - 1.6))
+                tail.addQuadCurve(to: CGPoint(x: 1, y: wl + 4), control: CGPoint(x: 2.4, y: wl + 2.6))
+                tail.addQuadCurve(to: CGPoint(x: 8, y: wl + 0.6), control: CGPoint(x: 4.4, y: wl + 1.4))
+                tail.closeSubpath()
+                Paint.fill(g, tail, acc.alpha(0.85))
+                let body = CGMutablePath()
+                body.move(to: CGPoint(x: 6.5, y: wl))
+                body.addQuadCurve(to: CGPoint(x: 31, y: wl - 0.5), control: CGPoint(x: 18, y: wl - (dip ? 6 : 9)))
+                body.addQuadCurve(to: CGPoint(x: 6.5, y: wl), control: CGPoint(x: 18, y: wl + 3))
+                body.closeSubpath()
+                Paint.fill(g, body, main.shade(0.18))
+                Paint.clipped(g, body) {
+                    Paint.fill(g, Paint.ellipse(18, wl - 2.4, 12, 3.6), main)
+                    if id == "koi" {
+                        for (x, y, rx) in [(12.0, -3.0, 3.4), (20.0, -4.0, 2.8), (27.0, -2.4, 2.2)] as [(CGFloat, CGFloat, CGFloat)] {
+                            Paint.fill(g, Paint.ellipse(x, wl + y, rx, 2.2), acc)
+                        }
+                        Paint.fill(g, Paint.ellipse(16, wl - 4.4, 1.1, 0.8), dark.alpha(0.8))
+                    } else {
+                        Paint.fill(g, Paint.ellipse(16, wl - 3.6, 8, 1.2), UIColor.white.alpha(0.55))
+                    }
+                }
+                let fin = CGMutablePath()
+                fin.addLines(between: [CGPoint(x: 14, y: wl - 5.2), CGPoint(x: 17.5, y: wl - 9), CGPoint(x: 21, y: wl - 5.6)])
+                fin.closeSubpath()
+                Paint.fill(g, fin, acc.alpha(dip ? 0 : 0.8))
+                Paint.stroke(g, Paint.ellipse(18, wl + 0.4, 16, 2.6), UIColor.white.alpha(0.45), 0.7)
+                if dip { return }
+                Paint.fill(g, Paint.circle(28, wl - 2.4, 0.9), UIColor(hex: 0x241C1C))
+                Paint.fill(g, Paint.circle(27.7, wl - 2.7, 0.3), .white)
+                Paint.stroke(g, CGPath(rect: CGRect(x: 30.5, y: wl - 1, width: 2.5, height: 0.01), transform: nil), main.shade(0.3), 0.5)
             }
         case "ammonite", "giantammonite":
             return Paint.image(24, 22, base: 7) { g in
