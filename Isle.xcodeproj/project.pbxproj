@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2EE34D84EE66D6F97AF11DC2 /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320C960278C9EC8B539CD33B /* GuideView.swift */; };
+		710949F0DC778D93EC7792C1 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB75FF464FD033C5834C1689 /* Haptics.swift */; };
 		446A9DBEE341098C2D72C93E /* Voices.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3998C2EB57B153FCF5A3C66 /* Voices.swift */; };
 		7C1A0D5E2B9F4E61A3C8D504 /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = 7C1A0D5E2B9F4E61A3C8D503 /* Sounds */; };
 		83C19325E8992D048F5B555F /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94483C55C1E942DE94501C15 /* Music.swift */; };
@@ -89,6 +91,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		320C960278C9EC8B539CD33B /* GuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideView.swift; sourceTree = "<group>"; };
+		FB75FF464FD033C5834C1689 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		F3998C2EB57B153FCF5A3C66 /* Voices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Voices.swift; sourceTree = "<group>"; };
 		7C1A0D5E2B9F4E61A3C8D503 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
 		94483C55C1E942DE94501C15 /* Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
@@ -266,6 +270,8 @@
 				F608C46F75DBC8D6B0DAA053 /* Theme.swift */,
 				F52769D2981D4EDB33D36D20 /* Tutorial.swift */,
 				7C1A0D5E2B9F4E61A3C8D216 /* TrustView.swift */,
+				320C960278C9EC8B539CD33B /* GuideView.swift */,
+				FB75FF464FD033C5834C1689 /* Haptics.swift */,
 				F3998C2EB57B153FCF5A3C66 /* Voices.swift */,
 				94483C55C1E942DE94501C15 /* Music.swift */,
 				26463B2EB47333DF07FFA79B /* LockView.swift */,
@@ -483,6 +489,8 @@
 				7C1A0D5E2B9F4E61A3C8D401 /* Funnel.swift in Sources */,
 				7C1A0D5E2B9F4E61A3C8D213 /* Secrets.swift in Sources */,
 				7C1A0D5E2B9F4E61A3C8D215 /* TrustView.swift in Sources */,
+				2EE34D84EE66D6F97AF11DC2 /* GuideView.swift in Sources */,
+				710949F0DC778D93EC7792C1 /* Haptics.swift in Sources */,
 				446A9DBEE341098C2D72C93E /* Voices.swift in Sources */,
 				83C19325E8992D048F5B555F /* Music.swift in Sources */,
 				6775C066C20DCA59FA4D073E /* LockView.swift in Sources */,
@@ -545,7 +553,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7ZST47J92X;
@@ -612,7 +620,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 7ZST47J92X;
@@ -657,7 +665,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Isle/Supporting/Isle.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 7;
 				INFOPLIST_FILE = Isle/Supporting/Info.plist;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -677,7 +685,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Isle/Supporting/Isle.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 7;
 				INFOPLIST_FILE = Isle/Supporting/Info.plist;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (

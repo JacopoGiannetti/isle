@@ -130,6 +130,7 @@ struct PrimaryButton: ButtonStyle {
             .shadow(color: (color ?? Color(hex: 0x7A5CFF)).opacity(0.35), radius: 12, y: 6)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(duration: 0.25), value: configuration.isPressed)
+            .pressHaptic(configuration.isPressed)
     }
 }
 
@@ -145,6 +146,7 @@ struct PaperButton: ButtonStyle {
             .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(duration: 0.25), value: configuration.isPressed)
+            .pressHaptic(configuration.isPressed)
     }
 }
 
@@ -159,6 +161,7 @@ struct SoftButton: ButtonStyle {
             .surface()
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(duration: 0.25), value: configuration.isPressed)
+            .pressHaptic(configuration.isPressed)
     }
 }
 

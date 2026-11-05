@@ -1558,6 +1558,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     }
 
     private func impact(at p: CGPoint, center: TileKey, hit: Set<String>?, fled: Set<String>?, oldTint: UIColor, completion: @escaping () -> Void) {
+        Haptic.crash()
         flash.alpha = 0.9
         flash.run(.fadeOut(withDuration: 0.6))
         let shake = SKAction.sequence((0..<10).map { i in

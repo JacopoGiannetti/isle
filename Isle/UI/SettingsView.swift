@@ -10,7 +10,6 @@ struct SettingsView: View {
     @Environment(\.scenePhase) private var phase
     @State private var notifications: UNAuthorizationStatus?
     @State private var confirmDelete = false
-    @State private var testBuild = false
     @State private var plan: Premium.Plan?
     @State private var managing = false
     @State private var restoring = false
@@ -137,23 +136,13 @@ struct SettingsView: View {
                 .listRowBackground(Theme.paper)
 
                 Section {
-                    Button {
-                        dismiss()
-                        Task {
-                            try? await Task.sleep(for: .milliseconds(350))
-                            withAnimation(.easeInOut(duration: 0.6)) { store.seenIntro = false }
-                        }
-                    } label: {
-                        row(L("Rivedi l'introduzione"), "sparkles")
-                    }
+                    NavigationLink { GuideView() } label: { row(L("Come funziona Isle"), "questionmark.circle") }
                     if let url = Brand.supportURL {
                         Link(destination: url) { row(L("Contatta il supporto"), "envelope", external: true) }
                     }
                     if let url = Brand.reviewURL {
                         Link(destination: url) { row(L("Lascia una recensione"), "star", external: true) }
                     }
-                } footer: {
-                    footer(L("Riparte il volo tra le nuvole, come alla prima apertura."))
                 }
                 .listRowBackground(Theme.paper)
 
@@ -168,28 +157,6 @@ struct SettingsView: View {
                     footer(L("Isle non ha account e non legge mai le tue isole: restano su questo iPhone e nel tuo iCloud privato, che puoi vedere solo tu."))
                 }
                 .listRowBackground(Theme.paper)
-
-                if testBuild {
-                    Section {
-                        Button {
-                            dismiss()
-                            Task {
-                                try? await Task.sleep(for: .milliseconds(350))
-                                UserDefaults.standard.set(true, forKey: TestTools.replayKey)
-                                Profile.reset()
-                                Premium.forgetFirstGuest()
-                                withAnimation(.easeInOut(duration: 0.6)) { store.seenIntro = false }
-                            }
-                        } label: {
-                            row("Rifai l'onboarding", "arrow.counterclockwise")
-                        }
-                    } header: {
-                        footer("Test")
-                    } footer: {
-                        footer("Solo in Xcode e TestFlight. Riparte dall'introduzione con tutte le domande, poi apre la creazione di un'isola; il primo animale chiederà di nuovo recensione e paywall.")
-                    }
-                    .listRowBackground(Theme.paper)
-                }
 
                 Section {
                     Button(role: .destructive) {
@@ -231,7 +198,6 @@ struct SettingsView: View {
             }
         }
         .presentationDetents([.large])
-        .task { testBuild = await TestTools.available.value }
         .task(id: phase) {
             guard phase == .active else { return }
             notifications = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus

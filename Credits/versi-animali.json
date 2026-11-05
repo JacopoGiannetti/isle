@@ -1,0 +1,2327 @@
+{
+ "hen": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 456803,
+    "user": "Breviceps",
+    "title": "Chicken clucking",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Breviceps/sounds/456803/"
+   }
+  ]
+ },
+ "chick": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 826677,
+    "user": "TheKingOfGeeks360",
+    "title": "Fowl - Chicken; Baby Chick, Peep",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/826677/"
+   }
+  ]
+ },
+ "pig": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 536746,
+    "user": "egomassive",
+    "title": "Pig.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/egomassive/sounds/536746/"
+   }
+  ]
+ },
+ "fieldmouse": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 463789,
+    "user": "shyguy014",
+    "title": "Mouse Squeaks.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/shyguy014/sounds/463789/"
+   },
+   {
+    "freesound": 463789,
+    "user": "shyguy014",
+    "title": "Mouse Squeaks.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/shyguy014/sounds/463789/"
+   }
+  ]
+ },
+ "blackbird": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 811988,
+    "user": "richwise",
+    "title": "Blackbird (isolated)",
+    "license": "CC0",
+    "url": "https://freesound.org/people/richwise/sounds/811988/"
+   }
+  ]
+ },
+ "whiteduck": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 719115,
+    "user": "OwennewO",
+    "title": "Ducks Quacking To Each Other",
+    "license": "CC0",
+    "url": "https://freesound.org/people/OwennewO/sounds/719115/"
+   }
+  ]
+ },
+ "sheep": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 692900,
+    "user": "satoristudios3",
+    "title": "Ewe Shetland Sheep Baa",
+    "license": "CC0",
+    "url": "https://freesound.org/people/satoristudios3/sounds/692900/"
+   }
+  ]
+ },
+ "dog": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 440865,
+    "user": "v23",
+    "title": "Angry big dog barking - Far [d15].wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/v23/sounds/440865/"
+   }
+  ]
+ },
+ "donkey": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 705300,
+    "user": "felix.blume",
+    "title": "Donkey braying loud with distant village atmosphere, close recording",
+    "license": "CC0",
+    "url": "https://freesound.org/people/felix.blume/sounds/705300/"
+   }
+  ]
+ },
+ "goat": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 581240,
+    "user": "Kinoton",
+    "title": "Single Goat Bleating 2x",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kinoton/sounds/581240/"
+   },
+   {
+    "freesound": 581240,
+    "user": "Kinoton",
+    "title": "Single Goat Bleating 2x",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kinoton/sounds/581240/"
+   }
+  ]
+ },
+ "cow": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 163727,
+    "user": "felix.blume",
+    "title": "Cow mooing in south of France (Limousin)",
+    "license": "CC0",
+    "url": "https://freesound.org/people/felix.blume/sounds/163727/"
+   }
+  ]
+ },
+ "horse": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 347036,
+    "user": "Kubuzz",
+    "title": "horse's whinny",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kubuzz/sounds/347036/"
+   }
+  ]
+ },
+ "turkey": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 678192,
+    "user": "pesticideX",
+    "title": "turkey call",
+    "license": "CC0",
+    "url": "https://freesound.org/people/pesticideX/sounds/678192/"
+   }
+  ]
+ },
+ "ox": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 610801,
+    "user": "JakobGille",
+    "title": "ANMLFarm_Kuh-Bulle-Agressiv 19_IOKA_NONE_Hofefeld.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/JakobGille/sounds/610801/"
+   }
+  ]
+ },
+ "magpie": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 418110,
+    "user": "straget",
+    "title": "Magpie.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/straget/sounds/418110/"
+   }
+  ]
+ },
+ "canary": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 464650,
+    "user": "AntonioZozobra",
+    "title": "Canario [Canary]",
+    "license": "CC0",
+    "url": "https://freesound.org/people/AntonioZozobra/sounds/464650/"
+   }
+  ]
+ },
+ "goldenhen": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 456803,
+    "user": "Breviceps",
+    "title": "Chicken clucking",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Breviceps/sounds/456803/"
+   },
+   {
+    "freesound": 725918,
+    "user": "goataamericannovel",
+    "title": "chicken sounds",
+    "license": "CC0",
+    "url": "https://freesound.org/people/goataamericannovel/sounds/725918/"
+   }
+  ]
+ },
+ "unicorn": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 269571,
+    "user": "shadoWisp",
+    "title": "horse neigh shortened.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/shadoWisp/sounds/269571/"
+   },
+   {
+    "freesound": 59569,
+    "user": "3bagbrew",
+    "title": "horse.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/3bagbrew/sounds/59569/"
+   }
+  ]
+ },
+ "mooncow": {
+  "world": "farm",
+  "sources": [
+   {
+    "freesound": 867553,
+    "user": "calebmills99",
+    "title": "COW_MOO",
+    "license": "CC0",
+    "url": "https://freesound.org/people/calebmills99/sounds/867553/"
+   }
+  ]
+ },
+ "variedtit": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 703254,
+    "user": "nfrae",
+    "title": "Black Capped Chickadee bird call",
+    "license": "CC0",
+    "url": "https://freesound.org/people/nfrae/sounds/703254/"
+   }
+  ]
+ },
+ "bushwarbler": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 524526,
+    "user": "warukunai",
+    "title": "Japanese bush warbler (uguisu) in a city ambiance",
+    "license": "CC0",
+    "url": "https://freesound.org/people/warukunai/sounds/524526/"
+   }
+  ]
+ },
+ "koi": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 507093,
+    "user": "paulprit",
+    "title": "Fish Splashing Release 2.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/paulprit/sounds/507093/"
+   }
+  ]
+ },
+ "turtledove": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 610563,
+    "user": "randomthoughts7",
+    "title": "Eurasian Collared Dove",
+    "license": "CC0",
+    "url": "https://freesound.org/people/randomthoughts7/sounds/610563/"
+   }
+  ]
+ },
+ "crane": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 548491,
+    "user": "joakgust",
+    "title": "Crane bird calling.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/joakgust/sounds/548491/"
+   }
+  ]
+ },
+ "moonbear": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 763026,
+    "user": "celldroid",
+    "title": "Bear Angry Growl",
+    "license": "CC0",
+    "url": "https://freesound.org/people/celldroid/sounds/763026/"
+   }
+  ]
+ },
+ "peacock": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 688203,
+    "user": "Kinoton",
+    "title": "Bird, Peacock Call",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kinoton/sounds/688203/"
+   }
+  ]
+ },
+ "iriomotecat": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 110011,
+    "user": "tuberatanka",
+    "title": "cat meow",
+    "license": "CC0",
+    "url": "https://freesound.org/people/tuberatanka/sounds/110011/"
+   }
+  ]
+ },
+ "egret": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 541377,
+    "user": "joericortens",
+    "title": "Great egret.WAV",
+    "license": "CC0",
+    "url": "https://freesound.org/people/joericortens/sounds/541377/"
+   }
+  ]
+ },
+ "greenpheasant": {
+  "world": "zen",
+  "sources": [
+   {
+    "freesound": 238824,
+    "user": "the_very_Real_Horst",
+    "title": "Spiekeroog Pheasant Cock 02",
+    "license": "CC0",
+    "url": "https://freesound.org/people/the_very_Real_Horst/sounds/238824/"
+   },
+   {
+    "freesound": 238824,
+    "user": "the_very_Real_Horst",
+    "title": "Spiekeroog Pheasant Cock 02",
+    "license": "CC0",
+    "url": "https://freesound.org/people/the_very_Real_Horst/sounds/238824/"
+   }
+  ]
+ },
+ "squirrel": {
+  "world": "forest",
+  "sources": [
+   {
+    "freesound": 820322,
+    "user": "SoundsLikeYukon",
+    "title": "Backyard squirrel",
+    "license": "CC0",
+    "url": "https://freesound.org/people/SoundsLikeYukon/sounds/820322/"
+   }
+  ]
+ },
+ "woodpecker": {
+  "world": "forest",
+  "sources": [
+   {
+    "freesound": 428146,
+    "user": "naturenotesuk",
+    "title": "Great Spotted Woodpecker",
+    "license": "CC0",
+    "url": "https://freesound.org/people/naturenotesuk/sounds/428146/"
+   },
+   {
+    "freesound": 428146,
+    "user": "naturenotesuk",
+    "title": "Great Spotted Woodpecker",
+    "license": "CC0",
+    "url": "https://freesound.org/people/naturenotesuk/sounds/428146/"
+   }
+  ]
+ },
+ "rabbit": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 381830,
+    "user": "mrgreaper",
+    "title": "bunnySwordInsert.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/mrgreaper/sounds/381830/"
+   }
+  ]
+ },
+ "sparrow": {
+  "world": "forest",
+  "sources": [
+   {
+    "freesound": 670176,
+    "user": "freemaster2",
+    "title": "House sparrows",
+    "license": "CC0",
+    "url": "https://freesound.org/people/freemaster2/sounds/670176/"
+   }
+  ]
+ },
+ "woodmouse": {
+  "world": "forest",
+  "sources": [
+   {
+    "freesound": 463789,
+    "user": "shyguy014",
+    "title": "Mouse Squeaks.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/shyguy014/sounds/463789/"
+   }
+  ]
+ },
+ "hedgehog": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 23142,
+    "user": "stackpool",
+    "title": "river otter or weasel 2006-09-17.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/stackpool/sounds/23142/"
+   }
+  ]
+ },
+ "dragonfly": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 447319,
+    "user": "antoineopeng",
+    "title": "Dragonfly.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/antoineopeng/sounds/447319/"
+   }
+  ]
+ },
+ "robin": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 784986,
+    "user": "freemaster2",
+    "title": "Robin singing",
+    "license": "CC0",
+    "url": "https://freesound.org/people/freemaster2/sounds/784986/"
+   }
+  ]
+ },
+ "roe": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 203593,
+    "user": "raoul_slayer",
+    "title": "barkingroedeer.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/raoul_slayer/sounds/203593/"
+   }
+  ]
+ },
+ "deer": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 186921,
+    "user": "ReadeOnly",
+    "title": "Angry Ram",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ReadeOnly/sounds/186921/"
+   }
+  ]
+ },
+ "beaver": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 427762,
+    "user": "MaestroALF",
+    "title": "Dogs_eats.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/MaestroALF/sounds/427762/"
+   }
+  ]
+ },
+ "fox": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 537587,
+    "user": "craigsays",
+    "title": "red fox screeching.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsays/sounds/537587/"
+   }
+  ]
+ },
+ "badger": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 527390,
+    "user": "TEDAgame",
+    "title": "badger eating peanuts",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TEDAgame/sounds/527390/"
+   }
+  ]
+ },
+ "frog": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 710245,
+    "user": "Sahand.Zangeneh",
+    "title": "Frogs_Toad_Close_Distance_River_Stream _Lake_Creature_Nature_Countryside",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Sahand.Zangeneh/sounds/710245/"
+   }
+  ]
+ },
+ "duck": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 456770,
+    "user": "WavJunction.com",
+    "title": "Mallard Duck Quack Flying Away.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/WavJunction.com/sounds/456770/"
+   }
+  ]
+ },
+ "lynx": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 844316,
+    "user": "TheKingOfGeeks360",
+    "title": "Wild Cats - Siberian Lynx, Huff",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/844316/"
+   }
+  ]
+ },
+ "owl": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 655380,
+    "user": "faxfaxfax",
+    "title": "Tawny Owl",
+    "license": "CC0",
+    "url": "https://freesound.org/people/faxfaxfax/sounds/655380/"
+   }
+  ]
+ },
+ "wolf": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 380156,
+    "user": "taure",
+    "title": "Howl_Echo.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/taure/sounds/380156/"
+   }
+  ]
+ },
+ "bear": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 856648,
+    "user": "Skylosaurus",
+    "title": "FFL-250 Sound effect",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Skylosaurus/sounds/856648/"
+   }
+  ]
+ },
+ "heron": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 521604,
+    "user": "jscolieri",
+    "title": "CPH-07JUN2020",
+    "license": "CC0",
+    "url": "https://freesound.org/people/jscolieri/sounds/521604/"
+   }
+  ]
+ },
+ "otter": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 23142,
+    "user": "stackpool",
+    "title": "river otter or weasel 2006-09-17.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/stackpool/sounds/23142/"
+   }
+  ]
+ },
+ "stork": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 705861,
+    "user": "Breviceps",
+    "title": "Storks bill-clapping",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Breviceps/sounds/705861/"
+   }
+  ]
+ },
+ "jay": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 57906,
+    "user": "cognito perceptu",
+    "title": "blue jay.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/cognito perceptu/sounds/57906/"
+   }
+  ]
+ },
+ "kingfisher": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 171650,
+    "user": "cvp1965",
+    "title": "Countryside 01",
+    "license": "CC0",
+    "url": "https://freesound.org/people/cvp1965/sounds/171650/"
+   }
+  ]
+ },
+ "bullfinch": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 556238,
+    "user": "Walking.With.Microphones",
+    "title": "Eurasian Bullfinch (Pyrrhula pyrrhula)",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Walking.With.Microphones/sounds/556238/"
+   }
+  ]
+ },
+ "marten": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 23142,
+    "user": "stackpool",
+    "title": "river otter or weasel 2006-09-17.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/stackpool/sounds/23142/"
+   }
+  ]
+ },
+ "stagbeetle": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 502211,
+    "user": "warrenXG",
+    "title": "Beetle Squark5.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/warrenXG/sounds/502211/"
+   }
+  ]
+ },
+ "turtle": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 860796,
+    "user": "GammaGool",
+    "title": "Water Droplets - Isolated",
+    "license": "CC0",
+    "url": "https://freesound.org/people/GammaGool/sounds/860796/"
+   }
+  ]
+ },
+ "bat": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 498406,
+    "user": "iainmccurdy",
+    "title": "Bats 1.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/iainmccurdy/sounds/498406/"
+   }
+  ]
+ },
+ "eagleowl": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 701135,
+    "user": "bruno.auzet",
+    "title": "eagle owl.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/bruno.auzet/sounds/701135/"
+   }
+  ]
+ },
+ "queenbee": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 528935,
+    "user": "fthgurdy",
+    "title": "Bees buzzing 1",
+    "license": "CC0",
+    "url": "https://freesound.org/people/fthgurdy/sounds/528935/"
+   }
+  ]
+ },
+ "flyingsquirrel": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 647444,
+    "user": "hedonfire",
+    "title": "Angry squirrel, buzzing flies",
+    "license": "CC0",
+    "url": "https://freesound.org/people/hedonfire/sounds/647444/"
+   }
+  ]
+ },
+ "hawkmoth": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 194772,
+    "user": "tubbers",
+    "title": "HUMMING BIRDS (7-15-2013).mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/tubbers/sounds/194772/"
+   }
+  ]
+ },
+ "starowl": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 546237,
+    "user": "Danjocross",
+    "title": "Low Owl Hoot.m4a",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Danjocross/sounds/546237/"
+   }
+  ]
+ },
+ "lightowl": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 415153,
+    "user": "howebzar",
+    "title": "Owl Hooting.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/howebzar/sounds/415153/"
+   }
+  ]
+ },
+ "salamander": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 710245,
+    "user": "Sahand.Zangeneh",
+    "title": "Frogs_Toad_Close_Distance_River_Stream _Lake_Creature_Nature_Countryside",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Sahand.Zangeneh/sounds/710245/"
+   }
+  ]
+ },
+ "arctichare": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 376187,
+    "user": "BeeProductive",
+    "title": "Rabbit drinking.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/BeeProductive/sounds/376187/"
+   }
+  ]
+ },
+ "lemming": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 536753,
+    "user": "egomassive",
+    "title": "Rat.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/egomassive/sounds/536753/"
+   }
+  ]
+ },
+ "arcticfox": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 634005,
+    "user": "Soundburst",
+    "title": "Fox Screams",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Soundburst/sounds/634005/"
+   }
+  ]
+ },
+ "redpoll": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 837675,
+    "user": "TheKingOfGeeks360",
+    "title": "Songbirds - Owl Finch",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/837675/"
+   }
+  ]
+ },
+ "ptarmigan": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 588558,
+    "user": "aurelien.leveque",
+    "title": "Pic-de-bure-lagopedes.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/aurelien.leveque/sounds/588558/"
+   }
+  ]
+ },
+ "seal": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 437960,
+    "user": "craigsmith",
+    "title": "G12-28-Seal Bark.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsmith/sounds/437960/"
+   }
+  ]
+ },
+ "puffin": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 538016,
+    "user": "Canardo55",
+    "title": "Herring Gull 1.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Canardo55/sounds/538016/"
+   }
+  ]
+ },
+ "reindeer": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 610801,
+    "user": "JakobGille",
+    "title": "ANMLFarm_Kuh-Bulle-Agressiv 19_IOKA_NONE_Hofefeld.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/JakobGille/sounds/610801/"
+   }
+  ]
+ },
+ "walrus": {
+  "world": "auto",
+  "sources": [
+   {
+    "commons": "Walrus sound effect.wav (Wikimedia Commons, CC0)",
+    "user": "Zagzav12",
+    "license": "CC0",
+    "url": "https://commons.wikimedia.org/wiki/File:Walrus_sound_effect.wav"
+   }
+  ]
+ },
+ "tern": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 538016,
+    "user": "Canardo55",
+    "title": "Herring Gull 1.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Canardo55/sounds/538016/"
+   }
+  ]
+ },
+ "muskox": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 873888,
+    "user": "timpet55",
+    "title": "Bison",
+    "license": "CC0",
+    "url": "https://freesound.org/people/timpet55/sounds/873888/"
+   }
+  ]
+ },
+ "polarbear": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 856648,
+    "user": "Skylosaurus",
+    "title": "FFL-250 Sound effect",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Skylosaurus/sounds/856648/"
+   }
+  ]
+ },
+ "beluga": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 723878,
+    "user": "lori.mortimer",
+    "title": "Totally Unique",
+    "license": "CC0",
+    "url": "https://freesound.org/people/lori.mortimer/sounds/723878/"
+   }
+  ]
+ },
+ "mammoth": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 527845,
+    "user": "D.jones",
+    "title": "Elephant Trumpets Growls.flac",
+    "license": "CC0",
+    "url": "https://freesound.org/people/D.jones/sounds/527845/"
+   }
+  ]
+ },
+ "arcticwolf": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 753896,
+    "user": "Sacha.Julien",
+    "title": "Adult and young wolves howling far away",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Sacha.Julien/sounds/753896/"
+   }
+  ]
+ },
+ "narwhal": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 408555,
+    "user": "felix.blume",
+    "title": "Amazonian Dolphins",
+    "license": "CC0",
+    "url": "https://freesound.org/people/felix.blume/sounds/408555/"
+   }
+  ]
+ },
+ "orca": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 408555,
+    "user": "felix.blume",
+    "title": "Amazonian Dolphins",
+    "license": "CC0",
+    "url": "https://freesound.org/people/felix.blume/sounds/408555/"
+   }
+  ]
+ },
+ "snowmonkey": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 256873,
+    "user": "JamboME",
+    "title": "Jungle Night Geko or Monkey Call Creepy",
+    "license": "CC0",
+    "url": "https://freesound.org/people/JamboME/sounds/256873/"
+   }
+  ]
+ },
+ "weaver": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 837677,
+    "user": "TheKingOfGeeks360",
+    "title": "Songbirds - Orange Bishop Weaver, Short Chirp",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/837677/"
+   }
+  ]
+ },
+ "warthog": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 842313,
+    "user": "TheKingOfGeeks360",
+    "title": "Swine - Pig; Dinosaur-like Grunt",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/842313/"
+   }
+  ]
+ },
+ "beeeater": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 140713,
+    "user": "j1987",
+    "title": "bee_firework.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/j1987/sounds/140713/"
+   }
+  ]
+ },
+ "sunbird": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 328915,
+    "user": "hedgehog1",
+    "title": "Bird Sounds of Knysna.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/hedgehog1/sounds/328915/"
+   }
+  ]
+ },
+ "vervet": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 343429,
+    "user": "firanthir",
+    "title": "Crows chattering",
+    "license": "CC0",
+    "url": "https://freesound.org/people/firanthir/sounds/343429/"
+   }
+  ]
+ },
+ "zebra": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 347036,
+    "user": "Kubuzz",
+    "title": "horse's whinny",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kubuzz/sounds/347036/"
+   }
+  ]
+ },
+ "fisheagle": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 130501,
+    "user": "dawidsounds",
+    "title": "VISARENDE.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/dawidsounds/sounds/130501/"
+   }
+  ]
+ },
+ "flamingo": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 417305,
+    "user": "Mikael_Sk",
+    "title": "flamingo_glass.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Mikael_Sk/sounds/417305/"
+   }
+  ]
+ },
+ "elephant": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 819668,
+    "user": "ikbenraar",
+    "title": "Elephant sound",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ikbenraar/sounds/819668/"
+   }
+  ]
+ },
+ "giraffe": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 873888,
+    "user": "timpet55",
+    "title": "Bison",
+    "license": "CC0",
+    "url": "https://freesound.org/people/timpet55/sounds/873888/"
+   }
+  ]
+ },
+ "lion": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 469123,
+    "user": "Manim8",
+    "title": "Demon_Lion_Monster_Growl_Roar",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Manim8/sounds/469123/"
+   }
+  ]
+ },
+ "hippo": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 759858,
+    "user": "cmp1",
+    "title": "Hippopotamus Sounds",
+    "license": "CC0",
+    "url": "https://freesound.org/people/cmp1/sounds/759858/"
+   }
+  ]
+ },
+ "rhino": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 535810,
+    "user": "Breviceps",
+    "title": "Indian rhinoceros (Rhinoceros unicornis)",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Breviceps/sounds/535810/"
+   }
+  ]
+ },
+ "pika": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 640993,
+    "user": "burgersmoke",
+    "title": "Ground Squirrel Second Chirp",
+    "license": "CC0",
+    "url": "https://freesound.org/people/burgersmoke/sounds/640993/"
+   }
+  ]
+ },
+ "wagtail": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 388734,
+    "user": "Inkahootz81",
+    "title": "Australian Willy Wagtail",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Inkahootz81/sounds/388734/"
+   }
+  ]
+ },
+ "uralowl": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 864872,
+    "user": "sound368",
+    "title": "Tawny Owl in Molkom, Sweden - Cleaned",
+    "license": "CC0",
+    "url": "https://freesound.org/people/sound368/sounds/864872/"
+   }
+  ]
+ },
+ "moonhare": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 381830,
+    "user": "mrgreaper",
+    "title": "bunnySwordInsert.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/mrgreaper/sounds/381830/"
+   },
+   {
+    "freesound": 381830,
+    "user": "mrgreaper",
+    "title": "bunnySwordInsert.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/mrgreaper/sounds/381830/"
+   }
+  ]
+ },
+ "ninetail": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 537587,
+    "user": "craigsays",
+    "title": "red fox screeching.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsays/sounds/537587/"
+   },
+   {
+    "freesound": 537587,
+    "user": "craigsays",
+    "title": "red fox screeching.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsays/sounds/537587/"
+   }
+  ]
+ },
+ "whitewolf": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 380156,
+    "user": "taure",
+    "title": "Howl_Echo.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/taure/sounds/380156/"
+   },
+   {
+    "freesound": 380156,
+    "user": "taure",
+    "title": "Howl_Echo.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/taure/sounds/380156/"
+   }
+  ]
+ },
+ "royaldeer": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 186921,
+    "user": "ReadeOnly",
+    "title": "Angry Ram",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ReadeOnly/sounds/186921/"
+   },
+   {
+    "freesound": 186921,
+    "user": "ReadeOnly",
+    "title": "Angry Ram",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ReadeOnly/sounds/186921/"
+   }
+  ]
+ },
+ "spirit": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 186921,
+    "user": "ReadeOnly",
+    "title": "Angry Ram",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ReadeOnly/sounds/186921/"
+   },
+   {
+    "freesound": 186921,
+    "user": "ReadeOnly",
+    "title": "Angry Ram",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ReadeOnly/sounds/186921/"
+   },
+   {
+    "freesound": 465697,
+    "user": "Breviceps",
+    "title": "Owl Hoot",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Breviceps/sounds/465697/"
+   }
+  ]
+ },
+ "aurorafox": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 634005,
+    "user": "Soundburst",
+    "title": "Fox Screams",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Soundburst/sounds/634005/"
+   },
+   {
+    "freesound": 634005,
+    "user": "Soundburst",
+    "title": "Fox Screams",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Soundburst/sounds/634005/"
+   }
+  ]
+ },
+ "frostlynx": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 808411,
+    "user": "TSP-Talk",
+    "title": "Cat_Say_Hello_and_Moan_250522_002_Tr1_ZoomF6_MD21_48kHz_32bitFP",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TSP-Talk/sounds/808411/"
+   },
+   {
+    "freesound": 808411,
+    "user": "TSP-Talk",
+    "title": "Cat_Say_Hello_and_Moan_250522_002_Tr1_ZoomF6_MD21_48kHz_32bitFP",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TSP-Talk/sounds/808411/"
+   }
+  ]
+ },
+ "silverreindeer": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 610801,
+    "user": "JakobGille",
+    "title": "ANMLFarm_Kuh-Bulle-Agressiv 19_IOKA_NONE_Hofefeld.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/JakobGille/sounds/610801/"
+   },
+   {
+    "freesound": 610801,
+    "user": "JakobGille",
+    "title": "ANMLFarm_Kuh-Bulle-Agressiv 19_IOKA_NONE_Hofefeld.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/JakobGille/sounds/610801/"
+   }
+  ]
+ },
+ "auroraorca": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 408555,
+    "user": "felix.blume",
+    "title": "Amazonian Dolphins",
+    "license": "CC0",
+    "url": "https://freesound.org/people/felix.blume/sounds/408555/"
+   },
+   {
+    "freesound": 408555,
+    "user": "felix.blume",
+    "title": "Amazonian Dolphins",
+    "license": "CC0",
+    "url": "https://freesound.org/people/felix.blume/sounds/408555/"
+   }
+  ]
+ },
+ "kingmammoth": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 527845,
+    "user": "D.jones",
+    "title": "Elephant Trumpets Growls.flac",
+    "license": "CC0",
+    "url": "https://freesound.org/people/D.jones/sounds/527845/"
+   },
+   {
+    "freesound": 527845,
+    "user": "D.jones",
+    "title": "Elephant Trumpets Growls.flac",
+    "license": "CC0",
+    "url": "https://freesound.org/people/D.jones/sounds/527845/"
+   }
+  ]
+ },
+ "blackpanther": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 675503,
+    "user": "craigsmith",
+    "title": "S28-08 Panther growl slowed down to create a monster.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsmith/sounds/675503/"
+   },
+   {
+    "freesound": 675503,
+    "user": "craigsmith",
+    "title": "S28-08 Panther growl slowed down to create a monster.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsmith/sounds/675503/"
+   }
+  ]
+ },
+ "whitelion": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 469123,
+    "user": "Manim8",
+    "title": "Demon_Lion_Monster_Growl_Roar",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Manim8/sounds/469123/"
+   },
+   {
+    "freesound": 469123,
+    "user": "Manim8",
+    "title": "Demon_Lion_Monster_Growl_Roar",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Manim8/sounds/469123/"
+   }
+  ]
+ },
+ "stargiraffe": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 873888,
+    "user": "timpet55",
+    "title": "Bison",
+    "license": "CC0",
+    "url": "https://freesound.org/people/timpet55/sounds/873888/"
+   },
+   {
+    "freesound": 873888,
+    "user": "timpet55",
+    "title": "Bison",
+    "license": "CC0",
+    "url": "https://freesound.org/people/timpet55/sounds/873888/"
+   }
+  ]
+ },
+ "royalcheetah": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 675446,
+    "user": "craigsmith",
+    "title": "S28-05 Baby monkey and cheetah wrestling and playing.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsmith/sounds/675446/"
+   },
+   {
+    "freesound": 675446,
+    "user": "craigsmith",
+    "title": "S28-05 Baby monkey and cheetah wrestling and playing.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsmith/sounds/675446/"
+   }
+  ]
+ },
+ "greatelephant": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 819668,
+    "user": "ikbenraar",
+    "title": "Elephant sound",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ikbenraar/sounds/819668/"
+   },
+   {
+    "freesound": 819668,
+    "user": "ikbenraar",
+    "title": "Elephant sound",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ikbenraar/sounds/819668/"
+   }
+  ]
+ },
+ "jadedragon": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 696476,
+    "user": "FALL-E",
+    "title": "tiger, roar, growl, wild",
+    "license": "CC0",
+    "url": "https://freesound.org/people/FALL-E/sounds/696476/"
+   },
+   {
+    "freesound": 321603,
+    "user": "corentin_faucher",
+    "title": "ClapClap.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/corentin_faucher/sounds/321603/"
+   }
+  ]
+ },
+ "phoenix": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 583615,
+    "user": "Johnnie_Holiday",
+    "title": "Eagle.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Johnnie_Holiday/sounds/583615/"
+   },
+   {
+    "freesound": 583615,
+    "user": "Johnnie_Holiday",
+    "title": "Eagle.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Johnnie_Holiday/sounds/583615/"
+   }
+  ]
+ },
+ "carouselhorse": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 347036,
+    "user": "Kubuzz",
+    "title": "horse's whinny",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kubuzz/sounds/347036/"
+   },
+   {
+    "freesound": 347036,
+    "user": "Kubuzz",
+    "title": "horse's whinny",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kubuzz/sounds/347036/"
+   }
+  ]
+ },
+ "frogprince": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 710245,
+    "user": "Sahand.Zangeneh",
+    "title": "Frogs_Toad_Close_Distance_River_Stream _Lake_Creature_Nature_Countryside",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Sahand.Zangeneh/sounds/710245/"
+   },
+   {
+    "freesound": 710245,
+    "user": "Sahand.Zangeneh",
+    "title": "Frogs_Toad_Close_Distance_River_Stream _Lake_Creature_Nature_Countryside",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Sahand.Zangeneh/sounds/710245/"
+   }
+  ]
+ },
+ "moondeer": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 743078,
+    "user": "qubodup",
+    "title": "Wildlife Creature Warning Howl",
+    "license": "CC0",
+    "url": "https://freesound.org/people/qubodup/sounds/743078/"
+   },
+   {
+    "freesound": 743078,
+    "user": "qubodup",
+    "title": "Wildlife Creature Warning Howl",
+    "license": "CC0",
+    "url": "https://freesound.org/people/qubodup/sounds/743078/"
+   }
+  ]
+ },
+ "trex": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 766592,
+    "user": "gordonez",
+    "title": "elephant",
+    "license": "CC0",
+    "url": "https://freesound.org/people/gordonez/sounds/766592/"
+   },
+   {
+    "freesound": 321603,
+    "user": "corentin_faucher",
+    "title": "ClapClap.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/corentin_faucher/sounds/321603/"
+   },
+   {
+    "freesound": 696476,
+    "user": "FALL-E",
+    "title": "tiger, roar, growl, wild",
+    "license": "CC0",
+    "url": "https://freesound.org/people/FALL-E/sounds/696476/"
+   }
+  ]
+ },
+ "brachiosaurus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 723878,
+    "user": "lori.mortimer",
+    "title": "Totally Unique",
+    "license": "CC0",
+    "url": "https://freesound.org/people/lori.mortimer/sounds/723878/"
+   },
+   {
+    "freesound": 527845,
+    "user": "D.jones",
+    "title": "Elephant Trumpets Growls.flac",
+    "license": "CC0",
+    "url": "https://freesound.org/people/D.jones/sounds/527845/"
+   }
+  ]
+ },
+ "triceratops": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 535810,
+    "user": "Breviceps",
+    "title": "Indian rhinoceros (Rhinoceros unicornis)",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Breviceps/sounds/535810/"
+   },
+   {
+    "freesound": 834331,
+    "user": "ali.g",
+    "title": "Yak grunts",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ali.g/sounds/834331/"
+   }
+  ]
+ },
+ "stegosaurus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 876412,
+    "user": "JobInThe444",
+    "title": "Hippopotamus Sounds",
+    "license": "CC0",
+    "url": "https://freesound.org/people/JobInThe444/sounds/876412/"
+   }
+  ]
+ },
+ "ankylosaurus": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 680733,
+    "user": "nifvimp",
+    "title": "Sea Lion 1.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/nifvimp/sounds/680733/"
+   }
+  ]
+ },
+ "spinosaurus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 321603,
+    "user": "corentin_faucher",
+    "title": "ClapClap.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/corentin_faucher/sounds/321603/"
+   },
+   {
+    "freesound": 696476,
+    "user": "FALL-E",
+    "title": "tiger, roar, growl, wild",
+    "license": "CC0",
+    "url": "https://freesound.org/people/FALL-E/sounds/696476/"
+   }
+  ]
+ },
+ "velociraptor": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 160685,
+    "user": "antique98",
+    "title": "Lots of Geese",
+    "license": "CC0",
+    "url": "https://freesound.org/people/antique98/sounds/160685/"
+   },
+   {
+    "freesound": 476338,
+    "user": "alexanderweidner",
+    "title": "Oriental Magpie Robin",
+    "license": "CC0",
+    "url": "https://freesound.org/people/alexanderweidner/sounds/476338/"
+   }
+  ]
+ },
+ "plesiosaur": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 723878,
+    "user": "lori.mortimer",
+    "title": "Totally Unique",
+    "license": "CC0",
+    "url": "https://freesound.org/people/lori.mortimer/sounds/723878/"
+   },
+   {
+    "freesound": 524524,
+    "user": "vero.marengere",
+    "title": "Water Splash in Lake 05.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/vero.marengere/sounds/524524/"
+   }
+  ]
+ },
+ "quetzalcoatlus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 583615,
+    "user": "Johnnie_Holiday",
+    "title": "Eagle.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Johnnie_Holiday/sounds/583615/"
+   },
+   {
+    "freesound": 770032,
+    "user": "Vrymaa",
+    "title": "Bird - Red-shouldered hawk",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Vrymaa/sounds/770032/"
+   }
+  ]
+ },
+ "mosasaurus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 321603,
+    "user": "corentin_faucher",
+    "title": "ClapClap.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/corentin_faucher/sounds/321603/"
+   },
+   {
+    "freesound": 524524,
+    "user": "vero.marengere",
+    "title": "Water Splash in Lake 05.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/vero.marengere/sounds/524524/"
+   }
+  ]
+ },
+ "silverdiplodocus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 527845,
+    "user": "D.jones",
+    "title": "Elephant Trumpets Growls.flac",
+    "license": "CC0",
+    "url": "https://freesound.org/people/D.jones/sounds/527845/"
+   },
+   {
+    "freesound": 723878,
+    "user": "lori.mortimer",
+    "title": "Totally Unique",
+    "license": "CC0",
+    "url": "https://freesound.org/people/lori.mortimer/sounds/723878/"
+   }
+  ]
+ },
+ "emberankylo": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 834331,
+    "user": "ali.g",
+    "title": "Yak grunts",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ali.g/sounds/834331/"
+   },
+   {
+    "freesound": 696476,
+    "user": "FALL-E",
+    "title": "tiger, roar, growl, wild",
+    "license": "CC0",
+    "url": "https://freesound.org/people/FALL-E/sounds/696476/"
+   }
+  ]
+ },
+ "pterodactyl": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 770032,
+    "user": "Vrymaa",
+    "title": "Bird - Red-shouldered hawk",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Vrymaa/sounds/770032/"
+   }
+  ]
+ },
+ "pteranodon": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 575524,
+    "user": "1888software",
+    "title": "red-tailed-hawk.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/1888software/sounds/575524/"
+   }
+  ]
+ },
+ "iguanodon": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 685761,
+    "user": "jlseagull",
+    "title": "Camel.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/jlseagull/sounds/685761/"
+   }
+  ]
+ },
+ "parasaurolophus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 846522,
+    "user": "sgo.75",
+    "title": "Common Crane",
+    "license": "CC0",
+    "url": "https://freesound.org/people/sgo.75/sounds/846522/"
+   }
+  ]
+ },
+ "compsognathus": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 156227,
+    "user": "akame",
+    "title": "augarten_crows.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/akame/sounds/156227/"
+   }
+  ]
+ },
+ "oviraptor": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 867550,
+    "user": "TheKingOfGeeks360",
+    "title": "Ratites - Ostrich; Snort, Close Perspective",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/867550/"
+   }
+  ]
+ },
+ "gallimimus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 867550,
+    "user": "TheKingOfGeeks360",
+    "title": "Ratites - Ostrich; Snort, Close Perspective",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/867550/"
+   }
+  ]
+ },
+ "pachycephalosaurus": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 475483,
+    "user": "o_ciz",
+    "title": "Horse(snort)_3.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/o_ciz/sounds/475483/"
+   }
+  ]
+ },
+ "protoceratops": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 805297,
+    "user": "jahjahjahjah",
+    "title": "goose honk",
+    "license": "CC0",
+    "url": "https://freesound.org/people/jahjahjahjah/sounds/805297/"
+   }
+  ]
+ },
+ "archaeopteryx": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 651186,
+    "user": "Borgory",
+    "title": "Raven, Crow, Ravens, Cry, Scream, Rabe, Kolkrabe, Kraehe",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Borgory/sounds/651186/"
+   }
+  ]
+ },
+ "ammonite": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 529383,
+    "user": "calebrankin",
+    "title": "Bubbles In Water",
+    "license": "CC0",
+    "url": "https://freesound.org/people/calebrankin/sounds/529383/"
+   }
+  ]
+ },
+ "meganeura": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 447319,
+    "user": "antoineopeng",
+    "title": "Dragonfly.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/antoineopeng/sounds/447319/"
+   }
+  ]
+ },
+ "ichthyosaur": {
+  "world": "auto",
+  "sources": [
+   {
+    "freesound": 456151,
+    "user": "jfournier18",
+    "title": "Dolphin Noise-.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/jfournier18/sounds/456151/"
+   }
+  ]
+ },
+ "baku": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 536746,
+    "user": "egomassive",
+    "title": "Pig.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/egomassive/sounds/536746/"
+   },
+   {
+    "freesound": 536746,
+    "user": "egomassive",
+    "title": "Pig.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/egomassive/sounds/536746/"
+   }
+  ]
+ },
+ "crossbill": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 670176,
+    "user": "freemaster2",
+    "title": "House sparrows",
+    "license": "CC0",
+    "url": "https://freesound.org/people/freemaster2/sounds/670176/"
+   }
+  ]
+ },
+ "dikdik": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 203593,
+    "user": "raoul_slayer",
+    "title": "barkingroedeer.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/raoul_slayer/sounds/203593/"
+   }
+  ]
+ },
+ "dipper": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 388734,
+    "user": "Inkahootz81",
+    "title": "Australian Willy Wagtail",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Inkahootz81/sounds/388734/"
+   }
+  ]
+ },
+ "gazelle": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 186921,
+    "user": "ReadeOnly",
+    "title": "Angry Ram",
+    "license": "CC0",
+    "url": "https://freesound.org/people/ReadeOnly/sounds/186921/"
+   }
+  ]
+ },
+ "honeybear": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 856648,
+    "user": "Skylosaurus",
+    "title": "FFL-250 Sound effect",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Skylosaurus/sounds/856648/"
+   }
+  ]
+ },
+ "hoopoe": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 610563,
+    "user": "randomthoughts7",
+    "title": "Eurasian Collared Dove",
+    "license": "CC0",
+    "url": "https://freesound.org/people/randomthoughts7/sounds/610563/"
+   }
+  ]
+ },
+ "hyrax": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 820322,
+    "user": "SoundsLikeYukon",
+    "title": "Backyard squirrel",
+    "license": "CC0",
+    "url": "https://freesound.org/people/SoundsLikeYukon/sounds/820322/"
+   }
+  ]
+ },
+ "komainu": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 469123,
+    "user": "Manim8",
+    "title": "Demon_Lion_Monster_Growl_Roar",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Manim8/sounds/469123/"
+   },
+   {
+    "freesound": 469123,
+    "user": "Manim8",
+    "title": "Demon_Lion_Monster_Growl_Roar",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Manim8/sounds/469123/"
+   }
+  ]
+ },
+ "leopardtortoise": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 759858,
+    "user": "cmp1",
+    "title": "Hippopotamus Sounds",
+    "license": "CC0",
+    "url": "https://freesound.org/people/cmp1/sounds/759858/"
+   }
+  ]
+ },
+ "malachite": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 171650,
+    "user": "cvp1965",
+    "title": "Countryside 01",
+    "license": "CC0",
+    "url": "https://freesound.org/people/cvp1965/sounds/171650/"
+   }
+  ]
+ },
+ "meerkat": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 536753,
+    "user": "egomassive",
+    "title": "Rat.ogg",
+    "license": "CC0",
+    "url": "https://freesound.org/people/egomassive/sounds/536753/"
+   }
+  ]
+ },
+ "mistsprite": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 388734,
+    "user": "Inkahootz81",
+    "title": "Australian Willy Wagtail",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Inkahootz81/sounds/388734/"
+   },
+   {
+    "freesound": 388734,
+    "user": "Inkahootz81",
+    "title": "Australian Willy Wagtail",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Inkahootz81/sounds/388734/"
+   }
+  ]
+ },
+ "oxpecker": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 837677,
+    "user": "TheKingOfGeeks360",
+    "title": "Songbirds - Orange Bishop Weaver, Short Chirp",
+    "license": "CC0",
+    "url": "https://freesound.org/people/TheKingOfGeeks360/sounds/837677/"
+   }
+  ]
+ },
+ "rainbowbird": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 328915,
+    "user": "hedgehog1",
+    "title": "Bird Sounds of Knysna.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/hedgehog1/sounds/328915/"
+   },
+   {
+    "freesound": 328915,
+    "user": "hedgehog1",
+    "title": "Bird Sounds of Knysna.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/hedgehog1/sounds/328915/"
+   }
+  ]
+ },
+ "serow": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 581240,
+    "user": "Kinoton",
+    "title": "Single Goat Bleating 2x",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kinoton/sounds/581240/"
+   },
+   {
+    "freesound": 581240,
+    "user": "Kinoton",
+    "title": "Single Goat Bleating 2x",
+    "license": "CC0",
+    "url": "https://freesound.org/people/Kinoton/sounds/581240/"
+   }
+  ]
+ },
+ "skywhale": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 723878,
+    "user": "lori.mortimer",
+    "title": "Totally Unique",
+    "license": "CC0",
+    "url": "https://freesound.org/people/lori.mortimer/sounds/723878/"
+   },
+   {
+    "freesound": 723878,
+    "user": "lori.mortimer",
+    "title": "Totally Unique",
+    "license": "CC0",
+    "url": "https://freesound.org/people/lori.mortimer/sounds/723878/"
+   }
+  ]
+ },
+ "starfox": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 537587,
+    "user": "craigsays",
+    "title": "red fox screeching.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsays/sounds/537587/"
+   },
+   {
+    "freesound": 537587,
+    "user": "craigsays",
+    "title": "red fox screeching.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsays/sounds/537587/"
+   }
+  ]
+ },
+ "snowbunting": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 670176,
+    "user": "freemaster2",
+    "title": "House sparrows",
+    "license": "CC0",
+    "url": "https://freesound.org/people/freemaster2/sounds/670176/"
+   }
+  ]
+ },
+ "swan": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 456770,
+    "user": "WavJunction.com",
+    "title": "Mallard Duck Quack Flying Away.wav",
+    "license": "CC0",
+    "url": "https://freesound.org/people/WavJunction.com/sounds/456770/"
+   }
+  ]
+ },
+ "tanuki": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 537587,
+    "user": "craigsays",
+    "title": "red fox screeching.mp3",
+    "license": "CC0",
+    "url": "https://freesound.org/people/craigsays/sounds/537587/"
+   }
+  ]
+ },
+ "whitepanda": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 763026,
+    "user": "celldroid",
+    "title": "Bear Angry Growl",
+    "license": "CC0",
+    "url": "https://freesound.org/people/celldroid/sounds/763026/"
+   },
+   {
+    "freesound": 763026,
+    "user": "celldroid",
+    "title": "Bear Angry Growl",
+    "license": "CC0",
+    "url": "https://freesound.org/people/celldroid/sounds/763026/"
+   }
+  ]
+ },
+ "wildebeest": {
+  "world": "final",
+  "sources": [
+   {
+    "freesound": 873888,
+    "user": "timpet55",
+    "title": "Bison",
+    "license": "CC0",
+    "url": "https://freesound.org/people/timpet55/sounds/873888/"
+   }
+  ]
+ }
+}

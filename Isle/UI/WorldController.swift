@@ -54,8 +54,14 @@ final class WorldController {
             guard let self else { return }
             Ambience.shared.set(self.scene.ambience)
         }
-        scene.onStrike = { Ambience.shared.thunder() }
-        scene.onAnimalVoice = { sp, pan in Voices.shared.tapped(sp, pan: pan) }
+        scene.onStrike = {
+            Haptic.strike()
+            Ambience.shared.thunder()
+        }
+        scene.onAnimalVoice = { sp, pan in
+            Haptic.touch()
+            Voices.shared.tapped(sp, pan: pan)
+        }
         scene.nameOf = { [weak self] r in self?.name(of: r) ?? L(r.name) }
         scene.onSkyChange = { [weak self] in
             guard let self else { return }
@@ -201,16 +207,19 @@ final class WorldController {
         scene.playSeedDrop(at: tile) { [weak self] in
             guard let self else { return }
             Sfx.seedLand.play()
+            Haptic.land()
             let p = Store.shared.plant(self.habitID, species: sp.id, at: tile)
             self.busy = false
             self.refresh(animated: true)
             if let p, p.rare {
                 Sfx.rare.play(after: 0.1)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { Haptic.success() }
                 self.scene.celebrateRare(at: p.id)
                 withAnimation(.spring(duration: 0.4)) { self.celebration = sp.rareName }
             } else if p != nil {
                 // In sincrono con `popIn`, che fa spuntare le piante seminate dopo 0,15 s.
                 Sfx.seedGrow.play(after: 0.15)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { Haptic.touch() }
             }
             if p != nil, self.habit?.placements.count == Habit.startSeeds { self.greetFirstGuest() }
         }

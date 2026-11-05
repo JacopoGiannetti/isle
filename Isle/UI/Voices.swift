@@ -1,9 +1,8 @@
 import AVFoundation
 import UIKit
 
-/// I versi degli animali sull'isola aperta. Gli animali simili condividono una voce di famiglia,
-/// intonata sulla loro taglia; i rari ci aggiungono un luccichio, gli Speciali un alone,
-/// i leggendari e i visitatori del cielo hanno ognuno la sua.
+/// I versi degli animali sull'isola aperta, da registrazioni vere: ogni specie il suo.
+/// Chi in natura non fa versi, come lucciole e lumache, resta zitto.
 /// Un regista ne fa sentire uno ogni pochi secondi, mai due insieme e mai la stessa specie di fila.
 @MainActor
 final class Voices {
@@ -23,18 +22,39 @@ final class Voices {
     /// Dopo un verso, il regista aspetta che finisca prima di farne sentire un altro.
     private var quietUntil = Date.distantPast
 
+    /// Gli animali dell'isola aperta.
+    private var island: (() -> [Candidate])?
+    /// Gli animali del mondo che si sta guardando nella scelta del mondo: finché ci sono, parlano loro.
+    private var previewing: (() -> [Candidate])?
+
     func start(_ candidates: @escaping () -> [Candidate]) {
+        island = candidates
+        if previewing == nil { run(after: 2.5) }
+    }
+
+    func stop() {
+        island = nil
+        if previewing == nil { halt() }
+    }
+
+    /// `nil` chiude l'anteprima e ridà la parola all'isola, se c'è.
+    func preview(_ candidates: (() -> [Candidate])?) {
+        previewing = candidates
+        if candidates != nil { run(after: 0.8) } else if island != nil { run(after: 2.5) } else { halt() }
+    }
+
+    private func run(after delay: Double) {
         director?.cancel()
         director = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(2.5))
-            while !Task.isCancelled {
-                self?.tick(candidates())
+            try? await Task.sleep(for: .seconds(delay))
+            while !Task.isCancelled, let self {
+                self.tick((self.previewing ?? self.island)?() ?? [])
                 try? await Task.sleep(for: .seconds(.random(in: 4...8)))
             }
         }
     }
 
-    func stop() {
+    private func halt() {
         director?.cancel()
         director = nil
         for p in players.values where p.isPlaying { p.setVolume(0, fadeDuration: 0.4) }
@@ -48,6 +68,7 @@ final class Voices {
 
     private func tick(_ list: [Candidate]) {
         guard Ambience.shared.on, Date.now >= quietUntil, UIApplication.shared.applicationState == .active else { return }
+        let list = list.filter { Self.voice($0.species) != nil }
         let fresh = list.filter { $0.species.id != last }
         guard let pick = Self.pick(fresh.isEmpty ? list : fresh) else { return }
         say(pick.species, pan: pick.pan, volume: 0.22 + 0.33 * pick.near)
@@ -69,14 +90,10 @@ final class Voices {
     }
 
     private func say(_ sp: AnimalSpecies, pan: Float, volume: Float) {
-        guard Ambience.shared.on else { return }
-        let v = Self.voice(sp)
+        guard Ambience.shared.on, let v = Self.voice(sp) else { return }
         last = sp.id
         guard let p = play(v.file, pan: pan, volume: volume, semitones: v.semitones) else { return }
         quietUntil = max(quietUntil, .now + p.duration / Double(p.rate) + 1)
-        if let glint = v.overlay {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { _ = self.play(glint, pan: pan, volume: volume * 0.7, semitones: 0) }
-        }
     }
 
     @discardableResult
@@ -105,105 +122,57 @@ final class Voices {
     struct Voice {
         let file: String
         let semitones: Float
-        /// Il luccichio dei rari o l'alone degli Speciali, sopra la voce.
-        let overlay: String?
     }
 
-    static func voice(_ sp: AnimalSpecies) -> Voice {
-        if legends.contains(sp.id) { return Voice(file: "v-\(sp.id)", semitones: 0, overlay: nil) }
-        let family = familyOf[sp.id] ?? fallback(sp)
-        // Più grande della media della sua famiglia, più grave; e ogni specie un filo diversa dalle sorelle.
-        let mean = familyScale[family] ?? sp.look.scale
-        var shift = -6 * Float(log2(max(0.2, sp.look.scale) / max(0.2, mean)))
-        shift += Float(sp.id.unicodeScalars.reduce(0) { $0 + Int($1.value) } % 3 - 1)
-        let overlay = sp.evolvesFrom != nil ? "v-glow" : sp.rare ? "v-glint" : nil
-        return Voice(file: "v-\(family)", semitones: max(-4, min(4, shift)), overlay: overlay)
+    /// Ogni specie ha il suo verso, registrato da animali veri. Le varianti di colore usano quello
+    /// della specie da cui vengono, un filo più acuto o più grave per non essere identiche.
+    static func voice(_ sp: AnimalSpecies) -> Voice? {
+        if silent.contains(sp.id) { return nil }
+        if has("v-\(sp.id)") { return Voice(file: "v-\(sp.id)", semitones: 0) }
+        if sp.move == .flutter || sp.id == "lunamoth" { return Voice(file: "v-flutter", semitones: 0) }
+        guard let base = variants[sp.id], has("v-\(base)") else { return nil }
+        let up = sp.id.unicodeScalars.reduce(0) { $0 + Int($1.value) } % 2 == 0
+        return Voice(file: "v-\(base)", semitones: up ? 1 : -1)
     }
 
-    private static func fallback(_ sp: AnimalSpecies) -> String {
-        switch sp.move {
-        case .fly: return "chirp"
-        case .flutter: return "flutter"
-        case .glow: return "twinkle"
-        case .swim: return "splash"
-        case .hop: return "squeak"
-        case .walk: return "snort"
-        }
+    private static var bundled: [String: Bool] = [:]
+
+    private static func has(_ file: String) -> Bool {
+        if let known = bundled[file] { return known }
+        let found = Bundle.main.url(forResource: file, withExtension: "m4a", subdirectory: "Sounds") != nil
+        bundled[file] = found
+        return found
     }
 
-    /// Hanno una voce tutta loro.
-    static let legends: Set<String> = [
-        "moonhare", "ninetail", "whitewolf", "royaldeer", "spirit",
-        "aurorafox", "frostlynx", "silverreindeer", "auroraorca", "kingmammoth",
-        "blackpanther", "whitelion", "stargiraffe", "royalcheetah", "greatelephant",
-        "emberankylo", "quetzalcoatlus", "mosasaurus", "silverdiplodocus", "trex",
-        "komainu", "baku", "whitepanda", "jadedragon", "phoenix",
-        "unicorn", "carouselhorse", "goldenhen", "frogprince", "mooncow",
-        "moondeer", "skywhale", "starfox",
+    /// In natura non fanno versi: niente campanelli al loro posto.
+    private static let silent: Set<String> = ["firefly", "glowsnail", "glowbeetle"]
+
+    /// Varianti rare e parenti stretti: prendono la voce della specie di base.
+    private static let variants: [String: String] = [
+        // foresta
+        "whitesquirrel": "squirrel", "ermine": "marten", "albinohedgehog": "hedgehog", "blackrabbit": "rabbit",
+        "whitedeer": "deer", "goldfrog": "frog", "flamefox": "fox", "dormouse": "woodmouse", "mandarin": "duck",
+        "snowowl": "owl", "blackswan": "swan",
+        // ghiacci
+        "silverhare": "arctichare", "redlemming": "lemming", "bluefox": "arcticfox", "goldredpoll": "redpoll",
+        "goldptarmigan": "ptarmigan", "whiteseal": "seal", "goldreindeer": "reindeer", "pinkwalrus": "walrus",
+        "goldpuffin": "puffin", "bluebeluga": "beluga", "whitemammoth": "mammoth", "crystalnarwhal": "narwhal",
+        "goldmonkey": "snowmonkey",
+        // savana
+        "pinkweaver": "weaver", "redwarthog": "warthog", "goldmeerkat": "meerkat", "emeraldsunbird": "sunbird",
+        "goldvervet": "vervet", "goldzebra": "zebra", "silvergazelle": "gazelle", "bluegnu": "wildebeest",
+        "whiteflamingo": "flamingo", "whiteelephant": "elephant", "whitegiraffe": "giraffe", "pinkhippo": "hippo",
+        "whiterhino": "rhino",
+        // preistoria
+        "ambercompy": "compsognathus", "goldproto": "protoceratops", "redpachy": "pachycephalosaurus",
+        "blueovi": "oviraptor", "goldptero": "pterodactyl", "whiteplesio": "plesiosaur", "goldparasaur": "parasaurolophus",
+        "whitetrike": "triceratops", "opalraptor": "velociraptor", "bluestego": "stegosaurus", "redbrachio": "brachiosaurus",
+        "crystalptera": "pteranodon", "quartzankylo": "ankylosaurus", "emeraldichthyo": "ichthyosaur",
+        // zen
+        "goldredpanda": "redpanda", "silverpika": "pika", "whitewarbler": "bushwarbler", "yellowwagtail": "wagtail",
+        "goldkoi": "koi", "goldpheasant": "greenpheasant", "whitepeacock": "peacock", "silvercrane": "crane",
+        // fattoria
+        "whitemouse": "fieldmouse", "silkie": "hen", "cintapig": "pig", "goldduck": "whiteduck",
+        "blacksheep": "sheep", "palomino": "horse", "highlandcow": "cow",
     ]
-
-    private static let families: [String: [String]] = [
-        "chirp": ["sparrow", "robin", "bullfinch", "crossbill", "dipper", "kingfisher", "snowbunting", "redpoll", "goldredpoll",
-                  "weaver", "pinkweaver", "oxpecker", "variedtit", "wagtail", "yellowwagtail", "canary", "archaeopteryx"],
-        "warble": ["blackbird", "bushwarbler", "whitewarbler", "sunbird", "emeraldsunbird", "malachite", "beeeater"],
-        "coo": ["turtledove", "hoopoe", "ptarmigan", "goldptarmigan"],
-        "caw": ["jay", "magpie"],
-        "hoot": ["owl", "snowowl", "uralowl", "starowl", "lightowl", "eagleowl"],
-        "quack": ["duck", "mandarin", "whiteduck", "goldduck"],
-        "honk": ["swan", "blackswan", "crane", "silvercrane", "flamingo", "whiteflamingo", "egret", "heron"],
-        "clack": ["woodpecker", "stork"],
-        "seabird": ["puffin", "goldpuffin", "tern"],
-        "screech": ["fisheagle", "pterodactyl", "pteranodon", "goldptero", "crystalptera"],
-        "cluck": ["hen", "turkey", "greenpheasant", "goldpheasant", "silkie"],
-        "peep": ["chick"],
-        "peacock": ["peacock", "whitepeacock"],
-        "flutter": ["butterfly", "bluebutterfly", "snowbutterfly", "savbutterfly", "zenbutterfly", "farmbutterfly", "hawkmoth", "lunamoth"],
-        "buzz": ["dragonfly", "meganeura", "queenbee", "stagbeetle"],
-        "twinkle": ["firefly", "glowsnail", "glowbeetle"],
-        "squeak": ["woodmouse", "dormouse", "fieldmouse", "whitemouse", "lemming", "redlemming", "hyrax", "pika", "silverpika",
-                   "bat", "meerkat", "goldmeerkat", "dikdik"],
-        "chitter": ["squirrel", "whitesquirrel", "flyingsquirrel", "marten", "ermine", "otter"],
-        "sniff": ["rabbit", "blackrabbit", "arctichare", "silverhare", "hedgehog", "albinohedgehog"],
-        "yip": ["fox", "flamefox", "arcticfox", "bluefox", "tanuki", "redpanda", "goldredpanda"],
-        "bark": ["dog", "seal", "whiteseal", "roe"],
-        "howl": ["wolf", "arcticwolf"],
-        "growl": ["bear", "polarbear", "moonbear", "honeybear"],
-        "meow": ["lynx", "iriomotecat"],
-        "roar": ["lion"],
-        "bellow": ["deer", "whitedeer", "reindeer", "goldreindeer", "muskox"],
-        "snort": ["gazelle", "silvergazelle", "serow", "giraffe", "whitegiraffe"],
-        "grunt": ["hippo", "pinkhippo", "walrus", "pinkwalrus", "rhino", "whiterhino", "badger", "wildebeest", "bluegnu"],
-        "oink": ["pig", "cintapig", "warthog", "redwarthog"],
-        "moo": ["cow", "ox", "highlandcow"],
-        "baa": ["sheep", "blacksheep", "goat"],
-        "neigh": ["horse", "palomino", "zebra", "goldzebra"],
-        "bray": ["donkey"],
-        "trumpet": ["elephant", "whiteelephant", "mammoth", "whitemammoth"],
-        "whale": ["beluga", "bluebeluga", "orca", "narwhal", "crystalnarwhal", "plesiosaur", "whiteplesio", "ichthyosaur", "emeraldichthyo"],
-        "splash": ["koi", "goldkoi", "turtle", "ammonite", "beaver", "salamander"],
-        "croak": ["frog", "goldfrog"],
-        "monkey": ["vervet", "goldvervet", "snowmonkey", "goldmonkey"],
-        "dinosmall": ["compsognathus", "ambercompy", "oviraptor", "blueovi", "gallimimus", "velociraptor", "opalraptor",
-                      "protoceratops", "goldproto", "pachycephalosaurus", "redpachy"],
-        "dinobig": ["triceratops", "whitetrike", "stegosaurus", "bluestego", "ankylosaurus", "quartzankylo", "iguanodon",
-                    "spinosaurus", "brachiosaurus", "redbrachio"],
-        "hadro": ["parasaurolophus", "goldparasaur"],
-        "plod": ["leopardtortoise"],
-    ]
-
-    private static let familyOf: [String: String] = {
-        var m: [String: String] = [:]
-        for (family, ids) in families { for id in ids { m[id] = family } }
-        return m
-    }()
-
-    /// La taglia media di ogni famiglia: la voce è registrata per quella.
-    private static let familyScale: [String: CGFloat] = {
-        var m: [String: CGFloat] = [:]
-        for (family, ids) in families {
-            let sizes = ids.compactMap { animalByID[$0]?.look.scale }
-            if !sizes.isEmpty { m[family] = sizes.reduce(0, +) / CGFloat(sizes.count) }
-        }
-        return m
-    }()
 }

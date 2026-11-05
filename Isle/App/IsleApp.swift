@@ -150,6 +150,14 @@ enum Launch {
             try? img.pngData()?.write(to: url)
             print("PLANTS -> \(url.path)")
         }
+        if d.bool(forKey: "dumpEachPortrait") {
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("portraits")
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            for sp in allAnimals + skyVisitors {
+                try? AnimalArt.portrait(sp, scale: 2).pngData()?.write(to: dir.appendingPathComponent("\(sp.id).png"))
+            }
+            print("PORTRAITS -> \(dir.path)")
+        }
         if d.bool(forKey: "dumpPortraits") {
             let list = d.string(forKey: "dumpLand").flatMap(Habitat.init(rawValue:))?.animals ?? allAnimals
             let cols = 8, cell: CGFloat = 80

@@ -21,7 +21,7 @@ struct WorldView: View {
     @State private var guestAfterPath = false
 
     enum Sheet: String, Identifiable {
-        case seeds, diary, path, calendar
+        case seeds, diary, path, calendar, guide
         var id: String { rawValue }
     }
 
@@ -103,6 +103,7 @@ struct WorldView: View {
             case "diary": sheet = .diary
             case "calendar": sheet = .calendar
             case "seeds": sheet = .seeds
+            case "guide": sheet = .guide
             case "delete": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { confirmDelete = true }
             default: break
             }
@@ -189,6 +190,14 @@ struct WorldView: View {
                 case .diary: DiaryView(controller: c) { sel in sheet = nil; DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { c.focus(sel) } }
                 case .path: PathView(controller: c)
                 case .calendar: if let h = habit { HabitCalendar(habit: h) }
+                case .guide:
+                    NavigationStack {
+                        GuideView().toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button(L("Fine")) { sheet = nil }.tint(Theme.ink)
+                            }
+                        }
+                    }
                 }
             }
             .presentationDetents(s == .seeds ? [.medium, .large] : [.large])
@@ -223,6 +232,7 @@ struct WorldView: View {
                 GlassButton(icon: "map.fill") { sheet = .path }.accessibilityLabel(L("Sentiero"))
                 GlassButton(icon: "calendar") { sheet = .calendar }.accessibilityLabel(L("Calendario"))
                 toolsButton
+                GlassButton(icon: "questionmark") { sheet = .guide }.accessibilityLabel(L("Come funziona Isle"))
             }
         }
         .padding(.top, 4)
@@ -787,6 +797,7 @@ struct WorldView: View {
         let outcome = c.answer(yes: yes)
         switch outcome {
         case .seed(let g):
+            if g.bonus != nil || g.seeds > 0 { Haptic.success() } else { Haptic.touch() }
             say(gainText(g, before), for: g.bonus != nil || g.done == g.target && before.rhythm.allowsExtra ? 7 : 4)
             if g.bonus != nil {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { withAnimation(.spring(duration: 0.5)) { bonus = g } }

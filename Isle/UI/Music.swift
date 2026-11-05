@@ -12,13 +12,16 @@ final class Music {
     var on: Bool {
         didSet {
             UserDefaults.standard.set(on, forKey: Self.key)
-            if on, let track { play(track: track) } else if !on { fade() }
+            if on, let wanted { start(wanted) } else if !on { fade() }
         }
     }
 
     @ObservationIgnored private var player: AVAudioPlayer?
     @ObservationIgnored private var playing: String?
     @ObservationIgnored private var track: String?
+    /// Il mondo che si sta guardando nella scelta del mondo: finché c'è, suona lui al posto dell'isola.
+    @ObservationIgnored private var previewing: String?
+    private var wanted: String? { previewing ?? track }
     @ObservationIgnored private var generation = 0
     /// Sotto la pioggia forte la musica fa un passo indietro.
     @ObservationIgnored private var ducked: Float = 1
@@ -34,7 +37,7 @@ final class Music {
             MainActor.assumeIsolated { Music.shared.player?.pause() }
         }
         center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
-            MainActor.assumeIsolated { if let track = Music.shared.track { Music.shared.play(track: track) } }
+            MainActor.assumeIsolated { if let wanted = Music.shared.wanted { Music.shared.start(wanted) } }
         }
     }
 
@@ -43,8 +46,19 @@ final class Music {
     /// Il cielo e le nuvole della prima pagina dell'introduzione.
     func intro() { play(track: "intro") }
 
+    /// `nil` chiude l'anteprima e torna alla musica di prima, se c'era.
+    func preview(_ land: Habitat?) {
+        previewing = land?.rawValue
+        if let wanted { start(wanted) } else { fade() }
+    }
+
     private func play(track: String) {
         self.track = track
+        if previewing == nil { start(track) }
+    }
+
+    /// Passando da un brano all'altro, il vecchio sfuma mentre il nuovo entra.
+    private func start(_ track: String) {
         guard on else { return }
         generation += 1
         if playing == track, let player {
@@ -52,21 +66,24 @@ final class Music {
             player.setVolume(level, fadeDuration: 1)
             return
         }
-        player?.stop()
+        if let old = player {
+            old.setVolume(0, fadeDuration: 0.7)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { old.stop() }
+        }
         guard let url = Bundle.main.url(forResource: track, withExtension: "m4a", subdirectory: "Music"),
               let next = try? AVAudioPlayer(contentsOf: url) else { return }
         try? AVAudioSession.sharedInstance().setActive(true)
         next.numberOfLoops = -1
         next.volume = 0
         next.play()
-        next.setVolume(level, fadeDuration: 2)
+        next.setVolume(level, fadeDuration: 1.2)
         player = next
         playing = track
     }
 
     func stop() {
         track = nil
-        fade()
+        if previewing == nil { fade() }
     }
 
     /// `amount` da 0 (musica piena) a 1 (musica quasi coperta dal meteo).
@@ -74,7 +91,7 @@ final class Music {
         let next = Float(1 - 0.4 * min(1, max(0, amount)))
         guard abs(next - ducked) > 0.01 else { return }
         ducked = next
-        if track != nil, let player, player.isPlaying { player.setVolume(level, fadeDuration: 2.5) }
+        if wanted != nil, let player, player.isPlaying { player.setVolume(level, fadeDuration: 2.5) }
     }
 
     private func fade() {
@@ -115,6 +132,8 @@ final class Ambience {
     }
 
     @ObservationIgnored private var mix = Mix()
+    /// Il mondo che si sta guardando nella scelta del mondo: finché c'è, si sente lui al posto dell'isola.
+    @ObservationIgnored private var previewing: Mix?
     @ObservationIgnored private var active = false
     @ObservationIgnored private var loops: [String: AVAudioPlayer] = [:]
     @ObservationIgnored private var thunders: [AVAudioPlayer] = []
@@ -150,6 +169,12 @@ final class Ambience {
         apply()
     }
 
+    /// `nil` chiude l'anteprima e torna ai suoni dell'isola aperta, se c'è.
+    func preview(_ mix: Mix?) {
+        previewing = mix
+        apply()
+    }
+
     func thunder() {
         guard active, on else { return }
         let delay = Double.random(in: 0.5...2.2)
@@ -163,7 +188,8 @@ final class Ambience {
     }
 
     private func apply() {
-        let playing = active && on
+        let mix = previewing ?? self.mix
+        let playing = (active || previewing != nil) && on
         var levels = ["rain-light": mix.drizzle, "rain-heavy": mix.rain, "wind": mix.wind]
         // Il fondo del mondo si ritira sotto la pioggia, come gli uccelli; cambiando ora sfuma nell'altro.
         for name in loops.keys where name.hasPrefix("bed-") { levels[name] = 0 }

@@ -24,12 +24,31 @@ struct WorldPicker: View {
         .onChange(of: page) { _, p in
             if let p, p != selection { withAnimation(.easeOut(duration: 0.3)) { selection = p } }
         }
+        .sensoryFeedback(.selection, trigger: selection)
         .task { await previews.prepare() }
+        // Si sente il mondo su cui ci si ferma, non tutti quelli che passano scorrendo:
+        // il suo sottofondo e i versi degli animali della sua isola d'esempio.
+        .task(id: selection) {
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            let land = selection
+            Music.shared.preview(land)
+            Ambience.shared.preview(previews.scenes[land]?.ambience ?? Ambience.Mix(bed: "bed-\(land.rawValue)-day"))
+            await previews.prepare()
+            guard !Task.isCancelled, let scene = previews.scenes[land] else { return }
+            Ambience.shared.preview(scene.ambience)
+            Voices.shared.preview { [weak scene] in scene?.voiceCandidates() ?? [] }
+        }
         .task {
             try? await Task.sleep(for: .milliseconds(600))
             previews.still = true
         }
-        .onDisappear { previews.still = false }
+        .onDisappear {
+            previews.still = false
+            Music.shared.preview(nil)
+            Ambience.shared.preview(nil)
+            Voices.shared.preview(nil)
+        }
         .task {
             guard Perf.on, UserDefaults.standard.bool(forKey: "cyclePages") else { return }
             try? await Task.sleep(for: .seconds(1.5))

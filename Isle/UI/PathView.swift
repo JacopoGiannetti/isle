@@ -426,6 +426,7 @@ private struct DotPress: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.88 : 1)
             .animation(.spring(duration: 0.2, bounce: 0.4), value: configuration.isPressed)
+            .pressHaptic(configuration.isPressed)
     }
 }
 

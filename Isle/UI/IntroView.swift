@@ -485,6 +485,7 @@ struct IntroView: View {
             let ready = Task { await world(i) }
             pass = CloudPass(cover: .now, first: true)
             Sfx.clouds.play(volume: 0.6)
+            Haptic.touch()
             await pause(CloudPass.coverTime(first: true))
             present(i, await ready.value)
             await pause(0.2)
@@ -494,7 +495,10 @@ struct IntroView: View {
             await pause(CloudPass.throughTime - 0.3)
             pass = nil
             for s in 1...3 {
-                if s == 1 { Sfx.title.play(volume: 0.55) }
+                if s == 1 {
+                    Sfx.title.play(volume: 0.55)
+                    Haptic.touch()
+                }
                 withAnimation(.timingCurve(0.16, 1, 0.3, 1, duration: 0.8)) { stage = s }
                 await pause(s == 1 ? 0.3 : 0.45)
             }

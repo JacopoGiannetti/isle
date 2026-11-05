@@ -751,10 +751,12 @@ private struct State {
                 elements[p.id].flatMap { $0.died == nil ? $0.speciesID : nil }
             })
             guard !plants.isEmpty else { return }
-            let lured = h.land.animals.filter { sp in !sp.rare && sp.named && sp.riddle == nil && sp.move != .fly && sp.lure.contains { plants.contains($0) } }
-            let early = lured.filter { $0.phase == 1 }
+            let lured = h.land.animals.filter { sp in !sp.rare && sp.named && sp.riddle == nil && sp.lure.contains { plants.contains($0) } }
+            let walkers = lured.filter { $0.move != .fly }
+            let candidates = walkers.isEmpty ? lured : walkers
+            let early = candidates.filter { $0.phase == 1 }
             var r = RNG("welcome/\(id)")
-            let pool = early.isEmpty ? lured : early
+            let pool = early.isEmpty ? candidates : early
             guard let sp = pool.isEmpty ? animalByID[h.land.firstGuest] : r.pick(pool) else { return }
             welcomeID = arrive(sp, at: t, rng: &r)
 

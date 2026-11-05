@@ -295,6 +295,7 @@ struct PressStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(duration: 0.25), value: configuration.isPressed)
+            .pressHaptic(configuration.isPressed)
     }
 }
 
