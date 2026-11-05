@@ -17,6 +17,8 @@ struct SettingsView: View {
     @State private var restored = false
     private let cloud = Cloud.status
     private let premium = Premium.shared
+    private let music = Music.shared
+    private let ambience = Ambience.shared
 
     var body: some View {
         NavigationStack {
@@ -66,6 +68,24 @@ struct SettingsView: View {
                     .foregroundStyle(Theme.ink)
                 } footer: {
                     footer(L("Cambia la lingua dell'app. Vale subito, senza chiudere."))
+                }
+                .listRowBackground(Theme.paper)
+
+                Section {
+                    Toggle(isOn: Binding(get: { music.on }, set: { music.on = $0 })) {
+                        Label(L("Musica"), systemImage: "music.note")
+                            .font(.cozy(16, .semibold))
+                            .foregroundStyle(Theme.ink)
+                    }
+                    .tint(Theme.green)
+                    Toggle(isOn: Binding(get: { ambience.on }, set: { ambience.on = $0 })) {
+                        Label(L("Effetti sonori"), systemImage: "speaker.wave.2")
+                            .font(.cozy(16, .semibold))
+                            .foregroundStyle(Theme.ink)
+                    }
+                    .tint(Theme.green)
+                } footer: {
+                    footer(L("Una musichetta diversa per ogni mondo. Gli effetti sono i suoni di ogni mondo, i versi degli animali (toccali per sentirli), il meteo e i semi che germogliano. Tacciono col tasto silenzioso."))
                 }
                 .listRowBackground(Theme.paper)
 

@@ -88,6 +88,10 @@ struct WorldView: View {
         .background(Color(hex: 0x9CD4EC))
         .onAppear {
             c.start()
+            Music.shared.play(c.world.habitat)
+            Ambience.shared.start(c.scene.ambience)
+            Voices.shared.start { [weak scene = c.scene] in scene?.voiceCandidates() ?? [] }
+            Sfx.prepare()
             if let h = habit, h.placements.isEmpty, !UserDefaults.standard.bool(forKey: tutorialKey) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     if !UserDefaults.standard.bool(forKey: tutorialKey) { tutorial = true }
@@ -154,7 +158,12 @@ struct WorldView: View {
             }
             #endif
         }
-        .onDisappear { c.stop() }
+        .onDisappear {
+            c.stop()
+            Music.shared.stop()
+            Ambience.shared.stop()
+            Voices.shared.stop()
+        }
         .alert(L("Hai sgarrato?"), isPresented: $confirmSlip) {
             Button(L("Sì, ho sgarrato"), role: .destructive) { slip() }
             Button(L("Annulla"), role: .cancel) {}
@@ -194,6 +203,7 @@ struct WorldView: View {
                 .presentationBackground(Theme.cream)
         }
         #endif
+        .premiumLock()
         .statusBarHidden(false)
     }
 

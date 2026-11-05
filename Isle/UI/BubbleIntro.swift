@@ -250,6 +250,31 @@ struct BubbleStream: View {
         .allowsHitTesting(false)
     }
 
+    /// Le biglie con un'immagine che nascono tra `from` e `to` secondi dall'inizio: quando, quanto grandi
+    /// e da che lato (da -1 a 1), con gli stessi numeri di `flight`.
+    static func births(from: Double, to: Double, count: Int) -> [(at: Double, size: Double, side: Double)] {
+        var out: [(at: Double, size: Double, side: Double)] = []
+        for k in 0..<min(slots, count) {
+            let key = "bubble/\(k)"
+            let delay = 0.15 + Double(k) * 0.06
+            var base = RNG(key)
+            let duration = base.range(3.4, 6.4)
+            var cycle = max(0, Int((from - delay) / duration))
+            while case let at = delay + Double(cycle) * duration, at < to {
+                if at >= from {
+                    var r = RNG("\(key)/\(cycle)")
+                    let born = r.range(-Double.pi * 0.95, -Double.pi * 0.05)
+                    let at0 = r.range(0.3, 1.7)
+                    _ = r.range(-1, 1)
+                    _ = r.range(0.55, 1.15)
+                    out.append((at, r.double(), max(-1, min(1, cos(born) * at0 / 1.7))))
+                }
+                cycle += 1
+            }
+        }
+        return out.sorted { $0.at < $1.at }
+    }
+
     /// Dove si trova una biglia in volo: nasce intorno alla bolla e sale piegando di lato.
     /// Ogni giro ha posizione, direzione e misura nuove.
     private func flight(_ key: String, _ t: Double, _ size: CGSize)

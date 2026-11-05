@@ -169,6 +169,24 @@ enum Launch {
             try? img.pngData()?.write(to: url)
             print("PORTRAITS -> \(url.path)")
         }
+        // Gli sfondi del Sentiero: un mondo per riga, le cinque zone in colonna.
+        if d.bool(forKey: "dumpPath") {
+            let grid = VStack(spacing: 4) {
+                ForEach(Habitat.allCases, id: \.self) { land in
+                    HStack(spacing: 4) {
+                        ForEach(0..<5) { z in
+                            PathBackdrop(land: land, zone: Double(z), fps: 1).frame(width: 195, height: 422).clipped()
+                        }
+                    }
+                }
+            }
+            let r = ImageRenderer(content: grid)
+            r.scale = 2
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("path.png")
+            try? r.uiImage?.pngData()?.write(to: url)
+            print("PATH -> \(url.path)")
+        }
+        if d.bool(forKey: "locked") { Premium.debugLock() }
         #endif
         if d.bool(forKey: "resetAll") {
             Store.shared.habits = []
@@ -321,6 +339,7 @@ struct RootView: View {
             if Launch.open == "tour" { Tour(onDone: {}).zIndex(2) }
             #endif
         }
+        .premiumLock()
         .fullScreenCover(item: Binding(get: { openWorld.map(IDBox.init) }, set: { openWorld = $0?.id })) { box in
             WorldView(habitID: box.id)
         }

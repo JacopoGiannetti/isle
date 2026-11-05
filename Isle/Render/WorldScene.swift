@@ -82,6 +82,11 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
     /// Il nome da mostrare sopra un animale: tradotto, o quello scelto dall'utente.
     var nameOf: ((Resident) -> String)?
     var onSkyChange: (() -> Void)?
+    /// Cambiati pioggia o vento: chi ascolta rilegge `ambience`.
+    var onWeather: (() -> Void)?
+    var onStrike: (() -> Void)?
+    /// Un animale toccato: la sua specie e da che lato della vista sta, da -1 a 1.
+    var onAnimalVoice: ((AnimalSpecies, Float) -> Void)?
     private var skyRain: SKEmitterNode?
     private var skyPetals: SKEmitterNode?
     private var skySparks: SKEmitterNode?
@@ -633,6 +638,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
             removeAction(forKey: "lightning")
         }
         if stormChanged { updateLight() }
+        onWeather?()
     }
 
     private func makeRain() -> SKEmitterNode {
@@ -734,6 +740,30 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
 
     var overcast: Double { storm > 0 ? stormLevel : skyOvercast }
 
+    /// Quanto suonano pioggia e vento adesso, per la tempesta o per il meteo del giorno.
+    /// Dove nevica la pioggia non si sente: resta il vento.
+    var ambience: Ambience.Mix {
+        var m = Ambience.Mix()
+        switch sky {
+        case .drizzle: m.drizzle = 0.7
+        case .rain: m.drizzle = 0.3; m.rain = 0.55
+        case .thunder: m.rain = 0.8; m.wind = 0.25
+        default: break
+        }
+        if rain != nil {
+            m.drizzle = max(m.drizzle, storm <= 2 ? 0.75 : 0.3)
+            m.rain = max(m.rain, [0, 0, 0.25, 0.55, 0.8, 1][storm])
+        }
+        m.wind = max(m.wind, [0, 0.12, 0.25, 0.45, 0.65, 0.85][storm])
+        m.bed = "bed-\(world.habitat.rawValue)-\(night > 0.5 ? "night" : "day")"
+        if world.habitat.snowy {
+            m.wind = max(m.wind, m.drizzle * 0.5 + m.rain * 0.7)
+            m.drizzle = 0
+            m.rain = 0
+        }
+        return m
+    }
+
     private var skyDim: CGFloat {
         switch sky {
         case .cloudy: return 0.08
@@ -787,6 +817,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         } else {
             removeAction(forKey: "skyLightning")
         }
+        onWeather?()
         if s == .petals && skyPetals == nil {
             let e = SKEmitterNode()
             e.particleTexture = Textures.tex("petal") { Art.petal() }.texture
@@ -935,6 +966,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
 
     /// Un lampo: doppio bagliore, come quelli veri.
     func strike() {
+        onStrike?()
         flash.removeAllActions()
         flash.run(.sequence([
             .fadeAlpha(to: 0.45, duration: 0.04), .fadeAlpha(to: 0.05, duration: 0.09),
@@ -987,7 +1019,9 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         if sky == .blaze { c = c.mix(UIColor(hex: 0xFF9A6A), 0.3) }
         if sky == .magic { c = c.mix(UIColor(hex: 0xCFD8FF), 0.4) }
         if !dramatic { tint.color = dim > 0 ? c.mix(UIColor(hex: 0x8A91A2), dim) : c }
+        let dusk = (night > 0.5) != (n > 0.5)
         night = n
+        if dusk { onWeather?() }
         env.hour = hour
         env.night = n
         for node in elementNodes.values {
@@ -1158,6 +1192,23 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
 
     func activity(of id: String) -> String? { animalNode(id)?.activityText }
 
+    /// Chi può fare un verso adesso: sveglio, non riparato dalla tempesta, e quanto è vicino al centro della vista.
+    func voiceCandidates() -> [Voices.Candidate] {
+        (Array(animalNodes.values) + visitors).compactMap { n in
+            guard n.alpha > 0.3, !n.sheltering, n.state != .sleep, n.state != .nap else { return nil }
+            let h = hearing(n.focusPoint)
+            return Voices.Candidate(species: n.sp, pan: h.pan, near: h.near)
+        }
+    }
+
+    /// Da che lato si sente un punto della scena, e quanto è vicino al centro di quello che si vede.
+    private func hearing(_ p: CGPoint) -> (pan: Float, near: Float) {
+        let dx = (p.x - cam.position.x) / max(1, size.width * cam.xScale / 2)
+        let dy = (p.y - cam.position.y) / max(1, size.height * cam.yScale / 2)
+        let pan = Float(max(-1, min(1, dx))) * 0.8
+        return (pan, max(0.1, min(1, 1.25 - 0.75 * Float(hypot(dx, dy)))))
+    }
+
     /// Gli abitanti e i visitatori del cielo: si toccano, si seguono e si descrivono allo stesso modo.
     private func animalNode(_ id: String) -> AnimalNode? {
         animalNodes[id] ?? visitors.first { $0.info.id == id }
@@ -1225,6 +1276,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         }
         if let (n, _) = bestAnimal {
             n.react()
+            onAnimalVoice?(n.sp, hearing(n.focusPoint).pan)
             following = nil
             select(.animal(n.info.id))
             onSelect?(.animal(n.info.id))
@@ -1246,6 +1298,7 @@ final class WorldScene: SKScene, UIGestureRecognizerDelegate {
         } else if let w = whale, (w.children.first?.alpha ?? 0) > 0.3, w.calculateAccumulatedFrame().contains(p) {
             // La balena nuota dietro l'isola: si tocca solo dove l'isola non la copre.
             following = nil
+            if let sp = animalByID["skywhale"] { onAnimalVoice?(sp, hearing(w.position).pan) }
             select(.animal(Self.visitorID("skywhale")))
             onSelect?(.animal(Self.visitorID("skywhale")))
         } else {

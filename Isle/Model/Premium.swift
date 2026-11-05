@@ -15,6 +15,11 @@ final class Premium: SuperwallDelegate {
     /// Vero con almeno un entitlement attivo.
     private(set) var active = false
 
+    /// Isle chiusa dietro al paywall obbligatorio. Sotto al paywall resta una schermata di Isle:
+    /// se si chiude senza abbonamento (un errore, la X che Superwall mostra quando la pagina
+    /// tarda a caricarsi) non si entra lo stesso, si può solo riaprirlo o ripristinare.
+    private(set) var locked = false
+
     static func configure() {
         Superwall.configure(apiKey: "pk_6DX7PU3Ms3bJvCWsabFe4")
         Superwall.shared.delegate = shared
@@ -25,6 +30,7 @@ final class Premium: SuperwallDelegate {
         active = newValue.isActive
         if oldValue.isActive && !newValue.isActive { Self.gate(Store.shared) }
         if newValue.isActive {
+            locked = false
             Task { await Analytics.reportPurchases() }
             Funnel.subscribed()
         }
@@ -126,10 +132,28 @@ final class Premium: SuperwallDelegate {
         Task {
             try? await Task.sleep(for: .seconds(1.5))
             await FirstTouch.wait()
-            guard !shared.active else { return }
-            register("first_animal")
+            lock()
         }
     }
+
+    /// Il paywall obbligatorio, con Isle bloccata sotto finché non c'è l'abbonamento.
+    /// Solo la dashboard può lasciar passare: un'audience esclusa o un gruppo di controllo.
+    static func lock() {
+        guard !shared.active else { return }
+        Task {
+            guard await !TestTools.skipPaywall() else { return }
+            shared.locked = true
+            guard !Superwall.shared.isPaywallPresented else { return }
+            let handler = PaywallPresentationHandler()
+            handler.onSkip { _ in Task { @MainActor in shared.locked = false } }
+            Superwall.shared.register(placement: "first_animal", handler: handler)
+        }
+    }
+
+    #if DEBUG
+    /// La schermata di blocco senza paywall sopra, per le schermate.
+    static func debugLock() { shared.locked = true }
+    #endif
 
     /// Dopo il primo animale Isle è solo per chi è abbonato: il paywall torna a ogni apertura
     /// e quando l'abbonamento scade. Mai durante introduzione e onboarding.
@@ -144,8 +168,8 @@ final class Premium: SuperwallDelegate {
                 guard case .unknown = Superwall.shared.subscriptionStatus else { break }
                 try? await Task.sleep(for: .milliseconds(100))
             }
-            guard case .inactive = Superwall.shared.subscriptionStatus, !Superwall.shared.isPaywallPresented else { return }
-            register("first_animal")
+            guard case .inactive = Superwall.shared.subscriptionStatus else { return }
+            lock()
         }
     }
 }

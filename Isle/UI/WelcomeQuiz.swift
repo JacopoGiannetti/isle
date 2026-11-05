@@ -89,6 +89,7 @@ struct WelcomeQuiz: View {
             askReminders = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .notDetermined
         }
         .onAppear {
+            Sfx.restartScale()
             Analytics.log("onboarding_step", ["step": step.rawValue])
             #if DEBUG
             if let s = Launch.once("quizStep").flatMap(Step.init(rawValue:)) {
@@ -193,12 +194,14 @@ struct WelcomeQuiz: View {
         guard index + 1 < order.count else { return }
         let to = order[index + 1]
         Analytics.log("onboarding_step", ["step": to.rawValue])
+        if to != .forming { Sfx.forward() }
         withAnimation(.spring(duration: 0.45)) { step = to }
     }
 
     private func back() {
         typing = false
         guard index > 0 else { return }
+        Sfx.backward()
         withAnimation(.spring(duration: 0.45)) { step = order[index - 1] }
     }
 
@@ -215,6 +218,7 @@ struct WelcomeQuiz: View {
 
     private func enableReminders() {
         Task {
+            Sfx.bell.play(volume: 0.5)
             remindersOn = await Notifier.requestPermission()
             Analytics.log("notifications_answered", ["granted": remindersOn])
             next()
@@ -274,6 +278,7 @@ struct WelcomeQuiz: View {
     private func sourceChip(_ o: Option) -> some View {
         let on = p.source == o.id
         return Button {
+            Sfx.choice(!on, Self.tone(o))
             p.source = on ? nil : o.id
         } label: {
             HStack(spacing: 10) {
@@ -406,6 +411,14 @@ struct WelcomeQuiz: View {
 
     // MARK: pezzi
 
+    /// La nota di un'opzione: il suo posto nella sua lista.
+    private static func tone(_ o: Option) -> Int {
+        for list in [sources, goals, obstacles] {
+            if let i = list.firstIndex(where: { $0.id == o.id }) { return i }
+        }
+        return 0
+    }
+
     private var goalLabels: [String] {
         Self.goals.filter { p.goals.contains($0.id) }.map(\.label)
     }
@@ -464,6 +477,7 @@ struct WelcomeQuiz: View {
         }
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: on)
+        .onChange(of: on) { _, now in Sfx.choice(now, Self.tone(o)) }
     }
 
     private func tile(_ o: Option, on: Bool, action: @escaping () -> Void) -> some View {
@@ -493,6 +507,7 @@ struct WelcomeQuiz: View {
         .buttonStyle(.plain)
         .animation(.spring(duration: 0.3), value: on)
         .sensoryFeedback(.selection, trigger: on)
+        .onChange(of: on) { _, now in Sfx.choice(now, Self.tone(o)) }
     }
 
     private func promise(icon: String, tint: Color, title: String, text: String) -> some View {
@@ -691,6 +706,7 @@ private struct HoldButton: View {
                 guard !done else { return }
                 buzz?.cancel()
                 withAnimation(pressing ? .linear(duration: duration) : .spring(duration: 0.35)) { progress = pressing ? 1 : 0 }
+                if pressing { Sfx.hold.play(volume: 0.55) } else { Sfx.hold.stop() }
                 if pressing {
                     buzz = Task {
                         while !Task.isCancelled {
@@ -710,6 +726,8 @@ private struct HoldButton: View {
         guard !done else { return }
         buzz?.cancel()
         done = true
+        Sfx.hold.stop()
+        Sfx.seal.play()
         withAnimation(.spring(duration: 0.3)) { progress = 1 }
         onDone()
     }
@@ -804,6 +822,7 @@ private struct Forming: View {
         }
         for i in 1...steps.count {
             try? await Task.sleep(for: .seconds(1.1))
+            [Sfx.formGround, .formFlowers, .formTrees, .formAnimals, .formStar][min(i, 5) - 1].play(volume: 0.6)
             withAnimation(.spring(duration: 0.5)) { stage = i }
         }
         try? await Task.sleep(for: .seconds(1.3))

@@ -69,7 +69,7 @@ struct PathView: View {
                 #endif
             }
         }
-        .background { PathBackdrop(zone: z, scroll: tab == 0 ? scroll[0] : 0, fps: tab == 0 ? 30 : 12) }
+        .background { PathBackdrop(land: w.habitat, zone: z, scroll: tab == 0 ? scroll[0] : 0, fps: tab == 0 ? 30 : 12) }
         .onChange(of: z, initial: true) { _, v in if tab == 0 { lastZone = v } }
         .sheet(item: $animal) { sp in
             AnimalSheet(sp: sp, world: w)

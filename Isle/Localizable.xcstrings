@@ -118643,6 +118643,181 @@
           }
         }
       }
+    },
+    "Effetti sonori" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soundeffekte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound effects"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Efectos de sonido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effets sonores"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effetti sonori"
+          }
+        }
+      }
+    },
+    "Le tue isole ti aspettano" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Inseln warten auf dich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your islands are waiting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus islas te esperan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tes îles t'attendent"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le tue isole ti aspettano"
+          }
+        }
+      }
+    },
+    "Musica" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Musik"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Música"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Musique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Musica"
+          }
+        }
+      }
+    },
+    "Per continuare a farle crescere serve l'abbonamento. Se non si è aperto nulla, controlla la connessione e riprova." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit sie weiter wachsen, brauchst du das Abo. Wenn sich nichts geöffnet hat, prüf deine Verbindung und versuch es noch einmal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To keep them growing you need a subscription. If nothing opened, check your connection and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para que sigan creciendo necesitas la suscripción. Si no se ha abierto nada, revisa la conexión y vuelve a intentarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour continuer à les faire grandir, il faut l'abonnement. Si rien ne s'est ouvert, vérifie ta connexion et réessaie."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per continuare a farle crescere serve l'abbonamento. Se non si è aperto nulla, controlla la connessione e riprova."
+          }
+        }
+      }
+    },
+    "Una musichetta diversa per ogni mondo. Gli effetti sono i suoni di ogni mondo, i versi degli animali (toccali per sentirli), il meteo e i semi che germogliano. Tacciono col tasto silenzioso." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine eigene kleine Melodie für jede Welt. Die Effekte sind die Klänge jeder Welt, die Rufe der Tiere (tippe sie an, um sie zu hören), das Wetter und keimende Samen. Im Lautlos-Modus bleiben sie still."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A different little tune for each world. The effects are the sounds of each world, the animals' calls (tap them to hear them), the weather and seeds sprouting. They stay quiet in silent mode."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una musiquita distinta para cada mundo. Los efectos son los sonidos de cada mundo, las voces de los animales (tócalos para oírlos), el tiempo y las semillas que brotan. Se callan en modo silencio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une petite musique différente pour chaque monde. Les effets, ce sont les sons de chaque monde, les cris des animaux (touche-les pour les entendre), la météo et les graines qui germent. Ils se taisent en mode silencieux."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una musichetta diversa per ogni mondo. Gli effetti sono i suoni di ogni mondo, i versi degli animali (toccali per sentirli), il meteo e i semi che germogliano. Tacciono col tasto silenzioso."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

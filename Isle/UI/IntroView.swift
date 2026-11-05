@@ -28,6 +28,8 @@ struct IntroView: View {
     @State private var arrivedAt: Date?
     /// Le biglie partono appena la bolla viene lasciata andare verso il centro.
     @State private var streamAt: Date?
+    /// Le bolle che si sentono mentre le biglie salgono: si ferma quando la pagina d'arrivo si chiude.
+    @State private var bubbling: Task<Void, Never>?
     /// Il sottotitolo arriva grigio chiaro e poi si scurisce.
     @State private var subtitle: Double = 0
     @State private var buttonIn = false
@@ -67,7 +69,15 @@ struct IntroView: View {
         .contentShape(Rectangle())
         .gesture(swipe(layout))
         .sensoryFeedback(.impact(weight: .medium), trigger: arrivedAt != nil)
-        .onAppear { if !motion.placed { motion.place(layout.rest) } }
+        .onAppear {
+            if !motion.placed { motion.place(layout.rest) }
+            Sfx.prepare()
+            if !leaving { Music.shared.intro() }
+        }
+        .onDisappear {
+            bubbling?.cancel()
+            Music.shared.stop()
+        }
         .task { await run() }
         .task { await loadArt() }
     }
@@ -171,7 +181,10 @@ struct IntroView: View {
     // MARK: arrivo
 
     private var continueButton: some View {
-        Button(L("Continua"), action: onStart)
+        Button(L("Continua")) {
+            bubbling?.cancel()
+            onStart()
+        }
             .buttonStyle(PrimaryButton())
             .padding(.horizontal, 24)
             .padding(.bottom, 24)
@@ -357,6 +370,8 @@ struct IntroView: View {
             motion.ty = layout.center.y
             withAnimation(.easeInOut(duration: 0.6).delay(0.4)) { subtitle = 0.9; buttonIn = true }
             arrivedAt = .now
+            Sfx.enter.play()
+            Music.shared.stop()
             return
         }
         grab()
@@ -372,12 +387,18 @@ struct IntroView: View {
         guard !leaving else { return }
         leaving = true
         streamAt = .now
+        Music.shared.stop()
+        if !reduceMotion, let start = streamAt {
+            bubbling?.cancel()
+            bubbling = Task { await blop(from: start) }
+        }
         visit += 1
         let v = visit
         Task {
             await pause(0.45)
             guard v == visit else { return }
             arrivedAt = .now
+            Sfx.enter.play()
             await pause(0.25)
             guard v == visit else { return }
             withAnimation(.easeOut(duration: 0.6)) { subtitle = 0.35 }
@@ -385,6 +406,27 @@ struct IntroView: View {
             await pause(1.0)
             guard v == visit else { return }
             withAnimation(.easeInOut(duration: 0.9)) { subtitle = 0.9 }
+        }
+    }
+
+    /// Ogni biglia che esce dalla bolla si sente nel momento in cui nasce, dal suo lato.
+    /// Nella prima cascata si sentono quasi tutte; poi solo le più grandi, un po' distanziate.
+    private func blop(from start: Date) async {
+        var from = 0.0
+        var last = -1.0
+        while !Task.isCancelled {
+            for b in BubbleStream.births(from: from, to: from + 1, count: art.count) {
+                let burst = b.at < 2.5
+                guard burst || b.size > 0.4, b.at - last >= (burst ? 0.05 : 0.16) else { continue }
+                last = b.at
+                let wait = b.at - Date.now.timeIntervalSince(start)
+                if wait > 0 { await pause(wait) }
+                guard !Task.isCancelled else { return }
+                if wait > -0.1 {
+                    Sfx.bubble(size: b.size, pan: Float(b.side) * 0.8, volume: Float(burst ? 0.22 : 0.16) * Float(0.7 + 0.6 * b.size))
+                }
+            }
+            from += 1
         }
     }
 
@@ -399,6 +441,8 @@ struct IntroView: View {
             leaving = false
             arrivedAt = nil
             streamAt = nil
+            bubbling?.cancel()
+            Music.shared.intro()
             withAnimation(.easeOut(duration: 0.3)) { subtitle = 0; buttonIn = false }
         }
         let v = visit
@@ -440,6 +484,7 @@ struct IntroView: View {
         } else {
             let ready = Task { await world(i) }
             pass = CloudPass(cover: .now, first: true)
+            Sfx.clouds.play(volume: 0.6)
             await pause(CloudPass.coverTime(first: true))
             present(i, await ready.value)
             await pause(0.2)
@@ -449,6 +494,7 @@ struct IntroView: View {
             await pause(CloudPass.throughTime - 0.3)
             pass = nil
             for s in 1...3 {
+                if s == 1 { Sfx.title.play(volume: 0.55) }
                 withAnimation(.timingCurve(0.16, 1, 0.3, 1, duration: 0.8)) { stage = s }
                 await pause(s == 1 ? 0.3 : 0.45)
             }
@@ -473,6 +519,7 @@ struct IntroView: View {
                 withAnimation(.easeInOut(duration: 0.9)) { present(next, w); shown = next }
             } else {
                 pass = CloudPass(cover: .now, first: false)
+                Sfx.nextCloud().play(volume: 0.35)
                 await pause(CloudPass.coverTime(first: false))
                 let w = await ready.value
                 guard !leaving && frozen == nil else { pass = nil; continue }

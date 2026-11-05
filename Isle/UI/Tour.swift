@@ -69,6 +69,7 @@ struct Tour: View {
 
     private func next() {
         let all = Page.allCases
+        Sfx.forward()
         guard let i = all.firstIndex(of: page), i + 1 < all.count else { return onDone() }
         withAnimation(.easeInOut(duration: 0.5)) { page = all[i + 1] }
     }
@@ -380,22 +381,29 @@ private struct TourAddictive: View {
         withAnimation(.timingCurve(0.2, 0, 0, 1, duration: 0.5)) { beat = 3 }
         await wait(0.6)
         withAnimation(.easeIn(duration: 0.1)) { pressed = true }
+        Sfx.done.play(volume: 0.55)
         await wait(0.12)
         withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { pressed = false; beat = 4 }
         await wait(0.35)
         beat = 5
         if let (tile, sprout) = Self.planted(on: base, age: 0),
            let (_, tree) = Self.planted(on: base, age: 10 * 86400) {
+            Sfx.seedFall.play()
             await withCheckedContinuation { done in s.playSeedDrop(at: tile, scale: 3.6, height: 520) { done.resume() } }
+            Sfx.seedLand.play()
             s.apply(sprout, animated: true)
+            Sfx.seedGrow.play(after: 0.15)
             await wait(0.6)
             s.apply(tree, animated: true)
             s.celebrateRare(at: "tour-rare")
+            Sfx.rare.play()
         }
         withAnimation(.spring(response: 0.45, dampingFraction: 0.6)) { beat = 6 }
         await wait(0.9)
+        Sfx.foxIn.play(volume: 0.5)
         withAnimation(.spring(response: 0.6, dampingFraction: 0.72)) { beat = 7 }
         await wait(0.45)
+        Sfx.babble.play(volume: 0.55)
         withAnimation(.spring(response: 0.38, dampingFraction: 0.6)) { beat = 8 }
     }
 }
@@ -565,9 +573,11 @@ private struct TourWorlds: View {
         withAnimation(.easeOut(duration: 0.55)) { beat = 1 }
         await wait(0.3)
         for step in 2...5 {
+            Sfx.world([.forest, .arctic, .savanna, .prehistoric][step - 2]).play(volume: 0.55)
             withAnimation(.spring(response: 0.55, dampingFraction: 0.68)) { beat = step }
             await wait(0.28)
         }
+        Sfx.worldMystery.play(volume: 0.55)
         await wait(0.2)
         withAnimation(.timingCurve(0.16, 1, 0.3, 1, duration: 1.2)) { beat = 6 }
     }
@@ -718,17 +728,23 @@ private struct TourStorm: View {
         await wait(0.2)
         withAnimation(.easeOut(duration: 0.55)) { beat = 1 }
         await wait(0.6)
+        Sfx.checks.play(volume: 0.5)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { beat = 2 }
         await wait(0.6)
+        Sfx.miss.play(volume: 0.5)
         withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { beat = 3 }
         await wait(0.45)
+        Sfx.miss.play(volume: 0.5, semitones: -2)
         withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { beat = 4 }
         await wait(0.4)
         s.apply(storm, animated: true)
+        Sfx.stormIn.play(volume: 0.6)
         withAnimation(.easeInOut(duration: 1.2)) { beat = 5 }
         await wait(0.5)
         s.strike()
+        Sfx.thunder.play(after: 0.3, volume: 0.6)
         await wait(0.5)
+        Sfx.leave.play(after: 0.25, volume: 0.5)
         withAnimation(.spring(response: 0.45, dampingFraction: 0.65)) { beat = 6 }
         await wait(1.6)
         withAnimation(.spring(response: 0.4, dampingFraction: 0.55)) { beat = 7 }
@@ -737,6 +753,7 @@ private struct TourStorm: View {
         back.weather = .rainbow
         if let i = back.residents.firstIndex(where: { $0.id == leaving?.id }) { back.residents[i].arrived = Clock.now }
         s.apply(back, animated: true)
+        Sfx.rainbow.play(volume: 0.6)
         withAnimation(.easeInOut(duration: 1.2)) { beat = 8 }
     }
 }
@@ -930,16 +947,20 @@ private struct TourLegends: View {
         await wait(0.2)
         withAnimation(.easeOut(duration: 0.55)) { beat = 1 }
         await wait(0.6)
+        Sfx.lantern.play(volume: 0.6)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) { beat = 2 }
         await wait(0.5)
         beat = 3
+        Sfx.trail.play(volume: 0.5)
         for i in 1...7 {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { dots = i }
             await wait(0.09)
         }
         await wait(0.2)
+        Sfx.shadow.play(volume: 0.55)
         withAnimation(.easeOut(duration: 0.7)) { beat = 4 }
         await wait(0.9)
+        Sfx.legend.play(volume: 0.65)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) { beat = 5 }
         await wait(0.6)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { beat = 6 }
@@ -986,9 +1007,11 @@ private struct TourPath: View {
         withAnimation(.timingCurve(0.45, 0, 0.25, 1, duration: 3.2)) { near = false }
         for step in 1...3 {
             await wait(step == 1 ? 0.3 : 0.65)
+            [Sfx.stop1, .stop2, .stop3][step - 1].play(volume: 0.55)
             withAnimation(.spring(response: 0.45, dampingFraction: 0.6)) { reveal = step }
         }
         await wait(0.9)
+        Sfx.portal.play(volume: 0.6)
         withAnimation(.spring(response: 0.7, dampingFraction: 0.7)) { reveal = 4 }
     }
 }
